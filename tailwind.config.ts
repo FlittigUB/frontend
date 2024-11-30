@@ -19,16 +19,16 @@ export default {
         'button-dark':
           '4px 4px 8px rgba(0, 0, 0, 0.5), -4px -4px 8px rgba(255, 255, 255, 0.1)',
         'neumorphic-icon':
-          '6px 6px 12px rgba(255, 102, 0, 0.2), -6px -6px 12px rgba(255, 102, 0, 0.5)',
+          '6px 6px 12px rgba(255, 102, 0, 0.2), -6px -6px 12px rgba(255, 255, 53, 0.5)',
         'neumorphic-icon-dark':
           '6px 6px 12px rgba(255, 102, 0, 0.5), -6px -6px 12px rgba(255, 102, 0, 0.2)',
       },
       colors: {
-        primary: '#FF6600', // Bright orange color
+        primary: '#FFE135', // Bright orange color
         secondary: '#FFFFFF', // White
         foreground: '#000000', // Black text
         'foreground-dark': '#FFFFFF', // White text in dark mode
-        background: '#e0e5ec', // Light grey background
+        background: '#FFF8DC', // Light grey background
         backgroundDark: '#1A1A1A',
         'background-dark': '#1A1A1A', // Dark background
       },
