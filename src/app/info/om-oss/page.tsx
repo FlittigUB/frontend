@@ -1,10 +1,11 @@
 import BeaverHero from '@/components/common/BeaverHero';
 import Section from '@/components/common/Section';
 import Image from 'next/image';
+import NavbarLayout from "@/components/NavbarLayout";
 
 export default function OmOssPage() {
   return (
-    <>
+    <NavbarLayout>
       <BeaverHero title={'Om Oss'} />
       <Section className="bg-secondary">
         <h2 className={'pb-8 text-center text-5xl text-blueGreen'}>
@@ -76,6 +77,6 @@ export default function OmOssPage() {
           height={600}
         />
       </Section>
-    </>
+    </NavbarLayout>
   );
 }
