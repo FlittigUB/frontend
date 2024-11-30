@@ -10,6 +10,7 @@ export default function OmOssPage() {
         <h2 className={'pb-8 text-center text-5xl text-blueGreen'}>
           Gjengen i Flittig UB
         </h2>
+
         <Image
           height={300}
           width={300}

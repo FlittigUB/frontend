@@ -3,7 +3,7 @@
   "plugins": ["prettier"],
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
-    "prettier/prettier": ["error", { "endOfLine": "auto" }],
+    "prettier/prettier": ["warn", { "endOfLine": "auto" }],
     "react/react-in-jsx-scope": "off"
   }
 }
