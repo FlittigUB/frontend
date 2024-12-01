@@ -39,6 +39,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+
         <section className="bg-primary px-4 py-24">
           <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
             <div className="mt-8">
@@ -51,6 +52,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+
         <section className="bg-secondary px-4 py-12">
           <div className="mx-auto max-w-5xl text-center">
             <h2 className="text-5xl font-bold text-blueGreen">
@@ -73,16 +75,17 @@ export default function Home() {
             </div>
           </div>
         </section>
+
         <section className="relative flex h-[50vh] w-full">
           <Image
             src="/Bever-mynt-bg.png"
             alt="Flittig UB Logo"
             fill
             priority
-            objectPosition="center"
-            className="absolute inset-0 object-cover"
+            className="absolute inset-0 object-left md:object-center object-cover"
           />
-          <div className="z-10 flex flex-1 flex-col items-center justify-center">
+          <div
+            className="z-10 flex w-1/3 flex-1 flex-col items-center justify-center bg-white/20 rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] backdrop-blur-md border border-white/30">
             <h1 className="text-center text-5xl font-bold text-foreground">
               Bli flittig du også!
             </h1>

@@ -1,6 +1,11 @@
+// app/portal/components/PortalLayout.tsx
+
+'use client';
+
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import NavigationBar from '@/components/portal/v1/NavigationBar';
+import NavigationBar from '@/components/portal/navigation/NavigationBar';
+import Image from 'next/image';
 
 interface PortalLayoutProps {
   children: React.ReactNode;
@@ -25,11 +30,11 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
   }, [userRole, router]);
 
   if (!userRole) {
-    return null; // Or a loading spinner
+    return null; // TODO: Loading spinner
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF8DC] px-4 pb-16 pt-12 mt-10">
+    <div className="dark:bg-background-dark dark:text-foreground-dark min-h-screen bg-background px-4 pb-16 pt-12 text-foreground">
       {children}
       <NavigationBar />
     </div>

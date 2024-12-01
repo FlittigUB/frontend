@@ -3,16 +3,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import JobList from '@/components/portal/v2/JobList';
+import JobList from '@/components/portal/job/JobList';
 import { Job } from '@/common/types';
-import PortalLayout from "@/components/portal/v2/PortalLayout";
+import PortalLayout from "@/components/portal/PortalLayout";
 
+// TODO: Protect endpoint to Arbeidstaker only
 const ArbeidsgiverHomePage: React.FC = () => {
   const [publishedJobs, setPublishedJobs] = useState<Job[]>([]);
 
   useEffect(() => {
-    // Fetch published jobs from your API or data source
-    // Replace the placeholder data with actual API calls
+    // TODO: Fetch published jobs from backend
     const fetchPublishedJobs = async () => {
       const fetchedPublishedJobs: Job[] = [
         {
