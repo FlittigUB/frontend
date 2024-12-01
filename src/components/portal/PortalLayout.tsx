@@ -5,7 +5,6 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import NavigationBar from '@/components/portal/navigation/NavigationBar';
-import Image from 'next/image';
 
 interface PortalLayoutProps {
   children: React.ReactNode;
