@@ -1,0 +1,31 @@
+services:
+  directus_app:
+    image: directus/directus:11.2.2
+    volumes:
+      - /var/www/flittig/database:/directus/database
+      - /var/www/flittig/uploads:/directus/uploads
+      - /var/www/flittig/extensions:/directus/extensions
+    environment:
+      DIRECTUS_CORS_ENABLED: "true"
+      DIRECTUS_CORS_ORIGIN: "http://localhost:3000" # List allowed origins
+      DIRECTUS_CORS_METHODS: "GET,POST,PATCH,DELETE,OPTIONS"
+      DIRECTUS_CORS_HEADERS: "Authorization,Content-Type"
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "*"
+      SECRET: "35ac2fae3dbfe89e953f1e01a1efece5444ea62975c388a64099e9e88d8965ea"
+      ADMIN_EMAIL: "kristoffer@nerskogen.com"
+      ADMIN_PASSWORD: "JJxk2007"
+      DB_CLIENT: "mysql"
+      DB_HOST: "flittig_mariadb"
+      DB_PORT: "3306"
+      DB_USER: "mariadb"
+      DB_PASSWORD: "a120baf04cf2a389937c"
+      DB_DATABASE: "flittig"
+      WEBSOCKETS_ENABLED: "true"
+      PUBLIC_URL: 'https://panel.flittigub.no'
+      LOG_LEVEL: "debug"
+      EXTENSIONS_PATH: "/directus/extensions"
+volumes:
+  flittig_directus_database:
+  flittig_directus_uploads:
+  flittig_directus_extensions:

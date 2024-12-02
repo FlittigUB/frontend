@@ -22,7 +22,7 @@ export default function ProfilePage() {
   return (
     <PortalLayout>
       <div className="flex min-h-screen flex-col items-center px-4 py-10">
-      <div className="shadow-neumorphism flex w-full max-w-lg flex-col items-center space-y-6 rounded-3xl p-6">
+      <div className="flex w-full max-w-lg flex-col items-center space-y-6 rounded-3xl p-6">
     {/* Profile Header */}
       <div className="flex flex-col items-center space-y-4">
         <div className="h-40 w-40 overflow-hidden rounded-full bg-gray-200 shadow-inner">
@@ -50,7 +50,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Bio */}
-      <div className="shadow-neumorphism w-full rounded-2xl bg-yellow-200 p-4">
+      <div className="shadow-neumorphic w-full rounded-2xl bg-yellow-200 p-4">
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
@@ -61,7 +61,7 @@ export default function ProfilePage() {
 
       {/* Contact Info */}
       <div className="w-full space-y-4">
-        <div className="shadow-neumorphism flex items-center justify-between rounded-2xl bg-yellow-200 p-4">
+        <div className="shadow-neumorphic flex items-center justify-between rounded-2xl bg-yellow-200 p-4">
           <span className="font-medium text-gray-800">Foresatte:</span>
           <input
             type="text"
@@ -71,7 +71,7 @@ export default function ProfilePage() {
           />
         </div>
 
-        <div className="shadow-neumorphism flex items-center justify-between rounded-2xl bg-yellow-200 p-4">
+        <div className="shadow-neumorphic flex items-center justify-between rounded-2xl bg-yellow-200 p-4">
           <span className="font-medium text-gray-800">Mobil:</span>
           <input
             type="tel"
@@ -81,7 +81,7 @@ export default function ProfilePage() {
           />
         </div>
 
-        <div className="shadow-neumorphism flex items-center justify-between rounded-2xl bg-yellow-200 p-4">
+        <div className="shadow-neumorphic flex items-center justify-between rounded-2xl bg-yellow-200 p-4">
           <span className="font-medium text-gray-800">Epost:</span>
           <input
             type="email"
@@ -98,7 +98,7 @@ export default function ProfilePage() {
           (task, index) => (
             <div
               key={index}
-              className={`shadow-neumorphism rounded-2xl p-4 text-center ${
+              className={`shadow-neumorphic rounded-2xl p-4 text-center ${
                 index % 2 === 0 ? "bg-green-200" : "bg-yellow-200"
               }`}
             >
@@ -117,10 +117,10 @@ export default function ProfilePage() {
 
       {/* Logout and Customer Service */}
       <div className="w-full space-y-4">
-        <button className="shadow-neumorphism w-full rounded-2xl bg-yellow-300 py-2 font-semibold text-gray-800">
+        <button className="shadow-neumorphic w-full rounded-2xl bg-yellow-300 py-2 font-semibold text-gray-800">
           Kundeservice
         </button>
-        <button className="shadow-neumorphism w-full rounded-2xl bg-yellow-300 py-2 font-semibold text-gray-800">
+        <button className="shadow-neumorphic w-full rounded-2xl bg-yellow-300 py-2 font-semibold text-gray-800">
           Logg ut
         </button>
       </div>

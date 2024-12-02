@@ -10,10 +10,10 @@ const FAQ = () => {
     {
       question: 'Hvorfor bruke Flittig?',
       answer:
-        'Flittig er en unik og ryddig app, slik at du enkelt kan løse dine små/mellomstore jobber. Klippe plenen, male veggen eller gå tur med hunden, her er det uendelige muligheter. Ikke slit med å skaffe hjelp til småjobber, bare last ned Flittig.',
+        'Flittig er en unik og ryddig plattform, slik at du enkelt kan løse dine små/mellomstore jobber. Klippe plenen, male veggen eller gå tur med hunden, her er det uendelige muligheter. Ikke slit med å skaffe hjelp til småjobber, bare last ned Flittig.',
     },
     {
-      question: 'Hvordan funker appen?',
+      question: 'Hvordan funker plattformen?',
       answer:
         'I Flittig legger du ut annonsene på jobbene du skal ha gjort. Hva, hvor og når. Slik kan potensielle arbeidstakere finne de jobbene som passer de best. ',
     },
@@ -22,7 +22,7 @@ const FAQ = () => {
       answer: 'Ja, det er en liten avgift for bruk av plattformen.',
     },
     {
-      question: 'Hvem kan bruke appen?',
+      question: 'Hvem kan bruke plattformen?',
       answer:
         'Alle over 12. år kan bruke Flittig. Ung eller eldre, her er det plass til alle! Men dersom du er under 18 trenger du foreldre-godkjennelse ved søknader',
     },

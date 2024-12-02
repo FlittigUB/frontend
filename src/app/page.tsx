@@ -8,7 +8,7 @@ export default function Home() {
       <div className="relative bg-background">
         <BeaverHero
           title={'En enklere hverdag!'}
-          subtitle={'Appen som gjør det lett å få hjelp til småjobber.'}
+          subtitle={'Plattformen som gjør det lett å få hjelp til småjobber.'}
         />
 
         <section className="bg-secondary px-4 py-12">
@@ -34,7 +34,7 @@ export default function Home() {
                 like!
               </p>
               <button className="hover:bg-primary-dark mt-6 rounded-md bg-primary px-6 py-2 font-medium text-white">
-                Last ned
+                Registrer deg
               </button>
             </div>
           </div>

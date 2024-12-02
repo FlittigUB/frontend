@@ -21,14 +21,14 @@ const ArbeidstakerHomePage: React.FC = () => {
           id: '1',
           title: 'Barnepass',
           description: 'Vi søker barnepass for sønnen vår',
-          place: 'Oslo',
+          place: 'Søm',
           dateAccessible: '2024-12-01',
         },
         {
           id: '2',
           title: 'Barnepass',
           description: 'Vi trenger vaskehjelp hjemme hos oss',
-          place: 'Bergen',
+          place: 'Vågsbygd',
           dateAccessible: '2024-12-15',
         },
         // Add more jobs as needed
