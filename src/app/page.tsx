@@ -34,7 +34,7 @@ export default function Home() {
                 like!
               </p>
               <button className="hover:bg-primary-dark mt-6 rounded-md bg-primary px-6 py-2 font-medium text-white">
-                Registrer deg
+                Bli flittig nå!
               </button>
             </div>
           </div>
@@ -90,7 +90,7 @@ export default function Home() {
               Bli flittig du også!
             </h1>
             <button className="mt-6 rounded-md bg-secondary px-6 py-2 font-medium text-foreground">
-              Last ned
+              Registrer deg
             </button>
           </div>
         </section>

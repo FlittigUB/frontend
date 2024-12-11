@@ -3,12 +3,12 @@
 // Interface for User
 export interface User {
   id: string;
-  name?: string;
-  email?: string;
-  role?: string;
+  name: string;
+  email: string;
+  role: string;
   image?: string; // ID of the user's profile image
   bio?: string;
-  birthdate?: Date;
+  birthdate: Date;
   applications?: Application[];
   jobs?: Job[];
   messagesReceived?: Message[]; // Messages where the user is the receiver

@@ -1,4 +1,4 @@
-// components/portal/NavigationBarDesktop.tsx
+// components/portal/navigation/NavigationBarDesktop.tsx
 
 import React from 'react';
 import {
@@ -18,11 +18,11 @@ interface NavigationBarDesktopProps {
 }
 
 export default function NavigationBarDesktop({
-  isDarkMode,
-  toggleDarkMode,
-}: NavigationBarDesktopProps) {
+                                               isDarkMode,
+                                               toggleDarkMode,
+                                             }: NavigationBarDesktopProps) {
   return (
-    <nav className="fixed left-0 right-0 top-0 z-10 flex items-center justify-between bg-background-dark px-6 py-4 shadow-neumorphic-dark">
+    <nav className="flex items-center justify-between bg-background-dark px-6 py-4 shadow-neumorphic-dark">
       {/* Logo */}
       <Link href="/portal">
         <div className="flex cursor-pointer items-center">

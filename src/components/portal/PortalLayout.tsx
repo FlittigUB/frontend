@@ -1,41 +1,61 @@
-// app/portal/components/PortalLayout.tsx
-
 'use client';
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import NavigationBar from '@/components/portal/navigation/NavigationBar';
+import React, { useEffect, useState } from 'react';
+import NavigationBar from '@/components/portal/layout/navigation/NavigationBar';
+import useAuth from '@/hooks/useAuth';
+import Spinner from '@/components/common/Spinner';
 
 interface PortalLayoutProps {
   children: React.ReactNode;
 }
 
 const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
-  const router = useRouter();
+  const { loggedIn } = useAuth();
 
-  // Placeholder function to get user role; replace with actual logic
-  const getUserRole = (): 'arbeidstaker' | 'arbeidsgiver' | null => {
-    // Replace with your actual authentication and role retrieval logic
-    // Example: return user.role;
-    return 'arbeidstaker'; // or 'arbeidsgiver', or null if not logged in
-  };
+  // Manage dark mode state
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  const userRole = getUserRole();
-
+  // Load user's preferred theme (if stored in localStorage or context)
   useEffect(() => {
-    if (!userRole) {
-      router.push('/portal/log-inn');
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme) {
+      setIsDarkMode(storedTheme === 'dark');
     }
-  }, [userRole, router]);
+  }, []);
 
-  if (!userRole) {
-    return null; // TODO: Loading spinner
+  // Toggle dark mode
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+/*  const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('theme', newMode ? 'dark' : 'light'); // Save preference
+  };*/
+
+  // While authentication is being verified, show nothing or a loader
+  if (!loggedIn) {
+    return (
+      <>
+        <Spinner />
+      </>
+    );
   }
 
   return (
-    <div className="dark:bg-background-dark dark:text-foreground-dark min-h-screen bg-background px-4 pb-16 pt-12 text-foreground">
-      {children}
+    <div
+      className={`flex h-screen flex-col ${
+        isDarkMode
+          ? 'bg-background-dark text-foreground-dark'
+          : 'bg-background text-foreground'
+      }`}
+    >
+      {/* Navigation Bar */}
       <NavigationBar />
+
+      {/* Main Content Area */}
+      <main className="flex flex-1 justify-center overflow-y-auto">
+        {/* Centered Card */}
+        <div className="w-full max-w-4xl">{children}</div>
+      </main>
     </div>
   );
 };

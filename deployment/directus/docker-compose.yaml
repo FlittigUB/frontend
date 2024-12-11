@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   directus_app:
     image: directus/directus:11.2.2
@@ -16,16 +18,24 @@ services:
       ADMIN_EMAIL: "kristoffer@nerskogen.com"
       ADMIN_PASSWORD: "JJxk2007"
       DB_CLIENT: "mysql"
-      DB_HOST: "flittig_mariadb"
+      DB_HOST: "mariadb"
       DB_PORT: "3306"
       DB_USER: "mariadb"
       DB_PASSWORD: "a120baf04cf2a389937c"
       DB_DATABASE: "flittig"
       WEBSOCKETS_ENABLED: "true"
-      PUBLIC_URL: 'https://panel.flittigub.no'
+      PUBLIC_URL: "https://panel.flittigub.no"
       LOG_LEVEL: "debug"
       EXTENSIONS_PATH: "/directus/extensions"
+    networks:
+      - flittig-backend
+
 volumes:
   flittig_directus_database:
   flittig_directus_uploads:
   flittig_directus_extensions:
+
+
+networks:
+  flittig-backend:
+    external: true

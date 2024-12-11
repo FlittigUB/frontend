@@ -1,5 +1,3 @@
-// tailwind.config.js
-
 import type { Config } from 'tailwindcss';
 
 export default {
@@ -9,6 +7,20 @@ export default {
   ],
   theme: {
     extend: {
+      animation: {
+        'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
+        'spin-smooth': 'spin-smooth 1.2s linear infinite',
+      },
+      keyframes: {
+        'fade-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'spin-smooth': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+      },
       boxShadow: {
         neumorphic:
           '6px 6px 12px rgba(0, 0, 0, 0.1), -6px -6px 12px rgba(255, 255, 255, 0.7)',
@@ -27,13 +39,20 @@ export default {
         primary: '#FFE135', // Bright orange color
         secondary: '#FFFFFF', // White
         foreground: '#000000', // Black text
-        'foreground-dark': '#FFFFFF', // White text in dark mode
-        background: '#FFF8DC', // Light grey background
-        backgroundDark: '#1A1A1A',
-        'background-dark': '#1A1A1A', // Dark background
+        foregroundDark: '#FFFFFF', // White text in dark mode
+        background: '#FFF8DC', // Light cream background
+        backgroundDark: '#1A1A1A', // Dark background
       },
       borderRadius: {
         xl: '1.5rem',
+        '3xl': '2rem',
+      },
+      maxWidth: {
+        '900px': '900px',
+      },
+      backgroundImage: {
+        'header-gradient': 'linear-gradient(to bottom, #FFFFFF, #F3F4F6)',
+        'background-gradient': 'linear-gradient(to bottom, #FFF8DC, #FFFFFF)',
       },
     },
   },
