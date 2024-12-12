@@ -45,7 +45,7 @@ export default async function OmOssPage() {
           alt="Flittig UB logo"
           className="mx-auto md:mx-0"
         />
-        <h2 className="w-2/5 text-lg text-gray-600">
+        <h2 className="text-center md:text-left w-full md:w-2/5 text-lg text-gray-600">
           Flittig er en ungdomsbedrift fra Kristiansand Katedralskole Gimle,
           bestående av 5 engasjerte elever. (f.v) HR- og Personalansvarlig: Ayad
           Muhammad Hayer, Produkt- og bærekraftsansvarlig: Henrik Granseth,

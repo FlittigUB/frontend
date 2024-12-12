@@ -15,36 +15,71 @@ export default function NavigationBarMobile({ isDarkMode }: any) {
 
   // Define active color based on dark mode
   const getActiveColor = () => {
-    return isDarkMode ? 'text-primary' : 'text-yellow-500'; // Darker yellow for light mode
+    return isDarkMode ? 'text-primary' : 'text-primary'; // Darker yellow for light mode
   };
 
   return (
     <div className="relative">
       {/* Navigation Bar */}
       <nav
-        className={`fixed bottom-0 left-0 right-0 z-10 h-20 ${
-          isDarkMode
-            ? 'shadow-neumorphic-dark bg-backgroundDark'
-            : 'shadow-neumorphic bg-background'
-        }`}
+        className={`fixed bottom-0 left-0 right-0 z-10 h-20`}
       >
         {/* SVG Background */}
         <div className="absolute inset-0 h-full">
           <svg
             width="100%"
             height="100%"
-            viewBox="0 0 892 134"
+            viewBox="0 0 900 142"
             preserveAspectRatio="xMidYMax slice"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             className="h-full w-full"
           >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M360.681 13.6852C356.332 5.41974 347.797 0 338.458 0H50C22.3858 0 0 22.3858 0 50V84C0 111.614 22.3858 134 50 134H842C869.614 134 892 111.614 892 84V50C892 22.3858 869.614 0 842 0H553.398C544.248 0 535.88 5.28365 531.589 13.3648V13.3648L531.588 13.3667C527.675 20.7356 523.724 28.1757 521.115 35.4764C519.779 39.2152 518.562 43.1416 517.321 47.1441L517.321 47.1453C508.991 74.0121 499.598 104.308 446.168 104.308C392.619 104.308 383.113 73.8756 374.706 46.964C373.5 43.1035 372.317 39.3155 371.029 35.7002C368.445 28.4434 364.547 21.0332 360.681 13.6852V13.6852Z"
-              fill={isDarkMode ? '#FFD700' : '#FFE135'} // Primary color for SVG
-            />
+            <g filter="url(#filter0_d_19_15)">
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M364.681 21.6852C360.332 13.4197 351.797 8 342.458 8H54C26.3858 8 4 30.3858 4 58V92C4 119.614 26.3858 142 54 142H846C873.614 142 896 119.614 896 92V58C896 30.3858 873.614 8 846 8H557.398C548.248 8 539.88 13.2836 535.589 21.3648V21.3648L535.588 21.3667C531.675 28.7356 527.724 36.1757 525.115 43.4764C523.779 47.2152 522.562 51.1416 521.321 55.1441L521.321 55.1453C512.991 82.0121 503.598 112.308 450.168 112.308C396.619 112.308 387.113 81.8756 378.706 54.964C377.5 51.1035 376.317 47.3155 375.029 43.7002C372.445 36.4434 368.547 29.0332 364.681 21.6852V21.6852Z"
+                fill="white"
+              />
+            </g>
+            <defs>
+              <filter
+                id="filter0_d_19_15"
+                x="0"
+                y="0"
+                width="900"
+                height="142"
+                filterUnits="userSpaceOnUse"
+                color-interpolation-filters="sRGB"
+              >
+                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feColorMatrix
+                  in="SourceAlpha"
+                  type="matrix"
+                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                  result="hardAlpha"
+                />
+                <feOffset dy="-4" />
+                <feGaussianBlur stdDeviation="2" />
+                <feComposite in2="hardAlpha" operator="out" />
+                <feColorMatrix
+                  type="matrix"
+                  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"
+                />
+                <feBlend
+                  mode="normal"
+                  in2="BackgroundImageFix"
+                  result="effect1_dropShadow_19_15"
+                />
+                <feBlend
+                  mode="normal"
+                  in="SourceGraphic"
+                  in2="effect1_dropShadow_19_15"
+                  result="shape"
+                />
+              </filter>
+            </defs>
           </svg>
         </div>
 
@@ -52,31 +87,37 @@ export default function NavigationBarMobile({ isDarkMode }: any) {
         <div className="relative z-10 flex h-20 items-center justify-between px-4 sm:px-6 md:px-8">
           {/* Left Icons */}
           <div className="flex items-center space-x-4 sm:space-x-6 md:space-x-8">
-            <Link href="/portal/profil" className="group flex flex-col items-center">
+            <Link
+              href="/portal/profil"
+              className="group flex flex-col items-center"
+            >
               <FaUser
                 className={`h-6 w-6 transition duration-300 ${
-                  isActive('/portal/profil') ? getActiveColor() : 'text-white'
+                  isActive('/portal/profil') ? getActiveColor() : 'text-gray-400'
                 }`}
                 aria-label="Profile"
               />
               <span
                 className={`mt-1 text-xs transition duration-300 ${
-                  isActive('/portal/profil') ? getActiveColor() : 'text-white'
+                  isActive('/portal/profil') ? getActiveColor() : 'text-gray-400'
                 }`}
               >
                 Profile
               </span>
             </Link>
-            <Link href="/portal/soknader" className="group flex flex-col items-center">
+            <Link
+              href="/portal/arbeidstaker/soknader"
+              className="group flex flex-col items-center"
+            >
               <FaRectangleList
                 className={`h-6 w-6 transition duration-300 ${
-                  isActive('/portal/soknader') ? getActiveColor() : 'text-white'
+                  isActive('/portal/soknader') ? getActiveColor() : 'text-gray-400'
                 }`}
                 aria-label="Applications"
               />
               <span
                 className={`mt-1 text-xs transition duration-300 ${
-                  isActive('/portal/soknader') ? getActiveColor() : 'text-white'
+                  isActive('/portal/soknader') ? getActiveColor() : 'text-gray-400'
                 }`}
               >
                 Applications
@@ -94,8 +135,8 @@ export default function NavigationBarMobile({ isDarkMode }: any) {
               <div
                 className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-full ${
                   isDarkMode
-                    ? 'bg-yellow-400 shadow-neumorphic-icon-dark'
-                    : 'bg-yellow-500 shadow-neumorphic-icon'
+                    ? 'bg-primary shadow-neumorphic-icon-dark'
+                    : 'bg-primary shadow-neumorphic-icon'
                 }`}
               >
                 <FaBriefcase className="h-6 w-6 text-white" aria-label="Home" />
@@ -105,31 +146,41 @@ export default function NavigationBarMobile({ isDarkMode }: any) {
 
           {/* Right Icons */}
           <div className="flex items-center space-x-4 sm:space-x-6 md:space-x-8">
-            <Link href="/portal/varsler" className="group flex flex-col items-center">
+            <Link
+              href="/portal/varsler"
+              className="group flex flex-col items-center"
+            >
               <FaBell
                 className={`h-6 w-6 transition duration-300 ${
-                  isActive('/portal/varsler') ? getActiveColor() : 'text-white'
+                  isActive('/portal/varsler') ? getActiveColor() : 'text-gray-400'
                 }`}
                 aria-label="Notifications"
               />
               <span
                 className={`mt-1 text-xs transition duration-300 ${
-                  isActive('/portal/varsler') ? getActiveColor() : 'text-white'
+                  isActive('/portal/varsler') ? getActiveColor() : 'text-gray-400'
                 }`}
               >
                 Notifications
               </span>
             </Link>
-            <Link href="/portal/meldinger" className="group flex flex-col items-center">
+            <Link
+              href="/portal/meldinger"
+              className="group flex flex-col items-center"
+            >
               <AiFillMessage
                 className={`h-6 w-6 transition duration-300 ${
-                  isActive('/portal/meldinger') ? getActiveColor() : 'text-white'
+                  isActive('/portal/meldinger')
+                    ? getActiveColor()
+                    : 'text-gray-400'
                 }`}
                 aria-label="Messages"
               />
               <span
                 className={`mt-1 text-xs transition duration-300 ${
-                  isActive('/portal/meldinger') ? getActiveColor() : 'text-white'
+                  isActive('/portal/meldinger')
+                    ? getActiveColor()
+                    : 'text-gray-400'
                 }`}
               >
                 Messages

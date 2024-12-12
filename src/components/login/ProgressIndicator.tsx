@@ -10,7 +10,7 @@ interface ProgressIndicatorProps {
   isDarkMode: boolean;
 }
 
-const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ currentStep, onStepClick, isDarkMode }) => {
+const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ currentStep, onStepClick }) => {
   const steps = [
     { number: 1, label: 'Rolle' },
     { number: 2, label: 'Informasjon' },
