@@ -2,7 +2,6 @@
 
 'use client';
 
-import PortalLayout from '@/components/portal/PortalLayout';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -27,14 +26,14 @@ export default function ConversationsPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
 
   // Base URL for assets
-  const ASSETS_URL =
-    process.env.NEXT_PUBLIC_ASSETS_URL || 'http://localhost:3003/assets/';
+  const ASSETS_URL = process.env.NEXT_PUBLIC_ASSETS_URL;
 
   // Character limit for last message content
   const MESSAGE_CHAR_LIMIT = 50;
 
   // Fetch conversations when logged in
   useEffect(() => {
+    console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
     const fetchConversations = async () => {
       if (loggedIn && token) {
         try {
@@ -44,7 +43,7 @@ export default function ConversationsPage() {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
-            }
+            },
           );
 
           if (response.ok) {
@@ -72,21 +71,21 @@ export default function ConversationsPage() {
 
   // Neumorphic style classes:
   const cardClass =
-    'bg-background rounded-xl shadow-neumorphic p-6 w-full flex flex-col h-full';
+   "bg-background rounded-xl shadow-neumorphic p-6 w-full flex flex-col mt-12 h-4/5"';
   const truncateClass = 'truncate overflow-hidden whitespace-nowrap';
 
   if (loading) {
     return (
-      <PortalLayout>
+      <>
         <div className="flex items-center justify-center h-full">
           <div className="loader"></div> {/* Ensure loader styles are defined */}
         </div>
-      </PortalLayout>
+      </>
     );
   }
 
   return (
-    <PortalLayout>
+    <>
       <div className={cardClass}>
         <h1 className="mb-6 text-center text-3xl font-bold text-foreground">
           Dine Meldinger
@@ -128,6 +127,6 @@ export default function ConversationsPage() {
           </ul>
         </div>
       </div>
-    </PortalLayout>
+    </>
   );
 }

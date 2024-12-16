@@ -54,7 +54,7 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
       {/* Main Content Area */}
       <main className="flex flex-1 justify-center overflow-y-auto">
         {/* Centered Card */}
-        <div className="w-full max-w-4xl">{children}</div>
+        <div className="mt-12 w-full max-w-4xl">{children}</div>
       </main>
     </div>
   );

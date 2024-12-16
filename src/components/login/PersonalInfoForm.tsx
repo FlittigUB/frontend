@@ -109,7 +109,6 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
               value={mobile}
               onChange={(e) => setMobile(e.target.value)}
               className="w-full rounded-2xl border border-gray-300 p-4 text-gray-800 shadow-inner focus:ring-2 focus:ring-orange-500 transition duration-300"
-              pattern="[0-9]{3} [0-9]{2} [0-9]{3}" // Optional: Basic pattern for Norwegian phone numbers
               required
             />
           </div>

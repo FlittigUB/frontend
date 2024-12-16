@@ -5,7 +5,6 @@
 import React, { useState, useEffect } from 'react';
 import JobList from '@/components/portal/job/JobList';
 import { Job } from '@/common/types';
-import PortalLayout from "@/components/portal/PortalLayout";
 import Image from "next/image";
 
 // TODO: Protect endpoint to Arbeidstaker
@@ -16,23 +15,7 @@ const ArbeidstakerHomePage: React.FC = () => {
     // Fetch jobs from your API or data source
     // Replace the placeholder data with actual API calls
     const fetchJobs = async () => {
-      const fetchedJobs: Job[] = [
-        {
-          id: '1',
-          title: 'Barnepass',
-          description: 'Vi søker barnepass for sønnen vår',
-          place: 'Søm',
-          dateAccessible: '2024-12-01',
-        },
-        {
-          id: '2',
-          title: 'Barnepass',
-          description: 'Vi trenger vaskehjelp hjemme hos oss',
-          place: 'Vågsbygd',
-          dateAccessible: '2024-12-15',
-        },
-        // Add more jobs as needed
-      ];
+      const fetchedJobs: Job[] = [];
       setJobs(fetchedJobs);
     };
 
@@ -40,11 +23,11 @@ const ArbeidstakerHomePage: React.FC = () => {
   }, []);
 
   return (
-    <PortalLayout>
+    <>
       <Image
         src={`${process.env.NEXT_PUBLIC_ASSETS_URL}b8c19b1d-652e-4ac1-9bbd-fd95ef7f4ff4.png`}
         alt="Flittig UB Logo"
-        className="mx-auto md:mx-0 my-0"
+        className="mx-auto my-0 md:mx-0"
         width={200}
         height={100}
       />
@@ -57,12 +40,12 @@ const ArbeidstakerHomePage: React.FC = () => {
       <input
         type="text"
         placeholder="Søk etter jobber..."
-        className="shadow-neumorphic dark:bg-background-dark dark:text-foreground-dark dark:shadow-neumorphic-dark mb-6 w-full rounded-lg bg-background p-3 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+        className="dark:bg-background-dark dark:text-foreground-dark mb-6 w-full rounded-lg bg-background p-3 text-foreground shadow-neumorphic focus:outline-none focus:ring-2 focus:ring-primary dark:shadow-neumorphic-dark"
       />
 
       {/* Jobbliste */}
-      <JobList jobs={jobs} />
-    </PortalLayout>
+      <JobList jobs={jobs} isEmployerView={false} />
+    </>
   );
 };
 

@@ -1,0 +1,28 @@
+# Dependency directories
+node_modules
+.pnpm
+.esm
+
+# Environment
+.env
+.env.local
+
+# Build directories
+.next
+out
+
+# Logs
+logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker files
+Dockerfile
+docker-compose.yml

@@ -2,10 +2,15 @@
 
 // Interface for User
 export interface User {
+  mobile: number;
+  guardian: any;
+  needs_guardian: boolean;
+  verified: boolean;
+  date_created: string;
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: UserRole;
   image?: string; // ID of the user's profile image
   bio?: string;
   birthdate: Date;
@@ -18,27 +23,40 @@ export interface User {
   reviewsAboutUser?: Review[]; // Reviews about the user
 }
 
+export type UserRole = 'arbeidstaker' | 'arbeidsgiver' | null;
+
 // Interface for Job
 export interface Job {
   id: string;
   status?: string;
-  title?: string;
+  title: string;
   description?: string;
-  place?: string;
-  dateAccessible?: string;
-  user?: string; // ID of the user who created the job
+  place: string;
+  date_accessible: string;
+  user: User;
   applications?: Application[];
-  categories?: Category[];
-  reviews?: Review[];
-  userObject?: User; // User object of the job creator
+  categories: Category[];
 }
 
+// types.ts
+
+// Interface for Job Form Data
+export interface JobFormData {
+  title: string;
+  description: string;
+  place: string;
+  date_accessible: string;
+  categories: string[]; // Array of category IDs
+  image?: File; // Optional image file
+}
+
+export type ApplicationStatus = "waiting" | "approved" | "rejected";
 // Interface for Application
 export interface Application {
   id: string;
-  status?: string;
-  user?: string; // ID of the user who applied
-  job?: string; // ID of the job applied for
+  status: ApplicationStatus;
+  user: User; // ID of the user who applied
+  job: string; // ID of the job applied for
   parentalApproval?: boolean;
   parentalApprovalRequired?: boolean;
   userObject?: User; // User object of the applicant

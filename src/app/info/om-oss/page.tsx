@@ -31,7 +31,7 @@ export default async function OmOssPage() {
     <NavbarLayout>
       <BeaverHero title={'Om Oss'} />
       <Section className="bg-secondary">
-        <h2 className={'pb-8 text-center text-5xl text-blueGreen'}>
+        <h2 className="text-blueGreen pb-8 text-center text-5xl">
           Gjengen i Flittig UB
         </h2>
 
@@ -42,10 +42,11 @@ export default async function OmOssPage() {
             process.env.NEXT_PUBLIC_ASSETS_URL +
             '722b612f-b083-4a34-bef7-4b884bbeb2dc.png'
           }
-          alt="Flittig UB logo"
+          alt="Flittig UB maskott"
           className="mx-auto md:mx-0"
         />
-        <h2 className="text-center md:text-left w-full md:w-2/5 text-lg text-gray-600">
+
+        <h2 className="w-full text-center text-lg text-gray-600 md:w-2/5 md:text-left">
           Flittig er en ungdomsbedrift fra Kristiansand Katedralskole Gimle,
           bestående av 5 engasjerte elever. (f.v) HR- og Personalansvarlig: Ayad
           Muhammad Hayer, Produkt- og bærekraftsansvarlig: Henrik Granseth,
@@ -53,16 +54,107 @@ export default async function OmOssPage() {
           Kommunikasjonsansvarlig, og Grafisk Designer: Celine Stahl og Daglig
           Leder: Emilie Kopland.
         </h2>
+
+        {/* New Team Members Section */}
+        <div className="mt-12 px-4">
+          <h3 className="text-blueGreen mb-8 text-center text-3xl">
+            Møt Teamet
+          </h3>
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
+            {/* Team Member 1 */}
+            <div className="flex flex-col items-center text-center">
+              <Image
+                height={150}
+                width={150}
+                src={
+                  process.env.NEXT_PUBLIC_ASSETS_URL +
+                  '1f95296e-0ca9-4604-93ef-4115b1e839e4.png'
+                }
+                alt="Emilie Kopland"
+                className="mb-4 rounded-full"
+              />
+              <h4 className="text-blueGreen text-xl">Emilie</h4>
+              <p className="text-gray-600">Daglig Leder</p>
+            </div>
+
+            {/* Team Member 2 */}
+            <div className="flex flex-col items-center text-center">
+              <Image
+                height={150}
+                width={150}
+                src={
+                  process.env.NEXT_PUBLIC_ASSETS_URL +
+                  '5fcd8f19-9919-4a0e-a0ce-fcbb4aef3cd3.png'
+                }
+                alt="Henrik Granseth"
+                className="mb-4 rounded-full"
+              />
+              <h4 className="text-blueGreen text-xl">Henrik</h4>
+              <p className="text-gray-600">Produkt- og bærekraftsansvarlig</p>
+            </div>
+
+            {/* Team Member 3 */}
+            <div className="flex flex-col items-center text-center">
+              <Image
+                height={150}
+                width={150}
+                src={
+                  process.env.NEXT_PUBLIC_ASSETS_URL +
+                  'bbfd297e-6028-492b-add4-ad790ad286e9.png'
+                }
+                alt="Ayad"
+                className="mb-4 rounded-full"
+              />
+              <h4 className="text-blueGreen text-xl">Ayad</h4>
+              <p className="text-gray-600">HR- og Personalansvarlig</p>
+            </div>
+
+            {/* Team Member 4 */}
+            <div className="flex flex-col items-center text-center">
+              <Image
+                height={150}
+                width={150}
+                src={
+                  process.env.NEXT_PUBLIC_ASSETS_URL +
+                  'd55d6e8a-df08-4ba0-a2a5-4761e95b17f7.png'
+                }
+                alt="Celine Stahl"
+                className="mb-4 rounded-full"
+              />
+              <h4 className="text-blueGreen text-xl">Celine</h4>
+              <p className="text-gray-600">
+                Markeds- og Kommunikasjonsansvarlig, og Grafisk Designer
+              </p>
+            </div>
+
+            {/* Team Member 5 */}
+            <div className="flex flex-col items-center text-center">
+              <Image
+                height={150}
+                width={150}
+                src={
+                  process.env.NEXT_PUBLIC_ASSETS_URL +
+                  'ef0cdb60-3e9d-407e-84eb-75768495791d.png'
+                }
+                alt="Ingrid Stray"
+                className="mb-4 rounded-full"
+              />
+              <h4 className="text-blueGreen text-xl">Ingrid</h4>
+              <p className="text-gray-600">Økonomi- og salgsansvarlig</p>
+            </div>
+          </div>
+        </div>
       </Section>
       <Section className="bg-secondary">
         <div className="space-y-12">
           {cooperationPartners.map((partner: any) => (
             <div
+              data-testid="cooperation-partner" // Corrected attribute name
               key={partner.id}
-              className="grid grid-cols-1 md:grid-cols-2 items-center gap-8"
+              className="grid grid-cols-1 items-center gap-8 md:grid-cols-2"
             >
               {/* Partner Logo */}
-              <div className="flex justify-center items-center">
+              <div className="flex items-center justify-center">
                 <Image
                   src={`${process.env.NEXT_PUBLIC_ASSETS_URL}${partner.logo}`}
                   alt={partner.title}
@@ -73,9 +165,13 @@ export default async function OmOssPage() {
               </div>
 
               {/* Partner Details */}
-              <div className="flex flex-col justify-center items-center text-center md:items-start md:text-left space-y-4">
-                <h2 className="text-2xl font-bold text-foreground">{partner.title}</h2>
-                <p className="text-lg text-gray-600 max-w-lg">{partner.description}</p>
+              <div className="flex flex-col items-center justify-center space-y-4 text-center md:items-start md:text-left">
+                <h2 className="text-2xl font-bold text-foreground">
+                  {partner.title}
+                </h2>
+                <p className="max-w-lg text-lg text-gray-600">
+                  {partner.description}
+                </p>
                 <div>
                   {partner.link.map((link: any, index: number) => (
                     <Link
@@ -98,7 +194,7 @@ export default async function OmOssPage() {
         <h2 className="pb-4 text-left text-5xl text-foreground">Addresse</h2>
       </Section>
       <Section className="flex flex-col items-center justify-center bg-secondary">
-        <h2 className="pb-4 text-left text-5xl text-blueGreen">
+        <h2 className="text-blueGreen pb-4 text-left text-5xl">
           &#34;Kontoret&#34;
         </h2>
         <p className="mb-8 mt-2 text-left text-2xl text-gray-600">

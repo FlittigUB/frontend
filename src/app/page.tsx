@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import BeaverHero from '@/components/common/BeaverHero';
 import NavbarLayout from '@/components/NavbarLayout';
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
             <div className="flex-shrink-0">
               <Image
                 height={400}
+                data-testid="flittig-logo"
                 width={400}
                 src="/FIB.png"
                 alt="Flittig UB logo"
@@ -23,19 +25,22 @@ export default function Home() {
               />
             </div>
             <div className="mt-8 text-center md:text-left">
-              <h2 className="text-3xl font-bold text-blueGreen">
+              <h2 className="text-blueGreen text-3xl font-bold">
                 Hvordan fungerer Flittig?
               </h2>
-              <p className="mt-4 text-lg text-foreground">
+              <p className="mb-6 mt-4 text-lg text-foreground">
                 I Flittig legger du enkelt ut annonser over arbeidsoppgavene du
                 trenger å få løst. Slik vil potensielle arbeidstakere kunne
                 finne de småjobbene som passer de best. Fortell hva, hvor og
                 når, så kan du anse jobben som gjort. Enkel å bruke, enkel å
                 like!
               </p>
-              <button className="hover:bg-primary-dark mt-6 rounded-md bg-primary px-6 py-2 font-medium text-white">
+              <Link
+                href="/portal/registrer-deg"
+                className="hover:bg-primary-dark rounded-md bg-primary px-6 py-2 font-medium text-white"
+              >
                 Bli flittig nå!
-              </button>
+              </Link>
             </div>
           </div>
         </section>
@@ -55,7 +60,7 @@ export default function Home() {
 
         <section className="bg-secondary px-4 py-12">
           <div className="mx-auto max-w-5xl text-center">
-            <h2 className="text-5xl font-bold text-blueGreen">
+            <h2 className="text-blueGreen text-5xl font-bold">
               Vasking, flytting eller handlehjelp?
             </h2>
             <div className="flex w-full items-center justify-center">
@@ -82,16 +87,19 @@ export default function Home() {
             alt="Flittig UB Logo"
             fill
             priority
-            className="absolute inset-0 object-left md:object-center object-cover"
+            className="absolute inset-0 object-cover object-left md:object-center"
           />
-          <div
-            className="z-10 flex w-1/3 flex-1 flex-col items-center justify-center bg-white/20 rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] backdrop-blur-md border border-white/30">
+          <div className="z-10 flex w-1/3 flex-1 flex-col items-center justify-center rounded-xl border border-white/30 bg-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.1)] backdrop-blur-md">
             <h1 className="text-center text-5xl font-bold text-foreground">
               Bli flittig du også!
             </h1>
-            <button className="mt-6 rounded-md bg-secondary px-6 py-2 font-medium text-foreground">
+            <Link
+              data-testid="bli-flittig-button"
+              href="/portal/registrer-deg"
+              className="mt-6 rounded-md bg-secondary px-6 py-2 font-medium text-foreground"
+            >
               Registrer deg
-            </button>
+            </Link>
           </div>
         </section>
       </div>

@@ -1,8 +1,6 @@
-version: "3.8"
-
 services:
   directus_app:
-    image: directus/directus:11.2.2
+    image: directus/directus:11.3.1
     volumes:
       - /var/www/flittig/database:/directus/database
       - /var/www/flittig/uploads:/directus/uploads
@@ -27,6 +25,12 @@ services:
       PUBLIC_URL: "https://panel.flittigub.no"
       LOG_LEVEL: "debug"
       EXTENSIONS_PATH: "/directus/extensions"
+      EMAIL_TRANSPORT: "smtp"
+      EMAIL_SMTP_HOST: "smtp.postmarkapp.com"
+      EMAIL_SMTP_PORT: "587"
+      EMAIL_SMTP_USER: "e5fa5902-a9e6-4738-b658-f3797021a758"
+      EMAIL_SMTP_PASSWORD: "e5fa5902-a9e6-4738-b658-f3797021a758"
+      EMAIL_FROM: "noreply@flittigub.no"
     networks:
       - flittig-backend
 
@@ -34,7 +38,6 @@ volumes:
   flittig_directus_database:
   flittig_directus_uploads:
   flittig_directus_extensions:
-
 
 networks:
   flittig-backend:

@@ -165,17 +165,21 @@ export default function MultiStepRegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-r from-yellow-200 to-yellow-300 px-4 py-10">
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10">
       {/* Logo */}
       <div className="mb-8">
         <Logo />
       </div>
 
       {/* Progress Indicator */}
-      <ProgressIndicator currentStep={step} onStepClick={handleStepClick} isDarkMode={false} />
+      <ProgressIndicator
+        currentStep={step}
+        onStepClick={handleStepClick}
+        isDarkMode={false}
+      />
 
       {/* Step Content */}
-      <div className="w-full max-w-md p-6 bg-white rounded-3xl shadow-md">
+      <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-md">
         {step === 1 && <RoleSelection onSelectRole={handleRoleSelection} />}
         {step === 2 && (
           <PersonalInfoForm
@@ -212,18 +216,10 @@ export default function MultiStepRegisterPage() {
       </div>
 
       {/* Error Message */}
-      {error && (
-        <div className="mt-4 text-red-600">
-          {error}
-        </div>
-      )}
+      {error && <div className="mt-4 text-red-600">{error}</div>}
 
       {/* Success Message */}
-      {success && (
-        <div className="mt-4 text-green-600">
-          {success}
-        </div>
-      )}
+      {success && <div className="mt-4 text-green-600">{success}</div>}
     </div>
   );
 }

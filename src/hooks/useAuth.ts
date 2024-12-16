@@ -2,15 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-type UserRole = 'arbeidstaker' | 'arbeidsgiver' | null;
-
-interface User {
-  id: string;
-  email: string;
-  name?: string;
-  image?: string;
-}
+import { User, UserRole } from '@/common/types';
 
 const useAuth = () => {
   const router = useRouter();
@@ -23,17 +15,24 @@ const useAuth = () => {
   // Function to retrieve user data from token or API
   const retrieveUserData = async (token: string): Promise<User | null> => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Ensure Authorization header is set
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       if (response.ok) {
         const data = await response.json();
-        console.log('User data fetched:', data.user);
+        console.log(data);
         return data.user;
       } else {
-        console.error('Failed to fetch user data:', response.status, response.statusText);
+        console.error(
+          'Failed to fetch user data:',
+          response.status,
+          response.statusText,
+        );
         return null;
       }
     } catch (error) {
@@ -52,8 +51,9 @@ const useAuth = () => {
           const userData = await retrieveUserData(savedToken);
           if (userData) {
             setUser(userData);
-            // Optionally, set userRole based on userData
-            setUserRole('arbeidstaker'); // Adjust based on your logic
+            console.log('?   ' + userData.role);
+            setUserRole(userData.role); // Update state
+            // Removed immediate logging of userRole to avoid undefined
           } else {
             setLoggedIn(false);
             setUser(null);
@@ -70,6 +70,14 @@ const useAuth = () => {
 
     checkAuth();
   }, [router]);
+
+  // Optional: Effect to log userRole whenever it changes
+  useEffect(() => {
+    if (userRole !== null) {
+      console.log('!  ' + userRole);
+      // Additional side effects based on userRole can be handled here
+    }
+  }, [userRole]);
 
   return { loggedIn, token, userRole, user, loading };
 };

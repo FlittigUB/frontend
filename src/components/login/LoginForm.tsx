@@ -1,10 +1,14 @@
-// components/login/LoginForm.tsx
+'use client';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Tooltip from "@/components/common/ToolTip";
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Extract the redirect URL from the query string, default to '/portal'
+  const redirectUrl = searchParams.get('redirect') || '/portal';
 
   // State variables
   const [email, setEmail] = useState('');
@@ -52,8 +56,8 @@ const LoginForm: React.FC = () => {
         const data = await response.json();
         // Store JWT token securely
         localStorage.setItem('token', data.access_token);
-        // Redirect to /portal
-        router.push('/portal');
+        // Redirect to the intended page instead of a fixed route
+        router.push(redirectUrl);
       } else {
         const errorData = await response.json();
         setError(errorData.message || 'Autentisering mislyktes.');

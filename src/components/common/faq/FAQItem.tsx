@@ -28,6 +28,7 @@ const FAQItem = ({ faq }: FAQItemProps) => {
       } rounded-md shadow-sm transition-all duration-300`}
     >
       <button
+        data-testid="faq-item-button"
         onClick={toggleFAQ}
         className={`flex w-full items-center justify-between px-4 py-2 text-left ${
           isActive ? 'bg-gray-100' : ''
@@ -48,13 +49,16 @@ const FAQItem = ({ faq }: FAQItemProps) => {
           <FiChevronDown className="h-5 w-5 text-foreground" />
         </span>
       </button>
-      <div
-        className={`overflow-hidden transition-all duration-300 ${
-          isActive ? 'max-h-96' : 'max-h-0'
-        }`}
-      >
-        <div className="px-4 py-2 text-gray-800">{faq.answer}</div>
-      </div>
+      {isActive && (
+        <div
+          data-testid="faq-answer-container"
+          className={`overflow-hidden transition-all duration-300 ${
+            isActive ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className={`px-4 py-2 text-gray-800`}>{faq.answer}</div>
+        </div>
+      )}
     </div>
   );
 };

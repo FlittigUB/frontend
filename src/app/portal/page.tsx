@@ -4,17 +4,16 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import PortalLayout from "@/components/portal/PortalLayout";
-import { getUserRole } from "@/utils/auth";
+import useAuth from '@/hooks/useAuth';
 
 const PortalPage: React.FC = () => {
   const router = useRouter();
 
-  const userRole = getUserRole();
+  const userRole = useAuth().userRole;
 
   useEffect(() => {
     if (!userRole) {
-      router.push('/portal/log-inn');
+      router.push('/portal/logg-inn');
     } else if (userRole === 'arbeidstaker') {
       router.push('/portal/arbeidstaker');
     } else if (userRole === 'arbeidsgiver') {
@@ -22,7 +21,7 @@ const PortalPage: React.FC = () => {
     }
   }, [userRole, router]);
 
-  return <PortalLayout>Laster...</PortalLayout>;
+  return <>Laster...</>;
 };
 
 export default PortalPage;
