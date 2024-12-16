@@ -388,8 +388,8 @@ export default function ProfilePage() {
           </Link>
           <button
             onClick={() => {
-              localStorage.removeItem"token"'); // Ensure consistency with token key
-              window.location.href ="/portal/logg-inn"'; // Redirect to login page
+              localStorage.removeItem('token'); // Ensure consistency with token key
+              window.location.href = '/portal/logg-inn'; // Redirect to login page
             }}
             className="w-full rounded-2xl bg-yellow-300 py-2 font-semibold text-gray-800 shadow-neumorphic"
           >

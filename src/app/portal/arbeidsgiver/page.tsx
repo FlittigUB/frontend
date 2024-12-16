@@ -2,12 +2,12 @@
 
 'use client';
 
-import React, { FormEvent, useEffect, useState } from 'react';
-import JobList from '@/components/portal/job/JobList';
-import JobModal from '@/components/portal/job/JobModal';
-import { Category, Job, JobFormData } from '@/common/types';
-import axios from 'axios';
-import { useAuthContext } from '@/context/AuthContext';
+import React, { FormEvent, useEffect, useState } from "react";
+import JobList from "@/components/portal/job/JobList";
+import { Category, Job, JobFormData } from "@/common/types";
+import axios from "axios";
+import { useAuthContext } from "@/context/AuthContext";
+import JobModal from "@/components/portal/job/JobModal";
 
 const ArbeidsgiverHomePage: React.FC = () => {
   const [publishedJobs, setPublishedJobs] = useState<Job[]>([]);
@@ -36,9 +36,9 @@ const ArbeidsgiverHomePage: React.FC = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/job`,
           {
             headers: {
-              Authorization: `Bearer ${token},
-            ,
-          ,
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
         setPublishedJobs(response.data);
       } catch (err: any) {
@@ -55,13 +55,13 @@ const ArbeidsgiverHomePage: React.FC = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/categories`,
           {
             headers: {
-              Authorization: `Bearer ${token},
-            ,
-          ,
+              Authorization: `Bearer ${token}`
+            },
+          },
         );
         setCategories(response.data);
       } catch (err: any) {
-        console.error"Error fetching categories:"', err);
+        console.error("Error fetching categories:", err);
         // Optionally handle errors
       }
     };

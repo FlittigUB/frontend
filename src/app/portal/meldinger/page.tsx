@@ -71,7 +71,7 @@ export default function ConversationsPage() {
 
   // Neumorphic style classes:
   const cardClass =
-   "bg-background rounded-xl shadow-neumorphic p-6 w-full flex flex-col mt-12 h-4/5"';
+    'bg-background rounded-xl shadow-neumorphic p-6 w-full flex flex-col mt-12 h-4/5';
   const truncateClass = 'truncate overflow-hidden whitespace-nowrap';
 
   if (loading) {
