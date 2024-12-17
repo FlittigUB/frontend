@@ -35,7 +35,7 @@ const JobModal: React.FC<JobModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div classame="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="w-full max-w-md rounded-lg bg-white p-6 dark:bg-gray-800">
         <h2 className="mb-4 text-2xl font-semibold">
           {isEdit ? 'Rediger Jobb' : 'Opprett Ny Jobb'}

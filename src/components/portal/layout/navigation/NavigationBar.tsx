@@ -29,11 +29,6 @@ export default function NavigationBar() {
       }}
     />
   ) : (
-    <NavigationBarDesktop
-      isDarkMode={false}
-      toggleDarkMode={function (): void {
-        throw new Error('Function not implemented.');
-      }}
-    />
+    <NavigationBarDesktop />
   );
 }

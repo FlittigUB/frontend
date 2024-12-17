@@ -1,26 +1,11 @@
 // components/portal/navigation/NavigationBarDesktop.tsx
 
 import React from 'react';
-import {
-  FaBell,
-  FaBriefcase,
-  FaEnvelope,
-  FaMoon,
-  FaSun,
-  FaUser,
-} from 'react-icons/fa';
+import { FaBell, FaBriefcase, FaEnvelope, FaUser } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
 
-interface NavigationBarDesktopProps {
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
-}
-
-export default function NavigationBarDesktop({
-  isDarkMode,
-  toggleDarkMod,
-}: NavigationBarDesktopProps) {
+export default function NavigationBarDesktop() {
   return (
     <nav className="bg-background-dark z-50 flex items-center justify-between px-6 py-4 shadow-neumorphic-dark">
       {/* Logo */}
@@ -46,18 +31,6 @@ export default function NavigationBarDesktop({
         <Link href="/portal/varsler">
           <FaBell className="text-foreground-dark h-6 w-6 cursor-pointer hover:text-primary" />
         </Link>
-        {/* Dark Mode Toggle */}
-        <button
-          onClick={toggleDarkMode}
-          aria-label="Toggle Dark Mode"
-          className="focus:outline-none"
-        >
-          {isDarkMode ? (
-            <FaSun className="text-foreground-dark h-6 w-6 hover:text-primary" />
-          ) : (
-            <FaMoon className="text-foreground-dark h-6 w-6 hover:text-primary" />
-          )}
-        </button>
       </div>
     </nav>
   );
