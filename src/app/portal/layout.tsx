@@ -1,8 +1,9 @@
 // app/portal/layout.tsx
+'use client';
 
 import React from 'react';
 import PortalLayout from '@/components/portal/PortalLayout';
-import { AuthProvider } from '@/context/AuthContext'; // Import AuthProvider
+import { AuthProvider } from '@/context/AuthContext';
 
 interface PortalRouteLayoutProps {
   children: React.ReactNode;
@@ -11,8 +12,6 @@ interface PortalRouteLayoutProps {
 const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
   return (
     <AuthProvider>
-      {' '}
-      {/* Wrap with AuthProvider */}
       <PortalLayout>{children}</PortalLayout>
     </AuthProvider>
   );

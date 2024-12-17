@@ -36,6 +36,7 @@ export interface Job {
   user: User;
   applications?: Application[];
   categories: Category[];
+  email_notifications: boolean;
 }
 
 // types.ts
@@ -47,7 +48,7 @@ export interface JobFormData {
   place: string;
   date_accessible: string;
   categories: string[]; // Array of category IDs
-  image?: File; // Optional image file
+  email_notifications: boolean;
 }
 
 export type ApplicationStatus = "waiting" | "approved" | "rejected";

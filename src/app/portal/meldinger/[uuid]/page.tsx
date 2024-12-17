@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
-import Image from 'next/image';
-import useAuth from '@/hooks/useAuth';
-import { FiArrowLeft, FiPhone, FiSmile, FiSend } from 'react-icons/fi';
-import Link from 'next/link';
+import React, { useEffect, useRef, useState } from "react";
+import { useParams } from "next/navigation";
+import Image from "next/image";
+import useAuth from "@/hooks/useAuth";
+import { FiArrowLeft, FiPhone, FiSend, FiSmile } from "react-icons/fi";
+import Link from "next/link";
 
 interface Message {
   id: string;
@@ -30,7 +30,7 @@ interface User {
 
 export default function MessagePage() {
   const params = useParams();
-  const { loggedIn, token, loading } = useAuth();
+  const { loggedIn, token } = useAuth();
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageInput, setMessageInput] = useState('');
@@ -64,7 +64,10 @@ export default function MessagePage() {
             const data = await response.json();
             setReceiver(data.user);
           } else {
-            console.error('Failed to fetch receiver data:', response.statusText);
+            console.error(
+              'Failed to fetch receiver data:',
+              response.statusText,
+            );
           }
         } catch (error) {
           console.error('Error fetching receiver data:', error);
@@ -120,7 +123,7 @@ export default function MessagePage() {
                 msg.user?.id === receiverIdRef.current || msg.sentByCurrentUser,
             );
             setMessages(filteredHistory);
-          } else if (payload.event === "userPresenceUpdate") {
+          } else if (payload.event ==="userPresenceUpdate"') {
             const { userId, online } = payload.data;
             if (userId === receiverIdRef.current) {
               setIsReceiverOnline(online);
@@ -163,7 +166,7 @@ export default function MessagePage() {
     }
   };
 
-  if (loading) {
+  if (!loggedIn) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="loader"></div>

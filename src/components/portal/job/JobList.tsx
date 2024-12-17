@@ -1,5 +1,3 @@
-// components/portal/job/JobList.tsx
-
 import React from 'react';
 import { Job } from '@/common/types';
 import JobItem from '@/components/portal/job/JobItem';
@@ -7,16 +5,20 @@ import JobItem from '@/components/portal/job/JobItem';
 interface JobListProps {
   jobs: Job[];
   isEmployerView: boolean;
-  onEdit?: (job: Job) => void; // Optional edit handler
-  onDelete?: (job: Job) => void; // Optional delete handler
+  onEdit?: (job: Job) => void;
+  onDelete?: (job: Job) => void;
 }
 
 const JobList: React.FC<JobListProps> = ({
-  jobs,
+  jobs = [],
   isEmployerView,
   onEdit,
   onDelete,
 }) => {
+  if (!jobs || jobs.length === 0) {
+    return <p>Ingen jobber tilgjengelig.</p>;
+  }
+
   return (
     <div className="space-y-4">
       {jobs.map((job) => (

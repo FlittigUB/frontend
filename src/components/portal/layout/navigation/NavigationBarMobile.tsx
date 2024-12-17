@@ -21,9 +21,7 @@ export default function NavigationBarMobile({ isDarkMode }: any) {
   return (
     <div className="relative">
       {/* Navigation Bar */}
-      <nav
-        className={`fixed bottom-0 left-0 right-0 z-10 h-20`}
-      >
+      <nav className={`fixed bottom-0 left-0 right-0 z-10 h-20`}>
         {/* SVG Background */}
         <div className="absolute inset-0 h-full">
           <svg
@@ -37,8 +35,8 @@ export default function NavigationBarMobile({ isDarkMode }: any) {
           >
             <g filter="url(#filter0_d_19_15)">
               <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
+                fillRule="evenodd"
+                clipRule="evenodd"
                 d="M364.681 21.6852C360.332 13.4197 351.797 8 342.458 8H54C26.3858 8 4 30.3858 4 58V92C4 119.614 26.3858 142 54 142H846C873.614 142 896 119.614 896 92V58C896 30.3858 873.614 8 846 8H557.398C548.248 8 539.88 13.2836 535.589 21.3648V21.3648L535.588 21.3667C531.675 28.7356 527.724 36.1757 525.115 43.4764C523.779 47.2152 522.562 51.1416 521.321 55.1441L521.321 55.1453C512.991 82.0121 503.598 112.308 450.168 112.308C396.619 112.308 387.113 81.8756 378.706 54.964C377.5 51.1035 376.317 47.3155 375.029 43.7002C372.445 36.4434 368.547 29.0332 364.681 21.6852V21.6852Z"
                 fill="white"
               />
@@ -51,9 +49,9 @@ export default function NavigationBarMobile({ isDarkMode }: any) {
                 width="900"
                 height="142"
                 filterUnits="userSpaceOnUse"
-                color-interpolation-filters="sRGB"
+                colorInterpolationFilters="sRGB"
               >
-                <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                <feFlood floodOpacity="0" result="BackgroundImageFix" />
                 <feColorMatrix
                   in="SourceAlpha"
                   type="matrix"
@@ -93,31 +91,39 @@ export default function NavigationBarMobile({ isDarkMode }: any) {
             >
               <FaUser
                 className={`h-6 w-6 transition duration-300 ${
-                  isActive('/portal/profil') ? getActiveColor() : 'text-gray-400'
+                  isActive('/portal/profil')
+                    ? getActiveColor()
+                    : 'text-gray-400'
                 }`}
                 aria-label="Profile"
               />
               <span
                 className={`mt-1 text-xs transition duration-300 ${
-                  isActive('/portal/profil') ? getActiveColor() : 'text-gray-400'
+                  isActive('/portal/profil')
+                    ? getActiveColor()
+                    : 'text-gray-400'
                 }`}
               >
                 Profile
               </span>
             </Link>
             <Link
-              href="/portal/arbeidstaker/soknader"
+              href="/portal/soknader"
               className="group flex flex-col items-center"
             >
               <FaRectangleList
                 className={`h-6 w-6 transition duration-300 ${
-                  isActive('/portal/soknader') ? getActiveColor() : 'text-gray-400'
+                  isActive('/portal/soknader')
+                    ? getActiveColor()
+                    : 'text-gray-400'
                 }`}
                 aria-label="Applications"
               />
               <span
                 className={`mt-1 text-xs transition duration-300 ${
-                  isActive('/portal/soknader') ? getActiveColor() : 'text-gray-400'
+                  isActive('/portal/soknader')
+                    ? getActiveColor()
+                    : 'text-gray-400'
                 }`}
               >
                 Applications
@@ -152,13 +158,17 @@ export default function NavigationBarMobile({ isDarkMode }: any) {
             >
               <FaBell
                 className={`h-6 w-6 transition duration-300 ${
-                  isActive('/portal/varsler') ? getActiveColor() : 'text-gray-400'
+                  isActive('/portal/varsler')
+                    ? getActiveColor()
+                    : 'text-gray-400'
                 }`}
                 aria-label="Notifications"
               />
               <span
                 className={`mt-1 text-xs transition duration-300 ${
-                  isActive('/portal/varsler') ? getActiveColor() : 'text-gray-400'
+                  isActive('/portal/varsler')
+                    ? getActiveColor()
+                    : 'text-gray-400'
                 }`}
               >
                 Notifications

@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import React from 'react';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: 'Flittig UB',
@@ -12,9 +13,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-    <body className="antialiased">
-    {children}
-    </body>
+      <body className="antialiased">
+        <Toaster richColors position="top-right" closeButton />
+        {children}
+      </body>
     </html>
   );
 }

@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import useAuth from '@/hooks/useAuth';
+import LoadingLogo from '@/components/NSRVLoader';
 
 interface Conversation {
   user: {
@@ -22,7 +23,7 @@ interface Conversation {
 }
 
 export default function ConversationsPage() {
-  const { loggedIn, token, loading } = useAuth(); // **Handle 'loading' state**
+  const { loggedIn, token } = useAuth(); // **Handle 'loading' state**
   const [conversations, setConversations] = useState<Conversation[]>([]);
 
   // Base URL for assets
@@ -74,11 +75,11 @@ export default function ConversationsPage() {
     'bg-background rounded-xl shadow-neumorphic p-6 w-full flex flex-col mt-12 h-4/5';
   const truncateClass = 'truncate overflow-hidden whitespace-nowrap';
 
-  if (loading) {
+  if (!loggedIn) {
     return (
       <>
-        <div className="flex items-center justify-center h-full">
-          <div className="loader"></div> {/* Ensure loader styles are defined */}
+        <div className="flex h-full items-center justify-center">
+          <LoadingLogo /> {/* Ensure loader styles are defined */}
         </div>
       </>
     );

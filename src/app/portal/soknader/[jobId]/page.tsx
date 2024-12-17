@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 import axios from 'axios';
 import { useAuthContext } from '@/context/AuthContext';
 import Logo from '@/components/common/Logo';
-import { Application, Category, User, ApplicationStatus } from '@/common/types';
+import { Application, ApplicationStatus, Category, User } from '@/common/types';
 
 import EmployerProfile from '@/components/portal/job/EmployerProfile';
 import JobDetailsComponent from '@/components/portal/job/JobDetailsComponent';
@@ -34,7 +34,6 @@ const ApplicationPage: React.FC = () => {
   const {
     loggedIn,
     user,
-    loading: authLoading,
     token,
     userRole,
   } = useAuthContext();
@@ -93,7 +92,7 @@ const ApplicationPage: React.FC = () => {
         }
       } catch (error: any) {
         console.error('Error fetching job details:', error);
-        if (!authLoading) {
+        if (!loggedIn) {
           setErrorMessage(
             error.response?.data?.message ||
               error.message ||
@@ -131,7 +130,7 @@ const ApplicationPage: React.FC = () => {
         }
       } catch (error: any) {
         console.error('Error fetching applications:', error);
-        if (!authLoading) {
+        if (!loggedIn) {
           setErrorMessage(
             error.response?.data?.message ||
               error.message ||
@@ -143,7 +142,7 @@ const ApplicationPage: React.FC = () => {
 
     const fetchData = async () => {
       setLoading(true);
-      if (jobId && !authLoading) {
+      if (jobId && loggedIn) {
         if (token) {
           await fetchJobDetails();
           await fetchApplications();
@@ -160,7 +159,7 @@ const ApplicationPage: React.FC = () => {
     };
 
     fetchData();
-  }, [jobId, token, authLoading, userRole, user]);
+  }, [jobId, token, userRole, user, loggedIn]);
 
   // Handle form submission (only for arbeidstaker)
   const handleSubmit = async (e: FormEvent) => {
@@ -268,7 +267,7 @@ const ApplicationPage: React.FC = () => {
   };
 
   // Loading state
-  if (loading || authLoading) {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-xl">Laster...</p>
@@ -299,7 +298,7 @@ const ApplicationPage: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gradient-to-r from-yellow-200 to-yellow-300 px-4 py-10">
+    <div className="flex min-h-screen flex-col items-center px-4 py-10">
       <Logo />
 
       {jobDetails?.user && (

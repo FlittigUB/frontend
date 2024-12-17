@@ -1,15 +1,15 @@
-import type { Config } from 'tailwindcss';
+import type { Config } from "tailwindcss";
 
 export default {
-  darkMode: 'class', // Enable dark mode support
-  content: [
-    './src/**/*.{js,ts,jsx,tsx,mdx}', // Adjusted to cover all src directories
-  ],
-  theme: {
+  darkMode: "class",
+  content: ['./sr"./src/**/*.{js,ts,jsx,tsx,mdx}"heme: {
     extend: {
       animation: {
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
         'spin-smooth': 'spin-smooth 1.2s linear infinite',
+          "draw-path"
+      :
+        "draw 2s ease-out forwards, fill 0.5s ease-out 2.5s forwards",
       },
       keyframes: {
         'fade-in-up': {
@@ -20,6 +20,36 @@ export default {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
         },
+        draw: {
+          "0%";
+        :
+          {
+            strokeDashoffset: "1000";
+          }
+        ,
+          "100%";
+        :
+          {
+            strokeDashoffset: "0";
+          }
+        ,
+        }
+      ,
+        fill: {
+          "0%";
+        :
+          {
+            fill: "transparent";
+          }
+        ,
+          "100%";
+        :
+          {
+            fill: "#ffffff";
+          }
+        ,
+        }
+      ,
       },
       boxShadow: {
         neumorphic:
@@ -36,12 +66,22 @@ export default {
           '6px 6px 12px rgba(255, 102, 0, 0.5), -6px -6px 12px rgba(255, 102, 0, 0.2)',
       },
       colors: {
-        primary: '#FFE135', // Bright orange color
-        secondary: '#FFFFFF', // White
-        foreground: '#000000', // Black text
-        foregroundDark: '#FFFFFF', // White text in dark mode
-        background: '#FFF8DC', // Light cream background
-        backgroundDark: '#1A1A1A', // Dark background
+        primary: "#FFE135",
+          secondary;
+      :
+        "#FFFFFF",
+          foreground;
+      :
+        "#000000",
+          foregroundDark;
+      :
+        "#FFFFFF",
+          background;
+      :
+        "#FFF8DC",
+          backgroundDark;
+      :
+        "#1A1A1A",
       },
       borderRadius: {
         xl: '1.5rem',

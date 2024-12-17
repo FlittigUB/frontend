@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Job } from '@/common/types';
+import Link from 'next/link';
 
 interface JobItemProps {
   job: Job;
@@ -28,7 +29,20 @@ const JobItem: React.FC<JobItemProps> = ({
 
   return (
     <div className="dark:bg-background-dark dark:text-foreground-dark rounded-xl bg-background p-6 text-foreground shadow-neumorphic dark:shadow-neumorphic-dark">
-      <h2 className="text-2xl font-semibold">{job.title}</h2>
+      <Link
+        href={`/portal/soknader/${job.id}`}
+        className="text-2xl font-semibold"
+      >
+        {job.title}
+      </Link>
+      {isEmployerView && (
+        <Link
+          href={`/portal/soknader/${job.id}`}
+          className="ml-12 rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
+        >
+          Se søknader
+        </Link>
+      )}
       <p className="mt-2">{job.description}</p>
       <p className="mt-1 text-sm text-gray-600">
         Sted: {job.place} | Tilgjengelig fra: {formatDate(job.date_accessible)}

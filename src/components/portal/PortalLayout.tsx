@@ -1,16 +1,17 @@
+// src/components/portal/layout/PortalLayout.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import NavigationBar from '@/components/portal/layout/navigation/NavigationBar';
 import useAuth from '@/hooks/useAuth';
-import Spinner from '@/components/common/Spinner';
+import LoadingLogo from '@/components/NSRVLoader';
 
 interface PortalLayoutProps {
   children: React.ReactNode;
 }
 
 const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
-  const { loggedIn } = useAuth();
+  const { loggedIn } = useAuth(); // No 'loading' from useAuth
 
   // Manage dark mode state
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -23,21 +24,9 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
     }
   }, []);
 
-  // Toggle dark mode
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-/*  const toggleDarkMode = () => {
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    localStorage.setItem('theme', newMode ? 'dark' : 'light'); // Save preference
-  };*/
-
-  // While authentication is being verified, show nothing or a loader
+  // While authentication or any global loading is being verified, show loader
   if (!loggedIn) {
-    return (
-      <>
-        <Spinner />
-      </>
-    );
+    return <LoadingLogo />;
   }
 
   return (
@@ -54,7 +43,7 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
       {/* Main Content Area */}
       <main className="flex flex-1 justify-center overflow-y-auto">
         {/* Centered Card */}
-        <div className="mt-12 w-full max-w-4xl">{children}</div>
+        <div className="w-full max-w-4xl">{children}</div>
       </main>
     </div>
   );

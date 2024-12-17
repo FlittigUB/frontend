@@ -2,12 +2,12 @@
 
 import React from 'react';
 import {
-  FaUser,
+  FaBell,
   FaBriefcase,
   FaEnvelope,
-  FaBell,
   FaMoon,
   FaSun,
+  FaUser,
 } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -18,16 +18,16 @@ interface NavigationBarDesktopProps {
 }
 
 export default function NavigationBarDesktop({
-                                               isDarkMode,
-                                               toggleDarkMode,
-                                             }: NavigationBarDesktopProps) {
+  isDarkMode,
+  toggleDarkMod,
+}: NavigationBarDesktopProps) {
   return (
-    <nav className="flex items-center justify-between bg-background-dark px-6 py-4 shadow-neumorphic-dark">
+    <nav className="bg-background-dark z-50 flex items-center justify-between px-6 py-4 shadow-neumorphic-dark">
       {/* Logo */}
       <Link href="/portal">
         <div className="flex cursor-pointer items-center">
           <Image src="/FIB.png" alt="Logo" width={40} height={40} />
-          <span className="ml-2 text-2xl font-bold text-foreground-dark">
+          <span className="text-foreground-dark ml-2 text-2xl font-bold">
             Flittig
           </span>
         </div>
@@ -35,16 +35,16 @@ export default function NavigationBarDesktop({
       {/* Navigation Icons */}
       <div className="flex items-center space-x-8">
         <Link href="/portal/profil">
-          <FaUser className="h-6 w-6 cursor-pointer text-foreground-dark hover:text-primary" />
+          <FaUser className="text-foreground-dark h-6 w-6 cursor-pointer hover:text-primary" />
         </Link>
-        <Link href="/portal/applikasjoner">
-          <FaBriefcase className="h-6 w-6 cursor-pointer text-foreground-dark hover:text-primary" />
+        <Link href="/portal/soknader">
+          <FaBriefcase className="text-foreground-dark h-6 w-6 cursor-pointer hover:text-primary" />
         </Link>
         <Link href="/portal/meldinger">
-          <FaEnvelope className="h-6 w-6 cursor-pointer text-foreground-dark hover:text-primary" />
+          <FaEnvelope className="text-foreground-dark h-6 w-6 cursor-pointer hover:text-primary" />
         </Link>
         <Link href="/portal/varsler">
-          <FaBell className="h-6 w-6 cursor-pointer text-foreground-dark hover:text-primary" />
+          <FaBell className="text-foreground-dark h-6 w-6 cursor-pointer hover:text-primary" />
         </Link>
         {/* Dark Mode Toggle */}
         <button
@@ -53,9 +53,9 @@ export default function NavigationBarDesktop({
           className="focus:outline-none"
         >
           {isDarkMode ? (
-            <FaSun className="h-6 w-6 text-foreground-dark hover:text-primary" />
+            <FaSun className="text-foreground-dark h-6 w-6 hover:text-primary" />
           ) : (
-            <FaMoon className="h-6 w-6 text-foreground-dark hover:text-primary" />
+            <FaMoon className="text-foreground-dark h-6 w-6 hover:text-primary" />
           )}
         </button>
       </div>

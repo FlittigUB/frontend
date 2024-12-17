@@ -1,4 +1,4 @@
-// app/portal/arbeidsgiver/page.tsx
+// src/pages/arbeidsgiver/home.tsx
 
 'use client';
 
@@ -8,8 +8,11 @@ import { Category, Job, JobFormData } from '@/common/types';
 import axios from 'axios';
 import { useAuthContext } from '@/context/AuthContext';
 import JobModal from '@/components/portal/job/JobModal';
+import LoadingLogo from '@/components/NSRVLoader';
+import { toast } from 'sonner'; // Sonner for notifications
 
 const ArbeidsgiverHomePage: React.FC = () => {
+  // State variables
   const [publishedJobs, setPublishedJobs] = useState<Job[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
@@ -18,20 +21,22 @@ const ArbeidsgiverHomePage: React.FC = () => {
     title: '',
     description: '',
     place: '',
-    date_accessible: '', // snake_case
+    date_accessible: '',
     categories: [],
+    email_notifications: false, // Default value for new jobs
   });
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [success, setSuccess] = useState<string>('');
 
-  const { token, userRole } = useAuthContext();
+  const { token, userRole, isAuthLoading } = useAuthContext();
+  const [isFetching, setIsFetching] = useState<boolean>(false); // Local loading state for data fetching
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // Local loading state for form submissions
 
+  // Fetch published jobs and categories on component mount or when token changes
   useEffect(() => {
     const fetchPublishedJobs = async () => {
       try {
-        setLoading(true);
+        setIsFetching(true);
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/job`,
           {
@@ -40,17 +45,20 @@ const ArbeidsgiverHomePage: React.FC = () => {
             },
           },
         );
-        setPublishedJobs(response.data);
+        const jobsData = Array.isArray(response.data) ? response.data : [];
+        setPublishedJobs(jobsData);
       } catch (err: any) {
         console.error('Error fetching jobs:', err);
         setError(err.response?.data?.message || 'Failed to fetch jobs.');
+        toast.error(err.response?.data?.message || 'Failed to fetch jobs.');
       } finally {
-        setLoading(false);
+        setIsFetching(false);
       }
     };
 
     const fetchCategories = async () => {
       try {
+        setIsFetching(true);
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/categories`,
           {
@@ -59,10 +67,16 @@ const ArbeidsgiverHomePage: React.FC = () => {
             },
           },
         );
-        setCategories(response.data);
+        const catData = Array.isArray(response.data) ? response.data : [];
+        setCategories(catData);
       } catch (err: any) {
         console.error('Error fetching categories:', err);
-        // Optionally handle errors
+        setError(err.response?.data?.message || 'Failed to fetch categories.');
+        toast.error(
+          err.response?.data?.message || 'Failed to fetch categories.',
+        );
+      } finally {
+        setIsFetching(false);
       }
     };
 
@@ -81,9 +95,9 @@ const ArbeidsgiverHomePage: React.FC = () => {
       place: '',
       date_accessible: '',
       categories: [],
+      email_notifications: false,
     });
     setError('');
-    setSuccess('');
   };
 
   const closeCreateModal = () => {
@@ -98,11 +112,11 @@ const ArbeidsgiverHomePage: React.FC = () => {
       description: job.description || '',
       place: job.place || '',
       date_accessible: job.date_accessible || '',
-      categories: job.categories.map((cat) => cat.id), // Assuming job.categories is populated
+      categories: (job.categories || []).map((cat) => cat.id),
+      email_notifications: job.email_notifications, // Use the current job's setting
     });
     setIsEditModalOpen(true);
     setError('');
-    setSuccess('');
   };
 
   const closeEditModal = () => {
@@ -110,6 +124,7 @@ const ArbeidsgiverHomePage: React.FC = () => {
     setCurrentJob(null);
   };
 
+  // Handle input changes in the form
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -118,14 +133,21 @@ const ArbeidsgiverHomePage: React.FC = () => {
     const target = e.target;
     const { name, value, type } = target;
 
-    if (type === 'checkbox' && target instanceof HTMLInputElement) {
+    if (name === 'email_notifications' && target instanceof HTMLInputElement) {
+      // Checkbox for email notifications
+      const checked = target.checked;
+      setNewJob((prev) => ({ ...prev, email_notifications: checked }));
+    } else if (
+      type === 'checkbox' &&
+      target instanceof HTMLInputElement &&
+      name === 'categories'
+    ) {
+      // Handling categories as checkboxes
       const { checked } = target;
       setNewJob((prev) => {
         if (checked) {
-          // Add category ID to the array
           return { ...prev, categories: [...prev.categories, value] };
         } else {
-          // Remove category ID from the array
           return {
             ...prev,
             categories: prev.categories.filter((id) => id !== value),
@@ -136,6 +158,7 @@ const ArbeidsgiverHomePage: React.FC = () => {
       type === 'select-multiple' &&
       target instanceof HTMLSelectElement
     ) {
+      // Handling multiple select
       const values = Array.from(
         target.selectedOptions,
         (option: HTMLOptionElement) => option.value,
@@ -145,6 +168,7 @@ const ArbeidsgiverHomePage: React.FC = () => {
         [name]: values,
       }));
     } else {
+      // Handling other input types
       setNewJob((prev) => ({
         ...prev,
         [name]: value,
@@ -155,14 +179,11 @@ const ArbeidsgiverHomePage: React.FC = () => {
   // Handle Create Job Submission
   const handleCreateSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
-    setSuccess('');
 
-    // Validate that at least one category is selected
     if (newJob.categories.length === 0) {
       setError('Vennligst velg minst én kategori.');
-      setLoading(false);
+      toast.error('Vennligst velg minst én kategori.');
       return;
     }
 
@@ -171,14 +192,16 @@ const ArbeidsgiverHomePage: React.FC = () => {
         throw new Error('Unauthorized');
       }
 
+      setIsSubmitting(true);
+
       const payload = {
         ...newJob,
-        categories: newJob.categories, // Send as array of strings
+        categories: newJob.categories,
       };
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/job`,
-        payload, // Send as JSON
+        payload,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -187,28 +210,33 @@ const ArbeidsgiverHomePage: React.FC = () => {
         },
       );
 
-      setSuccess('Job opprettet suksessfullt!');
-      setPublishedJobs((prev) => [...prev, response.data.item]);
+      // Update the jobs list with the newly created job
+      setPublishedJobs((prev) => [...prev, response.data]);
+
+      // Close the create modal
       closeCreateModal();
+
+      // Show success notification
+      toast.success('Job opprettet!', {
+        description: 'Du kan nå administrere jobben fra listen.',
+      });
     } catch (err: any) {
       console.error('Error creating job:', err);
       setError(err.response?.data?.message || 'Kunne ikke opprette jobben.');
+      toast.error(err.response?.data?.message || 'Kunne ikke opprette jobben.');
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   // Handle Edit Job Submission
   const handleEditSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
-    setSuccess('');
 
-    // Validate that at least one category is selected
     if (newJob.categories.length === 0) {
       setError('Vennligst velg minst én kategori.');
-      setLoading(false);
+      toast.error('Vennligst velg minst én kategori.');
       return;
     }
 
@@ -217,14 +245,16 @@ const ArbeidsgiverHomePage: React.FC = () => {
         throw new Error('Unauthorized or invalid job ID');
       }
 
+      setIsSubmitting(true);
+
       const payload = {
         ...newJob,
-        categories: newJob.categories, // Send as array of strings
+        categories: newJob.categories,
       };
 
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/job/${currentJob.id}`,
-        payload, // Send as JSON
+        payload,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -233,18 +263,26 @@ const ArbeidsgiverHomePage: React.FC = () => {
         },
       );
 
-      setSuccess('Job oppdatert suksessfullt!');
+      // Update the jobs list with the edited job
       setPublishedJobs((prev) =>
-        prev.map((job) =>
-          job.id === currentJob.id ? response.data.updatedItem : job,
-        ),
+        prev.map((j) => (j.id === currentJob.id ? response.data : j)),
       );
+
+      // Close the edit modal
       closeEditModal();
+
+      // Show success notification
+      toast.success('Job oppdatert!', {
+        description: 'Endringene er lagret.',
+      });
     } catch (err: any) {
       console.error('Error updating job:', err);
       setError(err.response?.data?.message || 'Kunne ikke oppdatere jobben.');
+      toast.error(
+        err.response?.data?.message || 'Kunne ikke oppdatere jobben.',
+      );
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -255,14 +293,14 @@ const ArbeidsgiverHomePage: React.FC = () => {
     );
     if (!confirmDelete) return;
 
-    setLoading(true);
     setError('');
-    setSuccess('');
 
     try {
       if (!token || !job.id) {
         throw new Error('Unauthorized or invalid job ID');
       }
+
+      setIsSubmitting(true);
 
       await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/job/${job.id}`, {
         headers: {
@@ -270,13 +308,19 @@ const ArbeidsgiverHomePage: React.FC = () => {
         },
       });
 
-      setSuccess('Job slettet suksessfullt!');
+      // Remove the deleted job from the list
       setPublishedJobs((prev) => prev.filter((j) => j.id !== job.id));
+
+      // Show success notification
+      toast.success('Job slettet!', {
+        description: 'Jobben er fjernet fra listen.',
+      });
     } catch (err: any) {
       console.error('Error deleting job:', err);
       setError(err.response?.data?.message || 'Kunne ikke slette jobben.');
+      toast.error(err.response?.data?.message || 'Kunne ikke slette jobben.');
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -298,7 +342,6 @@ const ArbeidsgiverHomePage: React.FC = () => {
         Her ser du en oversikt over alle jobbene du har publisert.
       </p>
 
-      {/* Create Job Button */}
       <button
         onClick={openCreateModal}
         className="hover:bg-primary-dark mb-6 rounded bg-primary px-4 py-2 text-white"
@@ -306,26 +349,24 @@ const ArbeidsgiverHomePage: React.FC = () => {
         Opprett Ny Jobb
       </button>
 
-      {/* Søkelinje */}
       <input
         type="text"
         placeholder="Søk gjennom dine jobber..."
         className="dark:bg-background-dark dark:text-foreground-dark mb-6 w-full rounded-lg bg-background p-3 text-foreground shadow-neumorphic focus:outline-none focus:ring-2 focus:ring-primary dark:shadow-neumorphic-dark"
       />
 
-      {/* Publiserte Jobbliste */}
-      {loading ? (
-        <p>Laster...</p>
+      {isAuthLoading || isFetching ? (
+        <LoadingLogo />
       ) : (
         <JobList
           jobs={publishedJobs}
-          isEmployerView
+          isEmployerView={true}
           onEdit={openEditModal}
           onDelete={handleDeleteJob}
         />
       )}
 
-      {/* Create Job Modal */}
+      {/* Job Creation Modal */}
       <JobModal
         isOpen={isCreateModalOpen}
         onClose={closeCreateModal}
@@ -334,12 +375,11 @@ const ArbeidsgiverHomePage: React.FC = () => {
         categories={categories}
         handleInputChange={handleInputChange}
         error={error}
-        success={success}
-        loading={loading}
+        isSubmitting={isSubmitting} // Pass loading state to disable form if needed
         isEdit={false}
       />
 
-      {/* Edit Job Modal */}
+      {/* Job Editing Modal */}
       <JobModal
         isOpen={isEditModalOpen && !!currentJob}
         onClose={closeEditModal}
@@ -348,8 +388,7 @@ const ArbeidsgiverHomePage: React.FC = () => {
         categories={categories}
         handleInputChange={handleInputChange}
         error={error}
-        success={success}
-        loading={loading}
+        isSubmitting={isSubmitting} // Pass loading state to disable form if needed
         isEdit={true}
       />
     </div>

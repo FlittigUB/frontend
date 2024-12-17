@@ -8,7 +8,8 @@ import { jwtDecode } from 'jwt-decode'; // Corrected import
 import Tooltip from '@/components/common/ToolTip';
 import Link from 'next/link';
 import axios from 'axios';
-import { FaCamera } from 'react-icons/fa'; // Importing the Camera Icon
+import { FaCamera } from 'react-icons/fa';
+import LoadingLogo from '@/components/NSRVLoader'; // Importing the Camera Icon
 
 interface User {
   id: string;
@@ -159,7 +160,7 @@ export default function ProfilePage() {
     return (
       <>
         <div className="flex min-h-screen items-center justify-center">
-          <p className="text-xl">Laster...</p>
+          <LoadingLogo />
         </div>
       </>
     );

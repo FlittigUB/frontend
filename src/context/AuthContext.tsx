@@ -1,40 +1,36 @@
 // src/context/AuthContext.tsx
+
 'use client';
-import React, { createContext, useContext, ReactNode } from 'react';
-import useAuth from '../hooks/useAuth';
+import React, { createContext, useContext } from 'react';
+import useAuth from '@/hooks/useAuth';
 import { User, UserRole } from '@/common/types';
 
-// Define the shape of your authentication context
-interface AuthContextProps {
+interface AuthContextType {
   loggedIn: boolean;
   token: string | null;
-  userRole: UserRole;
+  userRole: UserRole | null;
   user: User | null;
-  loading: boolean;
+  isAuthLoading: boolean; // Added property
 }
 
-// Define the props for the AuthProvider component
-interface AuthProviderProps {
-  children: ReactNode;
-}
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create the AuthContext with an initial value of undefined
-const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { loggedIn, token, userRole, user, isAuthLoading } = useAuth();
 
-// AuthProvider component that wraps your app and provides authentication state
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const auth = useAuth();
-
-  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ loggedIn, token, userRole, user, isAuthLoading }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-// Custom hook to use the AuthContext
-export const useAuthContext = () => {
+export const useAuthContext = (): AuthContextType => {
   const context = useContext(AuthContext);
-
   if (!context) {
     throw new Error('useAuthContext must be used within an AuthProvider');
   }
-
   return context;
 };
+
+export default AuthContext;
