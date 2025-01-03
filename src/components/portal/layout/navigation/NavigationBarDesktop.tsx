@@ -25,9 +25,6 @@ export default function NavigationBarDesktop() {
         <Link href="/portal/soknader">
           <FaBriefcase className="text-foreground-dark h-6 w-6 cursor-pointer hover:text-primary" />
         </Link>
-        <Link href="/portal/meldinger">
-          <FaEnvelope className="text-foreground-dark h-6 w-6 cursor-pointer hover:text-primary" />
-        </Link>
         <Link href="/portal/varsler">
           <FaBell className="text-foreground-dark h-6 w-6 cursor-pointer hover:text-primary" />
         </Link>

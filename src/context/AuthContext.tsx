@@ -1,6 +1,5 @@
 // src/context/AuthContext.tsx
 
-'use client';
 import React, { createContext, useContext } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { User, UserRole } from '@/common/types';
@@ -10,7 +9,7 @@ interface AuthContextType {
   token: string | null;
   userRole: UserRole | null;
   user: User | null;
-  isAuthLoading: boolean; // Added property
+  isAuthLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,7 +27,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuthContext = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
+    // If there's no AuthProvider above, we throw:
     throw new Error('useAuthContext must be used within an AuthProvider');
+  }
+  return context;
+};
+
+// 1) NEW: Optional hook that does NOT throw if no provider is found
+export const useOptionalAuthContext = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  // If no provider, return fallback "logged out" data
+  if (!context) {
+    return {
+      loggedIn: false,
+      token: null,
+      userRole: null,
+      user: null,
+      isAuthLoading: false
+    };
   }
   return context;
 };

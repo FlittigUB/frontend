@@ -2,13 +2,14 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: 'class',
-  content: ['./sr"./src/**/*.{js,ts,jsx,tsx,mdx'],
+  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'], // Fixed content path
   theme: {
     extend: {
       animation: {
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
         'spin-smooth': 'spin-smooth 1.2s linear infinite',
-        'draw-path': "draw 2s ease-out forwards, fill 0.5s ease-out 2.5s forwards"
+        'draw-path':
+          'draw 2s ease-out forwards, fill 0.5s ease-out 2.5s forwards',
       },
       keyframes: {
         'fade-in-up': {
@@ -20,20 +21,12 @@ export default {
           '100%': { transform: 'rotate(360deg)' },
         },
         draw: {
-          "0%": {
-            strokeDashoffset: "1000"
-          },
-          "100%": {
-            strokeDashoffset: "0"
-          }
+          '0%': { strokeDashoffset: '1000' },
+          '100%': { strokeDashoffset: '0' },
         },
         fill: {
-          "0%": {
-            fill: "transparent"
-          },
-          "100%": {
-            fill: "#ffffff"
-          }
+          '0%': { fill: 'transparent' },
+          '100%': { fill: '#ffffff' },
         },
       },
       boxShadow: {
@@ -51,13 +44,36 @@ export default {
           '6px 6px 12px rgba(255, 102, 0, 0.5), -6px -6px 12px rgba(255, 102, 0, 0.2)',
       },
       colors: {
-        primary: "#FFE135",
-        secondary: "#FFFFFF",
-        foreground: "#000000",
-        foregroundDark: "#FFFFFF",
-        background: "#FFF8DC",
-        backgroundDark: "#1A1A1A"
+        primary: '#FFE135',
+        secondary: '#FFFFFF',
+        foreground: '#000000',
+        foregroundDark: '#FFFFFF',
+        background: '#FFF8DC',
+        backgroundDark: '#1A1A1A',
       },
+        typography: (theme: (arg0: string) => any) => ({
+          DEFAULT: {
+            css: {
+              color: theme('colors.foreground'),
+              a: {
+                color: theme('colors.foreground'),
+                '&:hover': {
+                  color: theme('colors.foreground'), // Adjust hover color if needed
+                },
+              },
+              h1: {
+                color: theme('colors.foreground'),
+              },
+              h2: {
+                color: theme('colors.foreground'),
+              },
+              h3: {
+                color: theme('colors.foreground'),
+              },
+              // Add more element-specific styles as needed
+            },
+          },
+        }),
       borderRadius: {
         xl: '1.5rem',
         '3xl': '2rem',
@@ -71,5 +87,8 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('@tailwindcss/typography'),
+  ],
 } satisfies Config;

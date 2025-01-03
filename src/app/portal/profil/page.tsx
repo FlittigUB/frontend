@@ -224,7 +224,7 @@ export default function ProfilePage() {
           <p className="mt-2 text-gray-700">Klikk for å redigere</p>
 
           {/* Name and Verified Badge */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 flex-col">
             <input
               type="text"
               value={name}

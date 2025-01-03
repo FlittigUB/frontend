@@ -12,7 +12,9 @@ interface PortalRouteLayoutProps {
 const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
   return (
     <AuthProvider>
-      <PortalLayout>{children}</PortalLayout>
+      <PortalLayout>
+        <div className={'pb-20'}>{children}</div>
+      </PortalLayout>
     </AuthProvider>
   );
 };

@@ -29,15 +29,12 @@ const JobItem: React.FC<JobItemProps> = ({
 
   return (
     <div className="dark:bg-background-dark dark:text-foreground-dark rounded-xl bg-background p-6 text-foreground shadow-neumorphic dark:shadow-neumorphic-dark">
-      <Link
-        href={`/portal/soknader/${job.id}`}
-        className="text-2xl font-semibold"
-      >
+      <Link href={`/portal/job/${job.id}`} className="text-2xl font-semibold">
         {job.title}
       </Link>
       {isEmployerView && (
         <Link
-          href={`/portal/soknader/${job.id}`}
+          href={`/portal/job/${job.id}`}
           className="ml-12 rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
         >
           Se søknader
@@ -66,9 +63,14 @@ const JobItem: React.FC<JobItemProps> = ({
         </div>
       ) : (
         !isEmployerView && (
-          <button className="hover:bg-primary-dark mt-4 rounded-full bg-primary px-6 py-2 text-white shadow focus:outline-none focus:ring-2 focus:ring-primary dark:shadow-button-dark">
-            Søk på denne jobben
-          </button>
+          <div className="mt-6">
+            <Link
+              href={`/portal/soknader/${job.id}`}
+              className="hover:bg-primary-dark rounded-full bg-primary px-6 py-2 text-white shadow focus:outline-none focus:ring-2 focus:ring-primary dark:shadow-button-dark"
+            >
+              Søk på denne jobben
+            </Link>
+          </div>
         )
       )}
     </div>

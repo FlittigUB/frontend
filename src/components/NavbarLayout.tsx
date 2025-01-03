@@ -16,7 +16,7 @@ export default function NavbarLayout({ children }: NavbarLayoutProps) {
   };
 
   return (
-    <div className="relative bg-primary h-screen">
+    <div className="relative h-screen">
       {/* Navbar Section */}
       <nav className="absolute right-10 top-10 mt-4 text-black">
         <div className="flex items-center justify-end px-4">

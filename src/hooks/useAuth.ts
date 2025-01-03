@@ -19,7 +19,7 @@ const useAuth = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/users/me`,
           {
             headers: {
-              Authoization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
           },
         );

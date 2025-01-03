@@ -2,10 +2,11 @@ import BeaverHero from '@/components/common/BeaverHero';
 import Section from '@/components/common/Section';
 import Image from 'next/image';
 import Link from 'next/link';
-import NavbarLayout from "@/components/NavbarLayout";
+import NavbarLayout from '@/components/NavbarLayout';
 
 export const revalidate = 3600; // Revalidate every hour: 3600
 
+// Function to fetch Cooperation Partners
 async function fetchCooperationPartners() {
   const res = await fetch(`${process.env.API_URL}/cooperationPartners`, {
     next: { revalidate: 3600 }, // Cache for 1 hour: 3600
@@ -18,18 +19,40 @@ async function fetchCooperationPartners() {
   return res.json();
 }
 
+// Function to fetch Employees
+async function fetchEmployees() {
+  const res = await fetch(`${process.env.API_URL}/employee`, {
+    next: { revalidate: 3600 }, // Cache for 1 hour: 3600
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch employees');
+  }
+
+  return res.json();
+}
+
 export default async function OmOssPage() {
   let cooperationPartners = [];
+  let employees = [];
 
   try {
     cooperationPartners = await fetchCooperationPartners();
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching cooperation partners:', error);
+  }
+
+  try {
+    employees = await fetchEmployees();
+  } catch (error) {
+    console.error('Error fetching employees:', error);
   }
 
   return (
     <NavbarLayout>
       <BeaverHero title={'Om Oss'} />
+
+      {/* Team Members Section */}
       <Section className="bg-secondary">
         <h2 className="text-blueGreen pb-8 text-center text-5xl">
           Gjengen i Flittig UB
@@ -55,99 +78,50 @@ export default async function OmOssPage() {
           Leder: Emilie Kopland.
         </h2>
 
-        {/* New Team Members Section */}
+        {/* Existing Team Members (Hard-Coded) */}
         <div className="mt-12 px-4">
           <h3 className="text-blueGreen mb-8 text-center text-3xl">
             Møt Teamet
           </h3>
           <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
-            {/* Team Member 1 */}
-            <div className="flex flex-col items-center text-center">
-              <Image
-                height={150}
-                width={150}
-                src={
-                  process.env.NEXT_PUBLIC_ASSETS_URL +
-                  '1f95296e-0ca9-4604-93ef-4115b1e839e4.png'
-                }
-                alt="Emilie Kopland"
-                className="mb-4 rounded-full"
-              />
-              <h4 className="text-blueGreen text-xl">Emilie</h4>
-              <p className="text-gray-600">Daglig Leder</p>
-            </div>
-
-            {/* Team Member 2 */}
-            <div className="flex flex-col items-center text-center">
-              <Image
-                height={150}
-                width={150}
-                src={
-                  process.env.NEXT_PUBLIC_ASSETS_URL +
-                  '5fcd8f19-9919-4a0e-a0ce-fcbb4aef3cd3.png'
-                }
-                alt="Henrik Granseth"
-                className="mb-4 rounded-full"
-              />
-              <h4 className="text-blueGreen text-xl">Henrik</h4>
-              <p className="text-gray-600">Produkt- og bærekraftsansvarlig</p>
-            </div>
-
-            {/* Team Member 3 */}
-            <div className="flex flex-col items-center text-center">
-              <Image
-                height={150}
-                width={150}
-                src={
-                  process.env.NEXT_PUBLIC_ASSETS_URL +
-                  'bbfd297e-6028-492b-add4-ad790ad286e9.png'
-                }
-                alt="Ayad"
-                className="mb-4 rounded-full"
-              />
-              <h4 className="text-blueGreen text-xl">Ayad</h4>
-              <p className="text-gray-600">HR- og Personalansvarlig</p>
-            </div>
-
-            {/* Team Member 4 */}
-            <div className="flex flex-col items-center text-center">
-              <Image
-                height={150}
-                width={150}
-                src={
-                  process.env.NEXT_PUBLIC_ASSETS_URL +
-                  'd55d6e8a-df08-4ba0-a2a5-4761e95b17f7.png'
-                }
-                alt="Celine Stahl"
-                className="mb-4 rounded-full"
-              />
-              <h4 className="text-blueGreen text-xl">Celine</h4>
-              <p className="text-gray-600">
-                Markeds- og Kommunikasjonsansvarlig, og Grafisk Designer
-              </p>
-            </div>
-
-            {/* Team Member 5 */}
-            <div className="flex flex-col items-center text-center">
-              <Image
-                height={150}
-                width={150}
-                src={
-                  process.env.NEXT_PUBLIC_ASSETS_URL +
-                  'ef0cdb60-3e9d-407e-84eb-75768495791d.png'
-                }
-                alt="Ingrid Stray"
-                className="mb-4 rounded-full"
-              />
-              <h4 className="text-blueGreen text-xl">Ingrid</h4>
-              <p className="text-gray-600">Økonomi- og salgsansvarlig</p>
-            </div>
+            {employees.map((employee: any) => (
+              <div
+                key={employee.id}
+                className="flex flex-col items-center text-center"
+              >
+                <Image
+                  height={150}
+                  width={150}
+                  src={
+                    process.env.NEXT_PUBLIC_ASSETS_URL + employee.image // Assuming each employee has a 'photo' field
+                  }
+                  alt={employee.name}
+                  className="mb-4 rounded-full"
+                />
+                <h4 className="text-blueGreen text-xl">
+                  <Link href={`/info/om-oss/${employee.id}`}>
+                    {employee.name}
+                  </Link>
+                </h4>
+                <p className="text-gray-600 mb-4">{employee.role}</p>
+                <Link
+                  aria-label={`Les mer om ${employee.name}`}
+                  className="inline-block rounded border-2 border-gray-400 px-6 py-2 text-gray-600 hover:bg-gray-100 mt-auto transition focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                  href={`/info/om-oss/${employee.id}`}
+                  passHref
+                >
+                  Les mer
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </Section>
+
+      {/* Cooperation Partners Section */}
       <Section className="bg-secondary">
         <div className="space-y-12">
-          {cooperationPartners.map((partner: any) => (
+          {cooperationPartners.map((partner:any) => (
             <div
               data-testid="cooperation-partner" // Corrected attribute name
               key={partner.id}
@@ -173,7 +147,7 @@ export default async function OmOssPage() {
                   {partner.description}
                 </p>
                 <div>
-                  {partner.link.map((link: any, index: number) => (
+                  {partner.link.map((link: any, index: never) => (
                     <Link
                       key={index}
                       href={link.link}
@@ -190,6 +164,7 @@ export default async function OmOssPage() {
         </div>
       </Section>
 
+      {/* Address Section */}
       <Section className="flex h-80 flex-row items-center justify-center bg-primary">
         <h2 className="pb-4 text-left text-5xl text-foreground">Addresse</h2>
       </Section>

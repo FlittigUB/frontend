@@ -5,22 +5,38 @@
 import React, { useState, useEffect } from 'react';
 import JobList from '@/components/portal/job/JobList';
 import { Job } from '@/common/types';
-import Image from "next/image";
+import Image from 'next/image';
+import useAuth from '@/hooks/useAuth';
 
 // TODO: Protect endpoint to Arbeidstaker
 const ArbeidstakerHomePage: React.FC = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const { token } = useAuth();
 
   useEffect(() => {
-    // Fetch jobs from your API or data source
-    // Replace the placeholder data with actual API calls
     const fetchJobs = async () => {
-      const fetchedJobs: Job[] = [];
-      setJobs(fetchedJobs);
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/job/all`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setJobs(data);
+        } else {
+          console.error('Failed to fetch jobs data:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching receiver data:', error);
+      }
     };
 
     fetchJobs();
-  }, []);
+  }, [token]);
 
   return (
     <>

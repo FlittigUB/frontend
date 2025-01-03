@@ -1,20 +1,21 @@
-// src/app/portal/soknader/[jobId]/page.tsx
-
 'use client';
 
 import React, { FormEvent, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
 import { useAuthContext } from '@/context/AuthContext';
+
 import Logo from '@/components/common/Logo';
 import { Application, ApplicationStatus, Category, User } from '@/common/types';
-
 import EmployerProfile from '@/components/portal/job/EmployerProfile';
 import JobDetailsComponent from '@/components/portal/job/JobDetailsComponent';
 import UserApplicationStatus from '@/components/portal/job/applications/UserApplicationStatus';
 import ApplicationForm from '@/components/portal/job/applications/ApplicationForm';
 import ApplicationsList from '@/components/portal/job/applications/ApplicationsList';
 
+import { Toaster, toast } from 'sonner';
+
+// -- Types
 interface JobDetails {
   id: string;
   status: string;
@@ -31,137 +32,138 @@ interface JobDetails {
 }
 
 const ApplicationPage: React.FC = () => {
-  const {
-    loggedIn,
-    user,
-    token,
-    userRole,
-  } = useAuthContext();
-
-  // State variables
-  const [jobDetails, setJobDetails] = useState<JobDetails | null>(null);
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [userApplication, setUserApplication] = useState<Application | null>(
-    null,
-  );
-  const [loading, setLoading] = useState<boolean>(true);
-  const [submitting, setSubmitting] = useState<boolean>(false);
-  const [successMessage, setSuccessMessage] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string>('');
-  const [previewImage, setPreviewImage] = useState<string>('');
-
-  // Mapping of status from English to Norwegian
-  const statusTranslation: {
-    [key in ApplicationStatus]: { text: string; color: string };
-  } = {
-    waiting: { text: 'Venter godkjenning', color: 'text-yellow-600' },
-    approved: { text: 'Akseptert', color: 'text-green-600' },
-    rejected: { text: 'Avslått', color: 'text-red-600' },
-  };
-
+  const { loggedIn, user, token, userRole } = useAuthContext();
   const params = useParams();
   const jobId = params?.jobId?.toString();
 
-  // Fetch job details and applications
+  // -- Local State
+  const [jobDetails, setJobDetails] = useState<JobDetails | null>(null);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [userApplication, setUserApplication] = useState<Application | null>(null);
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+
+  const [previewImage, setPreviewImage] = useState<string>('');
+
+  // We'll store messages, but not show them directly. Toasts are triggered below in useEffects.
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  // Tailwind color-coded statuses
+  const statusTranslation: {
+    [key in ApplicationStatus]: { text: string; color: string };
+  } = {
+    waiting: {
+      text: 'Venter godkjenning',
+      color: 'bg-yellow-100 text-yellow-800',
+    },
+    approved: {
+      text: 'Akseptert',
+      color: 'bg-green-100 text-green-800',
+    },
+    rejected: {
+      text: 'Avslått',
+      color: 'bg-red-100 text-red-800',
+    },
+  };
+
+  // For simple fade-in transition
+  const [hasMounted, setHasMounted] = useState(false);
   useEffect(() => {
-    const fetchJobDetails = async () => {
+    setHasMounted(true);
+  }, []);
+
+  // -- Show toast whenever errorMessage or successMessage changes
+  useEffect(() => {
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
+  }, [errorMessage]);
+
+  useEffect(() => {
+    if (successMessage) {
+      toast.success(successMessage);
+    }
+  }, [successMessage]);
+
+  // -- Data fetching in one effect
+  useEffect(() => {
+    // Early returns to avoid multiple toast calls
+    if (!jobId) {
+      setLoading(false);
+      setErrorMessage('Ugyldig jobb-ID.');
+      return;
+    }
+    if (!loggedIn) {
+      setLoading(false);
+      setErrorMessage('Du må være logget inn.');
+      return;
+    }
+    if (!token) {
+      setLoading(false);
+      setErrorMessage('Uautorisert. Vennligst logg inn igjen.');
+      return;
+    }
+
+    const fetchAllData = async () => {
       try {
-        if (!token) {
-          throw new Error('Unauthorized');
-        }
-        const response = await axios.get(
+        setLoading(true);
+
+        // 1) Fetch Job Details
+        const jobResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/job/${jobId}`,
           {
             headers: {
-              'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
+        const job = jobResponse.data as JobDetails;
+        setJobDetails(job);
 
-        setJobDetails(response.data);
-
-        const userImage = response.data.user.image;
-        if (userImage) {
-          const assetsUrl = process.env.NEXT_PUBLIC_ASSETS_URL;
-          setPreviewImage(`${assetsUrl}${userImage}`);
+        if (job.user?.image) {
+          setPreviewImage(`${process.env.NEXT_PUBLIC_ASSETS_URL}${job.user.image}`);
         } else {
           setPreviewImage(
-            `${process.env.NEXT_PUBLIC_ASSETS_URL}default-profile-image.png`,
+            `${process.env.NEXT_PUBLIC_ASSETS_URL}default-profile-image.png`
           );
         }
-      } catch (error: any) {
-        console.error('Error fetching job details:', error);
-        if (!loggedIn) {
-          setErrorMessage(
-            error.response?.data?.message ||
-              error.message ||
-              'Kunne ikke hente jobbdetaljer.',
-          );
-        }
-      }
-    };
 
-    const fetchApplications = async () => {
-      try {
-        if (!token) {
-          throw new Error('Unauthorized');
-        }
-        const response = await axios.get(
+        // 2) Fetch Applications
+        const appsResponse = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/applications/job/${jobId}`,
           {
             headers: {
-              'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
-
-        const fetchedApplications: Application[] = response.data;
+        const fetchedApplications: Application[] = appsResponse.data;
         setApplications(fetchedApplications);
 
+        // If arbeidstaker, check if user has an existing application
         if (userRole === 'arbeidstaker' && user) {
-          const existingApplication = fetchedApplications.find(
-            (app) => app.user.id === user.id, // Compare the 'id' properties
-          );
-          if (existingApplication) {
-            setUserApplication(existingApplication);
-          }
+          const existing = fetchedApplications.find((app) => app.user.id === user.id);
+          if (existing) setUserApplication(existing);
         }
-      } catch (error: any) {
-        console.error('Error fetching applications:', error);
-        if (!loggedIn) {
-          setErrorMessage(
-            error.response?.data?.message ||
-              error.message ||
-              'Kunne ikke hente søknader.',
-          );
-        }
+      } catch (err: any) {
+        console.error(err);
+        // Avoid double toasting; just set error state
+        setErrorMessage(
+          err.response?.data?.message ||
+          err.message ||
+          'Noe gikk galt ved henting av data.'
+        );
+      } finally {
+        setLoading(false);
       }
     };
 
-    const fetchData = async () => {
-      setLoading(true);
-      if (jobId && loggedIn) {
-        if (token) {
-          await fetchJobDetails();
-          await fetchApplications();
-        } else {
-          setErrorMessage('Uautorisert. Vennligst logg inn igjen.');
-          setLoading(false);
-          return;
-        }
-      } else {
-        console.log('jobId er undefined eller auth er lastet.');
-        setErrorMessage('Ugyldig jobb-ID.');
-      }
-      setLoading(false);
-    };
+    fetchAllData();
+  }, [jobId, token, user, userRole, loggedIn]);
 
-    fetchData();
-  }, [jobId, token, userRole, user, loggedIn]);
-
-  // Handle form submission (only for arbeidstaker)
+  // -- Form submission
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -170,112 +172,92 @@ const ApplicationPage: React.FC = () => {
 
     try {
       if (!token || !user) {
-        throw new Error('Unauthorized');
+        throw new Error('Uautorisert bruker');
       }
-
-      const payload: any = {
-        job: jobId,
-        user: user.id,
-      };
-
+      const payload = { job: jobId, user: user.id };
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/applications`,
         payload,
         {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        },
+          headers: { Authorization: `Bearer ${token}` },
+        }
       );
-
       setSuccessMessage('Søknaden har blitt sendt!');
       setUserApplication(response.data);
       setApplications((prev) => [...prev, response.data]);
-    } catch (error: any) {
-      console.error('Error submitting application:', error);
+    } catch (err: any) {
+      console.error(err);
       setErrorMessage(
-        error.response?.data?.message ||
-          error.message ||
-          'Kunne ikke sende søknaden.',
+        err.response?.data?.message ||
+        err.message ||
+        'Kunne ikke sende søknaden.'
       );
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Approve Application Handler
+  // -- Approve
   const handleApprove = async (applicationId: string) => {
     try {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/applications/${applicationId}`,
         { status: 'approved' },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      setApplications((prevApplications) =>
-        prevApplications.map((app) =>
-          app.id === applicationId ? { ...app, status: 'approved' } : app,
-        ),
+      setApplications((prev) =>
+        prev.map((app) =>
+          app.id === applicationId ? { ...app, status: 'approved' } : app
+        )
       );
-
       setSuccessMessage('Søknaden har blitt godkjent!');
-    } catch (error: any) {
-      console.error('Error approving application:', error);
+    } catch (err: any) {
+      console.error(err);
       setErrorMessage(
-        error.response?.data?.message ||
-          error.message ||
-          'Kunne ikke godkjenne søknaden.',
+        err.response?.data?.message ||
+        err.message ||
+        'Kunne ikke godkjenne søknaden.'
       );
     }
   };
 
-  // Decline Application Handler
+  // -- Decline
   const handleDecline = async (applicationId: string) => {
     try {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/applications/${applicationId}`,
         { status: 'declined' },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      setApplications((prevApplications) =>
-        prevApplications.map((app) =>
-          app.id === applicationId ? { ...app, status: 'rejected' } : app,
-        ),
+      setApplications((prev) =>
+        prev.map((app) =>
+          app.id === applicationId ? { ...app, status: 'rejected' } : app
+        )
       );
-
       setSuccessMessage('Søknaden har blitt avslått.');
-    } catch (error: any) {
-      console.error('Error declining application:', error);
+    } catch (err: any) {
+      console.error(err);
       setErrorMessage(
-        error.response?.data?.message ||
-          error.message ||
-          'Kunne ikke avslå søknaden.',
+        err.response?.data?.message ||
+        err.message ||
+        'Kunne ikke avslå søknaden.'
       );
     }
   };
 
-  // Loading state
+  // -- Loading State
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-xl">Laster...</p>
+        <div className="flex flex-col items-center space-y-4 animate-pulse">
+          <div className="h-10 w-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-xl text-gray-700">Laster...</p>
+        </div>
       </div>
     );
   }
 
-  // Ensure the user is logged in
+  // -- Must be logged in
   if (!loggedIn || !user) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
@@ -287,66 +269,101 @@ const ApplicationPage: React.FC = () => {
     );
   }
 
-  // Error state
+  // -- If there's an error before job details load
   if (errorMessage && !jobDetails) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
         <Logo />
         <p className="mt-4 text-xl text-red-500">Feil: {errorMessage}</p>
+        <Toaster position="top-center" richColors />
       </div>
     );
   }
 
+  // -- Main View
   return (
-    <div className="flex min-h-screen flex-col items-center px-4 py-10">
-      <Logo />
+    <main
+      className="min-h-screen w-full px-4 py-10 bg-gradient-to-b from-gray-50 to-gray-100
+      flex flex-col items-center relative"
+    >
+      {/* Sonner Toaster */}
+      <Toaster position="top-center" richColors />
 
-      {jobDetails?.user && (
-        <EmployerProfile user={jobDetails.user} previewImage={previewImage} />
-      )}
+      {/* Container */}
+      <div className="w-full max-w-4xl space-y-6">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-4">
+          <Logo />
+        </div>
 
-      {jobDetails && (
-        <JobDetailsComponent
-          title={jobDetails.title}
-          description={jobDetails.description}
-          place={jobDetails.place}
-          date_accessible={jobDetails.date_accessible}
-          date_created={jobDetails.date_created}
-          date_updated={jobDetails.date_updated}
-          status={jobDetails.status}
-          categories={jobDetails.categories}
-        />
-      )}
-
-      {userRole === 'arbeidstaker' && (
-        <>
-          {userApplication ? (
-            <UserApplicationStatus
-              userApplication={userApplication}
-              statusTranslation={statusTranslation}
-              employerId={jobDetails?.user.id || ''}
-            />
-          ) : (
-            <ApplicationForm
-              onSubmit={handleSubmit}
-              submitting={submitting}
-              successMessage={successMessage}
-              errorMessage={errorMessage}
-            />
+        {/* Employer Profile + Job Details (Glass-style card) */}
+        <div
+          className={`
+            backdrop-blur-lg bg-white/80 rounded-xl shadow-lg p-6
+            transform transition-all duration-700
+            ${hasMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+          `}
+        >
+          {jobDetails?.user && (
+            <EmployerProfile user={jobDetails.user} previewImage={previewImage} />
           )}
-        </>
-      )}
+          {jobDetails && (
+            <div className="mt-6">
+              <JobDetailsComponent
+                title={jobDetails.title}
+                description={jobDetails.description}
+                place={jobDetails.place}
+                date_accessible={jobDetails.date_accessible}
+                date_created={jobDetails.date_created}
+                date_updated={jobDetails.date_updated}
+                status={jobDetails.status}
+                categories={jobDetails.categories}
+              />
+            </div>
+          )}
+        </div>
 
-      {userRole === 'arbeidsgiver' && (
-        <ApplicationsList
-          applications={applications}
-          statusTranslation={statusTranslation}
-          token={token!}
-          onApprove={handleApprove}
-          onDecline={handleDecline}
-        />
-      )}
-    </div>
+        {/* If arbeidstaker => Show own application or form */}
+        {userRole === 'arbeidstaker' && (
+          <div
+            className={`
+              backdrop-blur-lg bg-white/80 rounded-xl shadow-lg p-6
+              transform transition-all duration-700
+              ${hasMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+            `}
+          >
+            {userApplication ? (
+              <UserApplicationStatus
+                userApplication={userApplication}
+                statusTranslation={statusTranslation}
+                employerId={jobDetails?.user.id || ''}
+              />
+            ) : (
+              <ApplicationForm onSubmit={handleSubmit} submitting={submitting}  errorMessage={errorMessage} successMessage={successMessage}/>
+            )}
+          </div>
+        )}
+
+        {/* If arbeidsgiver => Show all applications */}
+        {userRole === 'arbeidsgiver' && (
+          <div
+            className={`
+              backdrop-blur-lg bg-white/80 rounded-xl shadow-lg p-6
+              transform transition-all duration-700
+              ${hasMounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+            `}
+          >
+            <ApplicationsList
+              applications={applications}
+              statusTranslation={statusTranslation}
+              token={token!}
+              onApprove={handleApprove}
+              onDecline={handleDecline}
+            />
+          </div>
+        )}
+      </div>
+    </main>
   );
 };
 

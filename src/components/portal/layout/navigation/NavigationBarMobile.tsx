@@ -7,7 +7,15 @@ import { FaRectangleList } from 'react-icons/fa6';
 import { AiFillMessage } from 'react-icons/ai';
 import Link from 'next/link';
 
-export default function NavigationBarMobile({ isDarkMode }: any) {
+interface NavigationBarMobileProps {
+  isDarkMode: boolean;
+  onOpenChat?: () => void;
+}
+
+export default function NavigationBarMobile({
+  isDarkMode,
+  onOpenChat,
+}: NavigationBarMobileProps) {
   const pathname = usePathname();
 
   // Helper function to determine if a link is active
@@ -174,9 +182,9 @@ export default function NavigationBarMobile({ isDarkMode }: any) {
                 Notifications
               </span>
             </Link>
-            <Link
-              href="/portal/meldinger"
-              className="group flex flex-col items-center"
+            <button
+              onClick={onOpenChat}
+              className="group flex flex-col items-center text-center focus:outline-none"
             >
               <AiFillMessage
                 className={`h-6 w-6 transition duration-300 ${
@@ -195,7 +203,7 @@ export default function NavigationBarMobile({ isDarkMode }: any) {
               >
                 Messages
               </span>
-            </Link>
+            </button>
           </div>
         </div>
       </nav>

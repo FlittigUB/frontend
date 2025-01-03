@@ -2,6 +2,7 @@ import React from 'react';
 import { Application, ApplicationStatus } from '@/common/types';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import ApplicantDetails from './ApplicantDetails';
+import Link from 'next/link';
 
 interface ApplicationsListProps {
   applications: Application[];
@@ -21,7 +22,7 @@ const ApplicationsList: React.FC<ApplicationsListProps> = ({
   onDecline,
 }) => {
   return (
-    <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-md">
+    <div className="mt-12 w-full max-w-2xl rounded-3xl bg-white p-6 shadow-md">
       <h2 className="mb-4 text-2xl font-bold">Mottatte Søknader</h2>
       {applications.length > 0 ? (
         <ul>
@@ -43,6 +44,16 @@ const ApplicationsList: React.FC<ApplicationsListProps> = ({
                     application.status}
                 </span>
               </p>
+              {application.status === 'approved' && (
+                <div className="mt-4 flex space-x-4">
+                  <Link
+                    className="flex items-center rounded-lg bg-blue-500 px-4 py-2 font-semibold text-white shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    href={`/portal/meldinger/${application.user.id}`}
+                  >
+                    Chat med {application.user.name}
+                  </Link>
+                </div>
+              )}
               {application.status === 'waiting' && (
                 <div className="mt-4 flex space-x-4">
                   <button

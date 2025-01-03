@@ -4,7 +4,11 @@ import dynamic from 'next/dynamic';
 const NavigationBarDesktop = dynamic(() => import('./NavigationBarDesktop'));
 const NavigationBarMobile = dynamic(() => import('./NavigationBarMobile'));
 
-export default function NavigationBar() {
+export default function NavigationBar({
+  onOpenChat,
+}: {
+  onOpenChat?: () => void;
+}) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -22,12 +26,7 @@ export default function NavigationBar() {
   }, []);
 
   return isMobile ? (
-    <NavigationBarMobile
-      isDarkMode={false}
-      toggleDarkMode={function (): void {
-        throw new Error('Function not implemented.');
-      }}
-    />
+    <NavigationBarMobile isDarkMode={false} onOpenChat={onOpenChat} />
   ) : (
     <NavigationBarDesktop />
   );

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
 import { User } from '@/common/types';
+import Link from 'next/link';
 
 interface EmployerProfileProps {
   user: User;
@@ -16,7 +17,7 @@ const EmployerProfile: React.FC<EmployerProfileProps> = ({
       <div className="flex w-1/2 flex-col">
         <h1 className="mb-4 text-2xl font-bold">Arbeidsgiver</h1>
         <p>
-          <strong>{user.name}</strong>
+          <Link href={`/portal/profil/${user.id}`}>{user.name}</Link>
         </p>
         <p>{user.bio}</p>
         <p>

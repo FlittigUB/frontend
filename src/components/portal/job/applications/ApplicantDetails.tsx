@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Application } from '@/common/types';
+import Link from 'next/link';
 
 interface ApplicantDetailsProps {
   application: Application;
@@ -18,10 +19,18 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
   if (!user) {
     return <p>Kunne ikke hente søkerens informasjon.</p>;
   }
+  let imageUrl = `${process.env.NEXT_PUBLIC_ASSETS_URL}default-profile-image.png`;
+  if (user.image && typeof user.image === 'object' && 'id' in user.image) {
+    imageUrl = user.image.id
+      ? `${process.env.NEXT_PUBLIC_ASSETS_URL}${user.image.id}`
+      : `${process.env.NEXT_PUBLIC_ASSETS_URL}default-profile-image.png`;
+  } else if (user.image && typeof user.image === 'string') {
+    imageUrl = user.image
+      ? `${process.env.NEXT_PUBLIC_ASSETS_URL}${user.image}`
+      : `${process.env.NEXT_PUBLIC_ASSETS_URL}default-profile-image.png`;
+  }
 
-  const imageUrl = user.image
-    ? `${process.env.NEXT_PUBLIC_ASSETS_URL}${user.image}`
-    : `${process.env.NEXT_PUBLIC_ASSETS_URL}default-profile-image.png`;
+  console.log(imageUrl);
 
   return (
     <div className="flex items-center space-x-4">
@@ -34,7 +43,9 @@ const ApplicantDetails: React.FC<ApplicantDetailsProps> = ({
         />
       </div>
       <div>
-        <p className="font-semibold">{user.name}</p>
+        <Link href={`/portal/profil/${user.id}`} className="font-semibold">
+          {user.name}
+        </Link>
         <p className="text-sm text-gray-600">{user.email}</p>
         {user.bio && <p className="text-sm text-gray-600">Bio: {user.bio}</p>}
         {user.birthdate && (

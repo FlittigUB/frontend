@@ -11,7 +11,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
-  image?: string; // ID of the user's profile image
+  image?: string | Image; // ID of the user's profile image
   bio?: string;
   birthdate: Date;
   applications?: Application[];
@@ -21,6 +21,9 @@ export interface User {
   parents?: Parent[];
   reviewsByUser?: Review[]; // Reviews made by the user
   reviewsAboutUser?: Review[]; // Reviews about the user
+}
+interface Image {
+  id: string;
 }
 
 export type UserRole = 'arbeidstaker' | 'arbeidsgiver' | null;
@@ -57,11 +60,9 @@ export interface Application {
   id: string;
   status: ApplicationStatus;
   user: User; // ID of the user who applied
-  job: string; // ID of the job applied for
+  job: Job; // ID of the job applied for
   parentalApproval?: boolean;
   parentalApprovalRequired?: boolean;
-  userObject?: User; // User object of the applicant
-  jobObject?: Job; // Job object applied to
 }
 
 // Interface for Category
@@ -110,4 +111,31 @@ export interface Parent {
   id: string;
   user?: string; // ID of the user who is a parent
   userObject?: User; // User object of the parent
+}
+// Interface for Article
+export interface Article {
+  id: string;
+  title: string;
+  content: string; // HTML string from WYSIWYG editor
+  description: string,
+  author: User;
+  date_published: string; // ISO date string
+  image?: string; // URL or path to the article's featured image
+}
+
+// Interface for Info
+export interface Info {
+  id: string;
+  title: string;
+  content: string; // HTML string from WYSIWYG editor
+  description: string,
+  date_created: string; // ISO date string
+  date_updated: string;
+}
+export interface Employee {
+  id: string;
+  name: string;
+  role: string;
+  details: string;
+  image: string;
 }
