@@ -1,117 +1,331 @@
 import Image from 'next/image';
-import BeaverHero from '@/components/common/BeaverHero';
 import NavbarLayout from '@/components/NavbarLayout';
 import Link from 'next/link';
 
 export default function Home() {
   return (
     <NavbarLayout>
-      <div className="relative bg-gradient-to-b from-yellow-300 via-yellow-200 to-yellow-100">
-        {/* Hero Section */}
-        <BeaverHero
-          title="En enklere hverdag!"
-          subtitle="Plattformen som gjør det lett å få hjelp til småjobber."
-        />
+      <main>
+        {/* HERO SECTION */}
+        <section className="relative flex min-h-[70vh] flex-col items-center justify-center overflow-hidden bg-gray-100 text-center">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0 h-full w-full">
+            <Image
+              src="https://panel.flittigub.no/assets/5c6a2d28-09a2-4f9b-87c4-36c0ec26319c.png"
+              alt="Flittig Hero Background"
+              fill
+              className="object-cover"
+              style={{ objectPosition: "50% 80%" }}
+              priority
+            />
+          </div>
 
-        {/* How It Works Section */}
-        <section className="bg-secondary px-6 py-16">
-          <div className="mx-auto flex max-w-6xl flex-col items-center md:flex-row md:items-start md:space-x-12">
-            <div className="flex-shrink-0">
-              <Image
-                height={400}
-                width={400}
-                src="/FIB.png"
-                alt="Flittig UB logo"
-                className="mx-auto drop-shadow-lg"
-              />
+          {/* Semi-Transparent Overlay */}
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/40 to-black/10" />
+
+          <div className="relative z-20 max-w-4xl px-6 py-12">
+            <h1 className="mb-4 text-5xl font-extrabold text-white drop-shadow-md md:text-6xl">
+              Gjør hverdagen enklere med Flittig
+            </h1>
+            <p className="mb-6 text-lg text-white md:text-xl">
+              En plattform som kobler ungdom med mennesker som trenger hjelp til
+              småoppgaver—raskt, trygt og enkelt.
+            </p>
+            <div className="flex flex-col items-center space-y-3 md:flex-row md:space-x-4 md:space-y-0">
+              <Link
+                href="/portal/registrer-deg"
+                className="inline-block rounded-md bg-yellow-500 px-8 py-3 text-lg font-semibold text-white shadow-md transition-transform duration-300 hover:scale-105 hover:bg-yellow-600"
+              >
+                Bli flittig du også
+              </Link>
+              <Link
+                href="/portal/stillinger"
+                className="leading-5 bg-white inline-block rounded-md border border-yellow-500 px-8 py-3 text-lg font-semibold text-yellow-500 shadow-md transition-transform duration-300 hover:scale-105 hover:bg-yellow-50"
+              >
+                Se ledige oppdrag
+                <p className="text-sm text-gray-400">(Krever ikke innlogging)</p>
+              </Link>
             </div>
-            <div className="mt-8 text-center md:text-left">
-              <h2 className="text-blueGreen text-4xl font-extrabold">
-                Hvordan fungerer Flittig?
+          </div>
+        </section>
+
+        {/* ABOUT SECTION */}
+        <section className="bg-white px-6 py-16">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="mb-4 text-center text-4xl font-bold text-gray-900 md:text-5xl">
+              Hva er Flittig?
+            </h2>
+            <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
+              Flittig er en ungdomsbedrift som forenkler hverdagen for de som
+              trenger litt ekstra hjelp. Eldre eller travle familier kan ha
+              utfordringer med alt fra husvask og hagearbeid til barnepass.
+              Samtidig finnes det unge som ønsker å tjene litt ekstra ved å bruke
+              sine ferdigheter og sin tilgjengelige tid.
+            </p>
+            <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
+              Gjennom Flittig kan du enten legge ut oppdrag du vil ha utført, eller
+              finne småjobber som passer dine ønsker. Dette gjør det enkelt å koble
+              behov og ressurser i nærmiljøet, til alles fordel.
+            </p>
+          </div>
+        </section>
+
+        {/* HOW IT WORKS SECTION */}
+        <section className="bg-green-50 px-6 py-16">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="mb-8 text-center text-3xl font-bold text-green-900 md:text-4xl">
+              Hvordan fungerer Flittig?
+            </h2>
+            <div className="grid max-w-4xl grid-cols-1 gap-10 md:mx-auto md:grid-cols-2">
+              <div>
+                <h3 className="mb-2 text-xl font-semibold text-green-900">
+                  For oppdragsgivere
+                </h3>
+                <p className="leading-relaxed text-gray-700">
+                  Opprett en profil og legg ut en kort beskrivelse av oppdraget —
+                  når, hvor og hva som skal gjøres. Du får raskt oversikt over
+                  interesserte ungdommer, og dere blir enige om lønn og
+                  tidsrammer.
+                </p>
+              </div>
+              <div>
+                <h3 className="mb-2 text-xl font-semibold text-green-900">
+                  For arbeidstakere
+                </h3>
+                <p className="leading-relaxed text-gray-700">
+                  Er du student eller ung voksen? Bla gjennom ledige stillinger
+                  uten å logge inn. Deretter kan du opprette en brukerkonto når du
+                  er klar for å sende en søknad. Slik tjener du litt ekstra og får
+                  verdifull erfaring.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* WHY CHOOSE FLITTIG SECTION */}
+        <section className="relative flex flex-col items-center justify-center overflow-hidden bg-white px-6 py-16 text-center">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">
+              Hvorfor velge Flittig?
+            </h2>
+            <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
+              Vi vektlegger trygghet, fleksibilitet og enkelhet — alt for å koble
+              behov og ressurser på en smidig måte. Hverken oppdragsgiver eller
+              arbeidstaker trenger å forholde seg til tunge prosesser eller skjulte
+              avgifter.
+            </p>
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
+              <div className="rounded-lg bg-yellow-50 p-6 shadow-sm">
+                <h3 className="mb-2 text-xl font-semibold text-gray-900">
+                  Nærmiljø-fokus
+                </h3>
+                <p className="leading-relaxed text-gray-700">
+                  Finn eller tilby hjelp i ditt eget område og bygg gode relasjoner
+                  på tvers av generasjoner.
+                </p>
+              </div>
+              <div className="rounded-lg bg-yellow-50 p-6 shadow-sm">
+                <h3 className="mb-2 text-xl font-semibold text-gray-900">
+                  Raskt og effektivt
+                </h3>
+                <p className="leading-relaxed text-gray-700">
+                  Svar og avtaler kommer kjapt, uten fordyrende mellomledd eller
+                  komplisert oppfølging.
+                </p>
+              </div>
+              <div className="rounded-lg bg-yellow-50 p-6 shadow-sm">
+                <h3 className="mb-2 text-xl font-semibold text-gray-900">
+                  Stor fleksibilitet
+                </h3>
+                <p className="leading-relaxed text-gray-700">
+                  Bestem selv når du vil jobbe, og hvilke oppgaver du ønsker å
+                  ta på deg. Oppdragsgivere setter kravene ut fra egne behov.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* COMMUNITY IMPACT SECTION */}
+        <section className="bg-green-50 px-6 py-16">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="mb-4 text-center text-3xl font-bold text-green-900 md:text-4xl">
+              Vårt bidrag til lokalsamfunnet
+            </h2>
+            <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
+              Småjobber som husvask, flyttehjelp og barnepass knytter folk tettere
+              sammen. Flittig gir unge en trygg arena for å tjene litt ekstra og
+              utvikle seg, samtidig som flere får løst daglige utfordringer.
+              Kort sagt: alle vinner, og lokalsamfunnet blir litt bedre.
+            </p>
+            <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
+              Lurer du på noe mer? Du kan lese mer om oss på
+              <Link
+                href="/info/om-oss"
+                className="ml-1 font-semibold text-green-900 underline"
+              >
+                Om Oss-siden
+              </Link>
+              , eller du kan sjekke vår
+              <Link
+                href="/info/ofte-stilte-sporsmal"
+                className="ml-1 font-semibold text-green-900 underline"
+              >
+                FAQ
+              </Link>
+              .
+            </p>
+          </div>
+        </section>
+
+        {/* SPONSORS SECTION */}
+        <section className="bg-white px-6 py-16">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="mb-4 text-center text-3xl font-bold text-gray-900 md:text-4xl">
+              Våre sponsorer
+            </h2>
+            <p className="mx-auto mt-4 max-w-3xl text-center text-lg leading-relaxed text-gray-700">
+              Vi er stolte av å ha flotte samarbeidspartnere som støtter vårt
+              arbeid og hjelper oss å vokse. Mer informasjon finner du på vår
+              <Link
+                href="/info/om-oss"
+                className="ml-1 font-semibold text-green-900 underline"
+              >
+                Om Oss
+              </Link>
+              -side.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-8">
+              {/* Examples of sponsor logos (replace with your real data) */}
+              <Link
+                href="/info/om-oss"
+                aria-label="Les mer om sponsor"
+                className="transition-transform hover:scale-105"
+              >
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}f80115fb-2be2-4131-9a3d-f6121fe58af8.png`}
+                  alt="Kristoffer Nerskogen Logo"
+                  width={120}
+                  height={60}
+                  className="object-contain"
+                />
+              </Link>
+              <Link
+                href="/info/om-oss"
+                aria-label="Les mer om sponsor"
+                className="transition-transform hover:scale-105"
+              >
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}4d17118a-2269-4af1-818a-79926aef1234.png`}
+                  alt="UIA Logo"
+                  width={120}
+                  height={60}
+                  className="object-contain"
+                />
+              </Link>
+              <Link
+                href="/info/om-oss"
+                aria-label="Les mer om sponsor"
+                className="transition-transform hover:scale-105"
+              >
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}ccf4234a-f3f4-4a60-a225-bcbadd67dfda.png`}
+                  alt="Dyreparken Logo"
+                  width={120}
+                  height={60}
+                  className="object-contain"
+                />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* SERVICES SECTION */}
+        <section className="bg-green-50 px-6 py-16">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="mb-4 text-center text-3xl font-bold text-green-900 md:text-4xl">
+              Eksempler på oppgaver
+            </h2>
+            <p className="mx-auto mt-4 max-w-3xl text-center text-lg leading-relaxed text-gray-700">
+              Her er noen populære tjenester du kan tilby eller få utført:
+            </p>
+            <div className="mx-auto mt-8 grid max-w-4xl grid-cols-1 gap-6 text-gray-700 md:grid-cols-3">
+              <div className="flex flex-col items-center justify-center rounded-lg bg-yellow-50 p-4 shadow-sm">
+                <h3 className="mb-2 text-xl font-semibold text-gray-900">
+                  Rengjøring
+                </h3>
+                <p className="text-center">
+                  Hjelp med husvask, rydding eller annet vedlikehold innendørs.
+                </p>
+              </div>
+              <div className="flex flex-col items-center justify-center rounded-lg bg-yellow-50 p-4 shadow-sm">
+                <h3 className="mb-2 text-xl font-semibold text-gray-900">
+                  Hagearbeid
+                </h3>
+                <p className="text-center">
+                  Alt fra gressklipping og planting til å forskjønne uteplassen.
+                </p>
+              </div>
+              <div className="flex flex-col items-center justify-center rounded-lg bg-yellow-50 p-4 shadow-sm">
+                <h3 className="mb-2 text-xl font-semibold text-gray-900">
+                  Barnepass
+                </h3>
+                <p className="text-center">
+                  Ansvarsfulle ungdommer kan stille opp som barnevakt.
+                </p>
+              </div>
+            </div>
+            <div className="mt-8 text-center">
+              <Link
+                href="/portal/stillinger"
+                className="inline-block rounded-md bg-yellow-500 px-8 py-3 text-lg font-semibold text-white shadow-md transition-transform duration-300 hover:scale-105 hover:bg-yellow-600"
+              >
+                Se flere oppdrag
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA SECTION */}
+        <section className="relative flex min-h-[40vh] w-full items-center justify-center bg-green-100">
+          {/* Background Accent */}
+          <div className="absolute inset-0 z-0 opacity-10">
+            <Image
+              src="/Bever-mynt-bg.png"
+              alt="Flittig UB Background"
+              fill
+              className="object-cover object-center"
+            />
+          </div>
+          <div className="relative z-10 mx-auto max-w-4xl text-center">
+            <div className="mx-4 rounded-xl bg-white/80 px-8 py-12 shadow-md backdrop-blur-sm">
+              <h2 className="text-4xl font-extrabold text-gray-900 md:text-5xl">
+                Bli med i Flittig i dag!
               </h2>
-              <p className="mb-6 mt-4 text-lg text-gray-800">
-                I Flittig legger du enkelt ut annonser over arbeidsoppgavene du
-                trenger å få løst. Slik vil potensielle arbeidstakere kunne finne
-                de småjobbene som passer de best. Fortell hva, hvor og når, så kan
-                du anse jobben som gjort. Enkel å bruke, enkel å like!
+              <p className="mt-4 text-lg leading-relaxed text-gray-700">
+                Opprett en konto og finn hjelpere, eller se ledige oppdrag på et
+                øyeblikk. Sammen bygger vi et mer inkluderende og fleksibelt
+                lokalsamfunn.
               </p>
-              <Link
-                href="/portal/registrer-deg"
-                className="hover:bg-primary-dark rounded-lg bg-primary px-8 py-3 font-semibold text-white shadow-md transition duration-300"
-              >
-                Bli flittig nå!
-              </Link>
+              <div className="mt-8 flex flex-col items-center space-y-3 md:flex-row md:space-x-4 md:space-y-0">
+                <Link
+                  href="/portal/registrer-deg"
+                  className="inline-block rounded-md bg-yellow-500 px-8 py-3 text-lg font-semibold text-white shadow-lg transition-transform duration-300 hover:scale-105 hover:bg-yellow-600"
+                >
+                  Registrer deg
+                </Link>
+                <Link
+                  href="/portal/stillinger"
+                  className="inline-block rounded-md border border-yellow-500 px-8 py-3 text-lg font-semibold text-yellow-500 shadow-lg transition-transform duration-300 hover:scale-105 hover:bg-yellow-50"
+                >
+                  Se oppdrag uten innlogging
+                </Link>
+              </div>
             </div>
           </div>
         </section>
-
-        {/* Key Message Section */}
-        <section className="bg-gradient-to-r from-green-100 via-white to-green-100 px-6 py-20">
-          <div className="mx-auto flex max-w-6xl flex-col items-center text-center">
-            <h2 className="text-5xl font-bold text-green-800">
-              Hverdagen skal være enkel
-            </h2>
-            <p className="mt-4 text-2xl text-gray-700">
-              ... og med Flittig er du bare få tastetrykk unna.
-            </p>
-          </div>
-        </section>
-
-        {/* Services Section */}
-        <section className="bg-secondary px-6 py-16">
-          <div className="mx-auto max-w-6xl text-center">
-            <h2 className="text-blueGreen text-5xl font-extrabold">
-              Vasking, flytting eller handlehjelp?
-            </h2>
-            <p className="mt-8 text-xl text-gray-800 md:w-3/5 mx-auto">
-              Med Flittig løser du små og mellomstore jobber på en enkel måte.
-              Det har aldri vært lettere å skaffe hjelp!
-            </p>
-            <div className="mt-8 flex justify-center">
-              <Image
-                src="/tre-bevere.png"
-                alt="Tre bevere som representerer vasking, flytting og handlehjelp"
-                width={600}
-                height={400}
-                className="rounded-lg drop-shadow-xl"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Call-to-Action Section */}
-        <section className="relative flex h-[60vh] w-full">
-          {/* Full-Width Background Image */}
-          <Image
-            src="/Bever-mynt-bg.png"
-            alt="Flittig UB Background"
-            fill
-            priority
-            className="absolute inset-0 object-cover object-center"
-          />
-
-          {/* Content Box */}
-          <div
-            className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center justify-center text-center px-4 py-12">
-            <div className="rounded-xl bg-white/80 py-12 px-10 shadow-lg backdrop-blur-sm">
-              <h1 className="text-5xl font-extrabold text-gray-900">
-                Bli flittig du også!
-              </h1>
-              <p className="mt-4 text-lg text-gray-700 leading-relaxed">
-                Registrer deg i dag og bli en del av vårt voksende nettverk!
-              </p>
-              <Link
-                data-testid="bli-flittig-button"
-                href="/portal/registrer-deg"
-                className="mt-6 inline-block rounded-lg bg-yellow-500 px-8 py-3 text-lg font-semibold text-white shadow-md transition-transform duration-300 hover:bg-yellow-600 hover:scale-105"
-              >
-                Registrer deg
-              </Link>
-            </div>
-          </div>
-        </section>
-
-      </div>
+      </main>
     </NavbarLayout>
   );
 }
