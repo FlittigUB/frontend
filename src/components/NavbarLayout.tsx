@@ -2,7 +2,7 @@
 
 import { ReactNode, useState } from 'react';
 import Link from 'next/link';
-import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
+import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
 
 interface NavbarLayoutProps {
   children: ReactNode;
@@ -15,87 +15,98 @@ export default function NavbarLayout({ children }: NavbarLayoutProps) {
     setMenuOpen(!menuOpen);
   };
 
+  // Define the navigation links for the home page
+  const navLinks = (
+    <>
+      <Link
+        href="/"
+        className="flex items-center gap-2 py-2 hover:text-primary transition-colors"
+        onClick={() => setMenuOpen(false)}
+      >
+        <span>Forside</span>
+      </Link>
+      <Link
+        href="/info/ofte-stilte-sporsmal"
+        className="flex items-center gap-2 py-2 hover:text-primary transition-colors"
+        onClick={() => setMenuOpen(false)}
+      >
+        <span>Ofte Stilte Spørsmål</span>
+      </Link>
+      <Link
+        href="/info/om-oss"
+        className="flex items-center gap-2 py-2 hover:text-primary transition-colors"
+        onClick={() => setMenuOpen(false)}
+      >
+        <span>Om Oss</span>
+      </Link>
+      {/* Portal as CTA Button */}
+      <Link
+        href="/portal"
+        className="flex items-center gap-2 py-2 px-4 bg-primary text-foregroundDark rounded-md font-semibold hover:bg-primaryDark transition-colors"
+        onClick={() => setMenuOpen(false)}
+      >
+        <span>Portal</span>
+      </Link>
+    </>
+  );
+
   return (
-    <div className="relative h-screen">
+    <div className="relative min-h-screen">
       {/* Navbar Section */}
-      <nav className="absolute right-10 top-10 mt-4 text-black">
-        <div className="flex items-center justify-end px-4">
-          {/* Desktop Links */}
-          <div className="z-50 hidden md:flex md:flex-row md:items-center md:space-x-2">
+      <header className="w-full border-b border-gray-200 bg-secondary shadow-sm">
+        <div className="relative container mx-auto flex items-center justify-between px-4 py-3">
+          {/* Brand / Logo */}
+          <div className="flex items-center">
             <Link
               href="/"
-              className="text-lg transition-colors hover:text-green-700"
+              className="text-2xl font-bold text-foreground hover:opacity-80 transition-opacity"
+              onClick={() => setMenuOpen(false)}
             >
-              Forside
-            </Link>
-            <span className="text-lg">/</span>
-            <Link
-              href="/info/ofte-stilte-sporsmal"
-              className="text-lg transition-colors hover:text-green-700"
-            >
-              Ofte Stilte Spørsmål
-            </Link>
-            <span className="text-lg">/</span>
-            <Link
-              href="/info/om-oss"
-              className="text-lg transition-colors hover:text-green-700"
-            >
-              Om Oss
-            </Link>
-            <span className="text-lg">/</span>
-            <Link
-              href="/prosessen"
-              className="text-lg transition-colors hover:text-green-700"
-            >
-              Prosessen
+              Flittig
             </Link>
           </div>
 
-          {/* Mobile Menu Icon */}
-          <div className="md:hidden">
-            <button
-              onClick={toggleMenu}
-              className="text-black focus:outline-none"
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center space-x-6">
+            {navLinks}
+          </nav>
+
+          {/* Mobile Menu Button */}
+          <button
+            type="button"
+            className="
+              md:hidden flex items-center justify-center
+              rounded-md p-2 text-foreground
+              hover:bg-primary hover:text-foregroundDark
+              transition-colors
+            "
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? (
+              <HiOutlineX className="text-2xl" />
+            ) : (
+              <HiOutlineMenu className="text-2xl" />
+            )}
+          </button>
+
+          {/* Mobile Dropdown */}
+          {menuOpen && (
+            <div
+              className="
+                absolute top-full left-0 w-full
+                bg-secondary
+                border-t border-gray-200
+                z-50
+                flex flex-col items-start px-4 py-4
+                md:hidden
+              "
             >
-              {menuOpen ? (
-                <AiOutlineClose size={24} />
-              ) : (
-                <AiOutlineMenu size={24} />
-              )}
-            </button>
-          </div>
+              {navLinks}
+            </div>
+          )}
         </div>
-
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="flex flex-col items-start space-y-2 px-4 py-2 md:hidden">
-            <Link
-              href="/"
-              className="text-lg transition-colors hover:text-green-700"
-            >
-              Forside
-            </Link>
-            <Link
-              href="/info/ofte-stilte-sporsmal"
-              className="text-lg transition-colors hover:text-green-700"
-            >
-              Ofte Stilte Spørsmål
-            </Link>
-            <Link
-              href="/info/om-oss"
-              className="text-lg transition-colors hover:text-green-700"
-            >
-              Om Oss
-            </Link>
-            <Link
-              href="/prosessen"
-              className="text-lg transition-colors hover:text-green-700"
-            >
-              Prosessen
-            </Link>
-          </div>
-        )}
-      </nav>
+      </header>
 
       {/* Content */}
       <main className="flex-1 overflow-y-auto">{children}</main>

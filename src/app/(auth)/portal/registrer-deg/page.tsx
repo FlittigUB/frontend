@@ -165,7 +165,7 @@ export default function MultiStepRegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10">
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 md:py-10 py-20">
       {/* Logo */}
       <div className="mb-8">
         <Logo />

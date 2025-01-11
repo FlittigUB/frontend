@@ -49,7 +49,7 @@ const ArbeidstakerHomePage: React.FC = () => {
       />
       <h1 className="mb-4 text-3xl font-bold">Velkommen til Flittig</h1>
       <p className="mb-6">
-        Finn relevante jobber nær deg og søk etter nye muligheter.
+        Finn jobben din her
       </p>
 
       {/* Søkelinje */}

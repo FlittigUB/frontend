@@ -4,24 +4,24 @@ import { Category } from '@/common/types';
 
 interface JobDetailsProps {
   title: string;
-  description: string;
+  description: string | undefined;
   place: string;
-  date_accessible: string;
+  scheduled_at: string;
   date_created: string;
   date_updated?: string | null;
-  status: string;
-  categories: Category[];
+  status: string | undefined;
+  category: Category;
 }
 
 const JobDetailsComponent: React.FC<JobDetailsProps> = ({
   title,
   description,
   place,
-  date_accessible,
+  scheduled_at,
   date_created,
   date_updated,
   status,
-  categories,
+  category,
 }) => {
   return (
     <div className="mb-8 w-full max-w-md rounded-3xl bg-white p-6 shadow-md">
@@ -32,7 +32,7 @@ const JobDetailsComponent: React.FC<JobDetailsProps> = ({
           <strong>Lokasjon:</strong> {place}
         </p>
         <p>
-          <strong>Tilgjengelig fra:</strong> {date_accessible}
+          <strong>Planlagt tidspunkt:</strong> {scheduled_at}
         </p>
         <p>
           <strong>Opprettet den:</strong>{' '}
@@ -48,11 +48,9 @@ const JobDetailsComponent: React.FC<JobDetailsProps> = ({
           <strong>Status:</strong> {status}
         </p>
         <strong>Kategorier:</strong>
-        {categories.map((category) => (
-          <p key={category.id}>
-            <strong>{category.name}</strong>
-          </p>
-        ))}
+        <p key={category.id}>
+          <strong>{category.name}</strong>
+        </p>
       </div>
     </div>
   );

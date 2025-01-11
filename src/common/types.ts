@@ -28,31 +28,51 @@ interface Image {
 
 export type UserRole = 'arbeidstaker' | 'arbeidsgiver' | null;
 
-// Interface for Job
 export interface Job {
+  date_updated: string | null | undefined;
+  date_created: string;
   id: string;
+  slug: string;
   status?: string;
   title: string;
   description?: string;
-  place: string;
-  date_accessible: string;
+  scheduled_at: string;
   user: User;
-  applications?: Application[];
-  categories: Category[];
+  category: Category;
   email_notifications: boolean;
+  rate: number;
+  hours_estimated: number;
+  payment_type: 'hourly' | 'fixed';
+  // place: string; // REMOVED if not needed
+  // possibly store position or reversedGeocode if needed
+  position: {
+    type?: 'Point';
+    coordinates?: [number, number];
+    latitude?: number;
+    longitude?: number;
+    formattedAddress?: string;
+    country?: string;
+    city?: string;
+    zipcode?: string;
+    streetName?: string;
+    streetNumber?: string;
+    countryCode?: string;
+    neighbourhood?: string;
+    provider?: string;
+  };
 }
 
-// types.ts
-
-// Interface for Job Form Data
+// Updated JobFormData: remove 'place', add lat/long
 export interface JobFormData {
+  latitude: string;
+  longitude: string;
   title: string;
   description: string;
-  place: string;
-  date_accessible: string;
-  categories: string[]; // Array of category IDs
+  scheduled_at: string;
+  category: Category['id'];
   email_notifications: boolean;
 }
+
 
 export type ApplicationStatus = "waiting" | "approved" | "rejected";
 // Interface for Application
@@ -67,6 +87,7 @@ export interface Application {
 
 // Interface for Category
 export interface Category {
+  image: string;
   id: string;
   name?: string;
   description?: string;

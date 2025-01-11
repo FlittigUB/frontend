@@ -1,62 +1,218 @@
 // src/components/portal/job/JobItem.tsx
 
-import React from 'react';
-import { Job } from '@/common/types';
-import Link from 'next/link';
+import React from "react";
+import Link from "next/link";
+import { Job } from "@/common/types";
+import { FiMapPin, FiCalendar, FiUser, FiMail, FiDollarSign, FiClock } from "react-icons/fi";
+import Image from "next/image";
+
+// Extended to handle job.distance if present
+interface ExtendedJob extends Job {
+  distance?: number;
+}
 
 interface JobItemProps {
-  job: Job;
+  job: ExtendedJob; // accept a job that may have distance
   isEmployerView?: boolean;
-  onEdit?: (job: Job) => void; // Edit handler
-  onDelete?: (job: Job) => void; // Delete handler
+  onEdit?: (job: Job) => void;
+  onDelete?: (job: Job) => void;
 }
 
 const JobItem: React.FC<JobItemProps> = ({
-  job,
-  isEmployerView = false,
-  onEdit,
-  onDelete,
-}) => {
-  // Function to format the date
+                                           job,
+                                           isEmployerView = false,
+                                           onEdit,
+                                           onDelete,
+                                         }) => {
+  // Format date in Norwegian
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    // Check if the date is valid
     if (isNaN(date.getTime())) {
-      return 'Ugyldig dato'; // "Invalid date" in Norwegian
+      return "Ugyldig dato";
     }
-    return date.toLocaleDateString('nb-NO');
+    return date.toLocaleDateString("nb-NO", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+  // Display payment info
+  const displayPayment = () => {
+    if (job.payment_type === "hourly") {
+      return `${job.rate} NOK / time`;
+    }
+    return `${job.rate} NOK (fast pris)`;
   };
 
+  // We'll display either position.formattedAddress or neighborhood/city
+  const displayLocation =
+    job.position?.neighbourhood ||
+    job.position?.city ||
+    "Ukjent sted";
+
   return (
-    <div className="dark:bg-background-dark dark:text-foreground-dark rounded-xl bg-background p-6 text-foreground shadow-neumorphic dark:shadow-neumorphic-dark">
-      <Link href={`/portal/job/${job.id}`} className="text-2xl font-semibold">
-        {job.title}
-      </Link>
-      {isEmployerView && (
+    <div
+      className="
+        flex flex-col
+        rounded-xl
+        bg-amber-50 p-6
+        text-foreground
+        shadow-neumorphic
+        dark:bg-background-dark
+        dark:text-foreground-dark
+        dark:shadow-neumorphic-dark
+        transition-shadow hover:shadow-lg
+      "
+    >
+      {/* Title row & "Se søknader" (only for employers) */}
+      <div className="flex items-center justify-between">
         <Link
-          href={`/portal/job/${job.id}`}
-          className="ml-12 rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
+          href={`/portal/stillinger/${job.slug}`}
+          className="
+            text-xl font-semibold
+            transition-colors
+            hover:text-primary
+            focus:outline-none
+          "
         >
-          Se søknader
+          {job.title}
         </Link>
+        {isEmployerView && (
+          <Link
+            href={`/portal/stillinger/${job.slug}`}
+            className="
+              hidden sm:inline-block
+              rounded-full border border-gray-200 bg-white
+              px-4 py-1 text-sm font-medium text-gray-700
+              shadow-sm
+              transition-colors
+              hover:bg-gray-100
+              focus:outline-none focus:ring-2 focus:ring-primary
+            "
+          >
+            Se søknader
+          </Link>
+        )}
+      </div>
+
+      {/* Gig Type Badge (Category) */}
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <span
+          className="
+            flex items-center gap-1
+            rounded-full bg-yellow-100 px-3 py-0.5
+            text-sm font-medium text-yellow-800
+          "
+        >
+          {job.category.name}
+        </span>
+      </div>
+
+      {/* Description */}
+      {job.description && (
+        <p className="mt-4 text-sm text-gray-800 dark:text-gray-200">
+          {job.description}
+        </p>
       )}
-      <p className="mt-2">{job.description}</p>
-      <p className="mt-1 text-sm text-gray-600">
-        Sted: {job.place} | Tilgjengelig fra: {formatDate(job.date_accessible)}
-      </p>
+      {/* Payment Information */}
+      <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <FiDollarSign className="h-4 w-4 flex-shrink-0" />
+        <span>{displayPayment()}</span>
+      </div>
+      {job.hours_estimated && (
+        <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <FiClock className="h-4 w-4 flex-shrink-0"/>
+          <span>{job.hours_estimated} timer</span>
+        </div>
+      )}
+
+      {/* Location & Date */}
+      <div className="mt-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        {/* Location */}
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <FiMapPin className="h-4 w-4 flex-shrink-0" />
+          <span>{displayLocation}</span>
+          {/* If there's a distance, show it */}
+          {job.distance !== undefined && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              ({job.distance.toFixed(1)} km unna)
+            </span>
+          )}
+        </div>
+
+        {/* Date */}
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <FiCalendar className="h-4 w-4 flex-shrink-0" />
+          <span>{`Planlagt tidspunkt: ${formatDate(job.scheduled_at)}`}</span>
+        </div>
+      </div>
+
+      {/* Posted by (job.user) section */}
+      <Link href={`/portal/profil/${job.user.id}`}>
+        <div className="mt-4 flex items-center gap-3 border-t border-gray-200 pt-3 dark:border-gray-700">
+          {/* If there's an image, display it; else, show an icon */}
+          {job.user.image ? (
+            <Image
+              src={
+                typeof job.user.image === "string"
+                  ? `${process.env.NEXT_PUBLIC_ASSETS_URL}${job.user.image}`
+                  : job.user.image?.id
+                    ? `${process.env.NEXT_PUBLIC_ASSETS_URL}${job.user.image.id}`
+                    : "/fallback.jpg"
+              }
+              alt={job.user.name}
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-full object-cover"
+            />
+          ) : (
+            <div
+              className="
+                flex h-9 w-9 items-center justify-center
+                rounded-full bg-gray-200 text-gray-600
+                dark:bg-gray-700 dark:text-gray-300
+                hover:text-primary
+                transition-colors
+              "
+            >
+              <FiUser className="h-5 w-5" />
+            </div>
+          )}
+
+          <div className="flex flex-col text-sm">
+            <span className="font-medium text-gray-800 dark:text-gray-200 hover:text-primary transition-colors">
+              {job.user.name}
+            </span>
+            <span className="flex items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-primary transition-colors">
+              <FiMail className="h-4 w-4" />
+              {job.user.email}
+            </span>
+          </div>
+        </div>
+      </Link>
 
       {/* Action Buttons */}
       {isEmployerView && onEdit && onDelete ? (
-        <div className="mt-4 flex space-x-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           <button
             onClick={() => onEdit(job)}
-            className="rounded-full bg-blue-500 px-4 py-2 text-white shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="
+              rounded-full bg-blue-500 px-5 py-2 text-sm font-semibold text-white
+              shadow transition-colors
+              hover:bg-blue-600
+              focus:outline-none focus:ring-2 focus:ring-blue-500
+            "
           >
             Rediger
           </button>
           <button
             onClick={() => onDelete(job)}
-            className="rounded-full bg-red-500 px-4 py-2 text-white shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="
+              rounded-full bg-red-500 px-5 py-2 text-sm font-semibold text-white
+              shadow transition-colors
+              hover:bg-red-600
+              focus:outline-none focus:ring-2 focus:ring-red-500
+            "
           >
             Slett
           </button>
@@ -65,8 +221,16 @@ const JobItem: React.FC<JobItemProps> = ({
         !isEmployerView && (
           <div className="mt-6">
             <Link
-              href={`/portal/soknader/${job.id}`}
-              className="hover:bg-primary-dark rounded-full bg-primary px-6 py-2 text-white shadow focus:outline-none focus:ring-2 focus:ring-primary dark:shadow-button-dark"
+              href={`/portal/stillinger/${job.slug}`}
+              className="
+                inline-flex items-center
+                rounded-full bg-primary px-6 py-2
+                text-sm font-semibold text-white
+                shadow transition-colors
+                hover:bg-primary-dark
+                focus:outline-none focus:ring-2 focus:ring-primary
+                dark:shadow-button-dark
+              "
             >
               Søk på denne jobben
             </Link>

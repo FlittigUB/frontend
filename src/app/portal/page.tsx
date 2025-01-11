@@ -16,7 +16,7 @@ const PortalPage: React.FC = () => {
     if (isAuthLoading) return;
 
     if (!userRole) {
-      router.push('/portal/logg-inn');
+      router.push('/portal/arbeidstaker');
     } else if (userRole === 'arbeidstaker') {
       router.push('/portal/arbeidstaker');
     } else if (userRole === 'arbeidsgiver') {

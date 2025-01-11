@@ -49,21 +49,12 @@ export default function ChatHeader({
       {/* Right side (call or close buttons) */}
       <div className="flex items-center space-x-4">
         <a
-          href="tel:123456789"
+          href={`tel:${receiver.mobile}`}
           className="rounded-full p-2 text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
           aria-label="Call"
         >
           <FiPhone className="h-5 w-5" />
         </a>
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="rounded-full p-2 text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
-            aria-label="Close chat"
-          >
-            ✕
-          </button>
-        )}
       </div>
     </div>
   );

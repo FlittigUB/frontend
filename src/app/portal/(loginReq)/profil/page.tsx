@@ -354,7 +354,7 @@ export default function ProfilePage() {
         {/* Task Ratings */}
         <div className="w-full">
           <h2 className="mb-4 text-xl font-semibold text-gray-800 dark:text-gray-50">
-            Task Ratings
+            Anmeldelser
           </h2>
           <div className="grid grid-cols-2 gap-4">
             {['Rengjøring', 'Leksehjelp', 'Hagestell', 'Handling', 'Annet'].map(

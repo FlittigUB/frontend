@@ -15,6 +15,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // 1) Provide these fields from useAuth
   const { loggedIn, token, userRole, user, isAuthLoading } = useAuth();
 
   return (
@@ -24,20 +25,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+// 2) Use this in “protected” contexts or anywhere you need
 export const useAuthContext = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
-    // If there's no AuthProvider above, we throw:
     throw new Error('useAuthContext must be used within an AuthProvider');
   }
   return context;
 };
 
-// 1) NEW: Optional hook that does NOT throw if no provider is found
+// 3) The optional version: doesn't throw
 export const useOptionalAuthContext = (): AuthContextType => {
   const context = useContext(AuthContext);
-  // If no provider, return fallback "logged out" data
   if (!context) {
+    // fallback: user not logged in
     return {
       loggedIn: false,
       token: null,
