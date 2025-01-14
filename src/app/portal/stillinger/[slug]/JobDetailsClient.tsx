@@ -1,3 +1,4 @@
+// app/portal/stillinger/[slug]/JobDetailsClient.tsx
 'use client';
 
 import React, { FormEvent, useEffect, useState } from 'react';
@@ -5,31 +6,29 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 import { useAuthContext } from '@/context/AuthContext';
-import { Application, ApplicationStatus, Job } from '@/common/types';
+import { Application, ApplicationStatus } from '@/common/types';
 import { FiClock, FiDollarSign, FiMapPin } from "react-icons/fi";
 import Image from 'next/image';
 import { usePortalLayout } from '@/components/portal/PortalLayout';
+import { IoIosTimer } from "react-icons/io";
+import Review from "@/components/portal/job/Review";
 
-interface Props {
-  job: Job;
-}
+import { useJob } from './JobContext';
+import Link from "next/link";
 
-export default function JobDetailsClient({ job }: Props) {
+export default function JobDetailsClient() {
+  const job = useJob();
   const { loggedIn, user, token, userRole } = useAuthContext();
-  // 1) We can get the function from the layout's context
   const { openChatWithReceiver } = usePortalLayout();
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Applications data if user is arbeidsgiver or arbeidstaker
   const [applications, setApplications] = useState<Application[]>([]);
-  const [userApplication, setUserApplication] = useState<Application | null>(
-    null,
-  );
+  const [userApplication, setUserApplication] = useState<Application | null>(null);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  // 1) Preload the employer's image or store null
+  // Preload the employer's image or store null
   useEffect(() => {
     if (job.user?.image) {
       setPreviewImage(`${process.env.NEXT_PUBLIC_ASSETS_URL}${job.user.image}`);
@@ -38,7 +37,7 @@ export default function JobDetailsClient({ job }: Props) {
     }
   }, [job.user?.image]);
 
-  // 2) If logged in, fetch the applications (so we know if the user has applied)
+  // If logged in, fetch the applications (so we know if the user has applied)
   useEffect(() => {
     if (!loggedIn || !token) return;
     setLoading(true);
@@ -71,7 +70,7 @@ export default function JobDetailsClient({ job }: Props) {
       });
   }, [loggedIn, token, user, userRole, job.id]);
 
-  // 3) Submit application (arbeidstaker)
+  // Submit application (arbeidstaker)
   const handleApply = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -98,7 +97,7 @@ export default function JobDetailsClient({ job }: Props) {
     }
   };
 
-  // 4) Approve/Decline (arbeidsgiver)
+  // Approve/Decline (arbeidsgiver)
   const handleApprove = async (applicationId: string) => {
     try {
       await axios.patch(
@@ -143,14 +142,31 @@ export default function JobDetailsClient({ job }: Props) {
     }
   };
 
-  // 5) Minimal statuses
-  const statusLabels: Record<ApplicationStatus, string> = {
-    waiting: 'Venter godkjenning',
-    approved: 'Akseptert',
-    rejected: 'Avslått',
+  // Expanded statuses with descriptions
+  const statusDetails: Record<ApplicationStatus, { label: string; description: string }> = {
+    waiting: {
+      label: 'Venter godkjenning',
+      description: 'Din søknad er mottatt og venter på arbeidsgivers vurdering.',
+    },
+    approved: {
+      label: 'Akseptert',
+      description: 'Din søknad er godkjent av arbeidsgiver.',
+    },
+    rejected: {
+      label: 'Avslått',
+      description: 'Din søknad er avslått av arbeidsgiver.',
+    },
+    finished: {
+      label: 'Fullført',
+      description: 'Jobben er fullført. Du kan nå bekrefte fullføringen.',
+    },
+    confirmed: {
+      label: 'Bekreftet fullført',
+      description: 'Jobben er bekreftet fullført. Nå kan du gi en vurdering.',
+    },
   };
 
-  // 6) (Optional) Quick loading indicator
+  // Quick loading indicator
   if (loading) {
     return (
       <div className="flex justify-center p-10 text-gray-600">
@@ -169,7 +185,7 @@ export default function JobDetailsClient({ job }: Props) {
     return `${job.rate} NOK (fast pris)`;
   };
 
-  // 7) Render
+  // Render
   return (
     <div className="mx-auto my-8 w-full max-w-5xl px-4">
       {/* The big pastel card */}
@@ -202,7 +218,7 @@ export default function JobDetailsClient({ job }: Props) {
             </svg>
             <span>
               Planlagt tidspunkt:{' '}
-              {new Date(job.scheduled_at).toLocaleDateString('no-NO')}
+              {new Date(job.scheduled_at).toLocaleString('no-NO')}
             </span>
           </div>
         </div>
@@ -216,7 +232,7 @@ export default function JobDetailsClient({ job }: Props) {
         </div>
         {job.hours_estimated && (
           <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <FiClock className="h-4 w-4 flex-shrink-0"/>
+            <FiClock className="h-4 w-4 flex-shrink-0" />
             <span>{job.hours_estimated} timer</span>
           </div>
         )}
@@ -225,6 +241,17 @@ export default function JobDetailsClient({ job }: Props) {
         <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <FiMapPin className="h-4 w-4 flex-shrink-0" />
           <span>{displayLocation}</span>
+        </div>
+        {/* Time */}
+        <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <IoIosTimer className="h-4 w-4 flex-shrink-0" />
+          <span>
+            Planlagt klokkeslett:{' '}
+            {new Date(job.scheduled_at).toLocaleTimeString('no-NO', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
         </div>
 
         {/* Divider */}
@@ -283,7 +310,10 @@ export default function JobDetailsClient({ job }: Props) {
               <div className="text-sm text-gray-700">
                 <p>
                   <strong>Status:</strong>{' '}
-                  {statusLabels[userApplication.status]}
+                  {statusDetails[userApplication.status].label}
+                </p>
+                <p className="mt-1 text-xs text-gray-500">
+                  {statusDetails[userApplication.status].description}
                 </p>
                 {userApplication.status === 'approved' && (
                   <p className="mt-1 text-green-600">
@@ -299,6 +329,11 @@ export default function JobDetailsClient({ job }: Props) {
                   <p className="mt-1 text-yellow-600">
                     Din søknad er under vurdering.
                   </p>
+                )}
+                {userApplication.status === 'confirmed' && (
+                  <div className="mt-4">
+                    <Review receiverId={job.user.id} jobId={job.id} />
+                  </div>
                 )}
               </div>
             ) : (
@@ -318,6 +353,14 @@ export default function JobDetailsClient({ job }: Props) {
         {/* If arbeidsgiver => show the list of applications */}
         {loggedIn && userRole === 'arbeidsgiver' && (
           <div className="mt-6">
+              {/* "Legg til ekstra tjenester" Button */}
+              <div className="mb-4">
+                <Link href={`/portal/stillinger/${job.slug}/tjenester`}>
+                  <button className="rounded-full bg-gradient-to-r from-yellow-400 to-yellow-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:from-yellow-500 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    Legg til ekstra tjenester
+                  </button>
+                </Link>
+              </div>
             <h2 className="mb-2 text-lg font-semibold text-gray-800">
               Søknader ({applications.length})
             </h2>
@@ -334,8 +377,11 @@ export default function JobDetailsClient({ job }: Props) {
                       <p className="text-sm font-medium text-gray-800">
                         {app.user.name} –{' '}
                         <span className="italic text-gray-600">
-                          {statusLabels[app.status]}
+                          {statusDetails[app.status].label}
                         </span>
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {statusDetails[app.status].description}
                       </p>
                     </div>
                     <div className="flex gap-2">

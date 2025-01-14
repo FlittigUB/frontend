@@ -111,7 +111,7 @@ export default function MultiStepRegisterPage() {
       if (response.ok) {
         setSuccess('Registrering vellykket! Logger inn...');
 
-        // Automatically log in the user
+        // TODO await for stripe to complete
         const loginResponse = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
           {

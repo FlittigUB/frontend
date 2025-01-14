@@ -2,14 +2,16 @@
 
 'use client';
 
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, FormEvent, useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
-import { jwtDecode } from 'jwt-decode'; // Corrected import
 import Tooltip from '@/components/common/ToolTip';
 import Link from 'next/link';
 import axios from 'axios';
 import { FaCamera } from 'react-icons/fa';
-import LoadingLogo from '@/components/NSRVLoader'; // Importing the Camera Icon
+import LoadingLogo from '@/components/NSRVLoader';
+import { Review } from "@/common/types"; // Importing Review interface
+import { useRouter } from 'next/navigation';
+import { jwtDecode } from 'jwt-decode'; // Corrected import
 
 interface User {
   id: string;
@@ -47,6 +49,13 @@ export default function ProfilePage() {
   const [verified, setVerified] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // States for reviews
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState<boolean>(true);
+  const [reviewsError, setReviewsError] = useState<string | null>(null);
+
+  const router = useRouter(); // Initialize router for navigation
 
   // Function to determine role
   const getRole = () => {
@@ -91,10 +100,50 @@ export default function ProfilePage() {
             ? `${process.env.NEXT_PUBLIC_ASSETS_URL}${data.image}`
             : `${process.env.NEXT_PUBLIC_ASSETS_URL}70e5b449-da0a-4d91-af74-8a4592080b98`,
         );
+
+        // Fetch reviews after fetching user data
+        await fetchUserReviews(userId, token);
       } catch (err: any) {
         setError(err.response?.data?.message || err.message);
       } finally {
         setLoading(false);
+      }
+    };
+
+    const fetchUserReviews = async (userId: string, token: string) => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/reviews/user/${userId}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        console.log(response.data);
+        const fetchedReviews: any[] = response.data; // Adjust based on API response
+
+        // Map fetched reviews to match the Review interface
+        const mappedReviews: Review[] = fetchedReviews.map(review => ({
+          id: review.id,
+          date_created: review.date_created,
+          date_updated: review.date_updated,
+          byUserObject: review.by_user,       // Map snake_case to camelCase
+          jobObject: {
+            ...review.job,
+            category: review.job.category, // Ensure category includes 'name'
+          },
+          rating: review.rating,
+          comment: review.comment,
+          userObject: review.user,
+        }));
+
+        setReviews(mappedReviews);
+      } catch (err: any) {
+        setReviewsError(err.response?.data?.message || err.message);
+      } finally {
+        setReviewsLoading(false);
       }
     };
 
@@ -156,23 +205,45 @@ export default function ProfilePage() {
     }
   };
 
+  // Compute average ratings per category dynamically
+  const averageRatings = useMemo(() => {
+    const ratingsMap: { [key: string]: number[] } = {};
+
+    // Aggregate ratings by category name
+    reviews.forEach((review) => {
+      const category = review.jobObject?.category?.name;
+      if (category) {
+        if (!ratingsMap[category]) {
+          ratingsMap[category] = [];
+        }
+        ratingsMap[category].push(review.rating || 0);
+      }
+    });
+
+    // Calculate average ratings per category
+    const averages: { [key: string]: number } = {};
+    Object.entries(ratingsMap).forEach(([category, ratings]) => {
+      const total = ratings.reduce((sum, rating) => sum + rating, 0);
+      averages[category] = parseFloat((total / ratings.length).toFixed(1));
+    });
+
+    console.log("Average Ratings:", averages);
+    return averages;
+  }, [reviews]);
+
   if (loading) {
     return (
-      <>
-        <div className="flex min-h-screen items-center justify-center">
-          <LoadingLogo />
-        </div>
-      </>
+      <div className="flex min-h-screen items-center justify-center">
+        <LoadingLogo />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <>
-        <div className="flex min-h-screen items-center justify-center">
-          <p className="text-xl text-red-500">Feil: {error}</p>
-        </div>
-      </>
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-xl text-red-500">Feil: {error}</p>
+      </div>
     );
   }
 
@@ -351,32 +422,62 @@ export default function ProfilePage() {
           </button>
         </form>
 
-        {/* Task Ratings */}
+        {/* Dynamic Reviews Section */}
         <div className="w-full">
-          <h2 className="mb-4 text-xl font-semibold text-gray-800 dark:text-gray-50">
-            Anmeldelser
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            {['Rengjøring', 'Leksehjelp', 'Hagestell', 'Handling', 'Annet'].map(
-              (task, index) => (
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-50">
+              Anmeldelser
+            </h2>
+            <button
+              onClick={() => router.push('/profile/reviews')} // Navigate to reviews page
+              className="text-blue-500 hover:underline"
+            >
+              Se alle anmeldelser
+            </button>
+          </div>
+
+          {/* Loading and Error States for Reviews */}
+          {reviewsLoading ? (
+            <div className="flex items-center justify-center">
+              <LoadingLogo />
+            </div>
+          ) : reviewsError ? (
+            <p className="text-red-500">Feil: {reviewsError}</p>
+          ) : reviews.length === 0 ? (
+            <p className="text-gray-600">Ingen anmeldelser tilgjengelig.</p>
+          ) : (
+            <div className="space-y-4">
+              {Object.entries(averageRatings).map(([category, average]) => (
                 <div
-                  key={index}
-                  className={`rounded-2xl p-4 text-center shadow-neumorphic ${
-                    index % 2 === 0 ? 'bg-green-200' : 'bg-yellow-200'
-                  }`}
+                  key={category}
+                  className="flex items-center justify-between rounded-2xl bg-yellow-200 p-4 shadow-neumorphic"
                 >
-                  <span className="font-medium text-gray-800">{task}</span>
-                  <div className="mt-2 flex justify-center space-x-1">
+                  <span className="font-medium text-gray-800 dark:text-gray-200">
+                    {category}
+                  </span>
+                  <div className="flex items-center space-x-1">
+                    {/* Display stars based on average rating */}
                     {Array.from({ length: 5 }).map((_, starIndex) => (
-                      <span key={starIndex} className="text-xl text-yellow-500">
+                      <span
+                        key={starIndex}
+                        className={`text-xl ${
+                          starIndex < Math.floor(average)
+                            ? 'text-yellow-500'
+                            : 'text-gray-300'
+                        }`}
+                      >
                         ★
                       </span>
                     ))}
+                    {/* Display numerical average */}
+                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                      {average > 0 ? average.toFixed(1) : 'Ingen vurdering'}
+                    </span>
                   </div>
                 </div>
-              ),
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Logout and Customer Service */}

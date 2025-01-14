@@ -7,8 +7,8 @@ import { Toaster } from 'sonner';
 import InsightsScript from '@/components/analytics/PlausibleScript';
 
 export const metadata: Metadata = {
-  title: 'Flittig UB',
-  description: 'En app for å hjelpe deg med småjobber.',
+  title: 'Flittig UB | Småjobber gjort enkelt',
+  description: 'Flittig UB gjør det enkelt å finne eller tilby småjobber lokalt. Barnepass, rengjøring og mer – raskt og trygt i ditt nærmiljø!',
 };
 
 export default function RootLayout({

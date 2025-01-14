@@ -45,6 +45,14 @@ export default function Home() {
                 Se ledige oppdrag
                 <p className="text-sm text-gray-400">(Krever ikke innlogging)</p>
               </Link>
+              {/* CTA 2: Publiser oppdrag (For those who need help, e.g. seniors) */}
+              <Link
+                href="/portal" // adjust to your actual route
+                className="bg-white inline-block rounded-md border border-green-500 px-8 py-3 text-lg font-semibold text-green-500 shadow-md transition-transform duration-300 hover:scale-105 hover:bg-green-50"
+              >
+                Publiser oppdrag
+                <p className="text-sm text-gray-400">(Krever innlogging)</p>
+              </Link>
             </div>
           </div>
         </section>

@@ -2,7 +2,7 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { Category, JobFormData } from '@/common/types';
 import AddressSearch from './AddressSearch';
-import { FaArrowRight, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaArrowRight, FaMapMarkerAlt, FaInfoCircle, FaList, FaDollarSign } from 'react-icons/fa';
 
 interface JobModalProps {
   isOpen: boolean;
@@ -42,7 +42,7 @@ const JobModal: React.FC<JobModalProps> = ({
                                              isSubmitting,
                                            }) => {
 
-  // Steps: 0 => Title & Description, 1 => Address / Position, 2 => Date/Category
+  // Steps: 0 => Title & Description, 1 => Address / Position, 2 => Date/Category, 3 => Payment Info
   const [step, setStep] = useState<number>(0);
 
   // Display lines for the chosen address
@@ -121,8 +121,16 @@ const JobModal: React.FC<JobModalProps> = ({
   // If modal is not open, return null
   if (!isOpen) return null;
 
-  const stepLabels = ['Grunnleggende Info', 'Posisjon', 'Detaljer & Send inn'];
+  const stepLabels = ['Grunnleggende Info', 'Posisjon', 'Detaljer', 'Betalingsinformasjon'];
   const progressPercent = ((step + 1) / stepLabels.length) * 100;
+
+  // Definer ikoner for hvert steg
+  const stepIcons = [
+    <FaInfoCircle key="icon-0" />,      // Grunnleggende Info
+    <FaMapMarkerAlt key="icon-1" />,    // Posisjon
+    <FaList key="icon-2" />,            // Detaljer
+    <FaDollarSign key="icon-3" />,      // Betalingsinformasjon
+  ];
 
   // Validate fields per step
   const validateStep = (currentStep: number): boolean => {
@@ -139,6 +147,31 @@ const JobModal: React.FC<JobModalProps> = ({
         setStepError(`Beskrivelse kan ikke overstige ${MAX_DESCRIPTION_LENGTH} tegn.`);
         return false;
       }
+    } else if (currentStep === 1) {
+      if (!formData.latitude || !formData.longitude) {
+        setStepError('Posisjon er påkrevd.');
+        return false;
+      }
+    } else if (currentStep === 2) {
+      if (!formData.scheduled_at) {
+        setStepError('Tilgjengelig dato er påkrevd.');
+        return false;
+      }
+      if (!formData.category) {
+        setStepError('Kategori er påkrevd.');
+        return false;
+      }
+    } else if (currentStep === 3) {
+      if (formData.rate === undefined || formData.rate === null || formData.rate === 0) {
+        setStepError('Honorar er påkrevd.');
+        return false;
+      }
+      if (!formData.payment_type) {
+        setStepError('Betalingstype er påkrevd.');
+        return false;
+      }
+      // Remove condition for hours_estimated based on payment_type
+      // Now, it's always optional
     }
     setStepError('');
     return true;
@@ -190,10 +223,20 @@ const JobModal: React.FC<JobModalProps> = ({
             return (
               <div
                 key={index}
-                className={`${isActive ? 'font-semibold text-primary' : 'text-gray-400'} 
-                            ${isCompleted ? 'opacity-70' : ''} text-center`}
+                className={`flex flex-col items-center text-center ${
+                  isActive ? 'font-semibold text-primary' : 'text-gray-400'
+                } ${isCompleted ? 'opacity-70' : ''}`}
               >
-                {index + 1}. {label}
+                {isActive ? (
+                  <span>{label}</span>
+                ) : (
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700">
+                      {stepIcons[index]}
+                    </div>
+                    <span className="mt-1">{index + 1}</span>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -221,7 +264,7 @@ const JobModal: React.FC<JobModalProps> = ({
                   type="text"
                   name="title"
                   placeholder="Skriv inn tittel"
-                  value={formData.title}
+                  value={formData.title || ''}
                   onChange={handleInputChange}
                   required
                   className="dark:bg-background-dark dark:text-foreground-dark mt-1 w-full rounded-md border p-2
@@ -241,7 +284,7 @@ const JobModal: React.FC<JobModalProps> = ({
                   id="description"
                   name="description"
                   placeholder="Skriv en kort beskrivelse"
-                  value={formData.description}
+                  value={formData.description || ''}
                   onChange={handleInputChange}
                   required
                   rows={3}
@@ -298,12 +341,12 @@ const JobModal: React.FC<JobModalProps> = ({
             <>
               <div className="mb-4">
                 <label className="block font-medium text-gray-700 dark:text-gray-200">
-                  Tilgjengelig Fra
+                  Planlagt dato
                 </label>
                 <input
                   type="date"
                   name="scheduled_at"
-                  value={formData.scheduled_at}
+                  value={formData.scheduled_at || ''}
                   onChange={handleInputChange}
                   required
                   className="dark:bg-background-dark dark:text-foreground-dark mt-1 w-full rounded-md border p-2
@@ -317,13 +360,15 @@ const JobModal: React.FC<JobModalProps> = ({
                 </label>
                 <select
                   name="category"
-                  value={formData.category}
+                  value={formData.category || ''}
                   onChange={handleInputChange}
                   required
                   className="dark:bg-background-dark dark:text-foreground-dark w-full rounded-md border p-2
                              focus:border-primary focus:ring-1 focus:ring-primary"
                 >
-                  <option value="">Velg en kategori</option>
+                  <option value="" disabled>
+                    Velg en kategori
+                  </option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
@@ -339,10 +384,84 @@ const JobModal: React.FC<JobModalProps> = ({
                 <input
                   type="checkbox"
                   name="email_notifications"
-                  checked={formData.email_notifications}
+                  checked={formData.email_notifications || false}
                   onChange={handleInputChange}
                   className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary
                              dark:border-gray-600 dark:bg-gray-700"
+                />
+              </div>
+            </>
+          )}
+
+          {/* STEP 3 - Payment Information */}
+          {step === 3 && (
+            <>
+              <div className="mb-4">
+                <label
+                  htmlFor="sats"
+                  className="block font-medium text-gray-700 dark:text-gray-200"
+                >
+                  Sats (NOK) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="sats"
+                  type="number"
+                  name="rate"
+                  placeholder="Skriv inn sats"
+                  value={formData.rate !== undefined && formData.rate !== null ? formData.rate : ''}
+                  onChange={handleInputChange}
+                  required
+                  min="0"
+                  step="0.01"
+                  className="dark:bg-background-dark dark:text-foreground-dark mt-1 w-full rounded-md border p-2
+                             focus:border-primary focus:ring-1 focus:ring-primary"
+                  aria-required="true"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label
+                  htmlFor="payment_type"
+                  className="block font-medium text-gray-700 dark:text-gray-200"
+                >
+                  Betalingstype <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="payment_type"
+                  name="payment_type"
+                  value={formData.payment_type || ''}
+                  onChange={handleInputChange}
+                  required
+                  className="dark:bg-background-dark dark:text-foreground-dark mt-1 w-full rounded-md border p-2
+                             focus:border-primary focus:ring-1 focus:ring-primary"
+                  aria-required="true"
+                  defaultValue="" // Ensures placeholder is shown initially
+                >
+                  <option value="" disabled hidden>
+                    Velg en betalingstype
+                  </option>
+                  <option value="fixed">Fast</option>
+                  <option value="hourly">Timebasert</option>
+                </select>
+              </div>
+
+              <div className="mb-4">
+                <label
+                  htmlFor="hours_estimated"
+                  className="block font-medium text-gray-700 dark:text-gray-200"
+                >
+                  Estimerte Timer
+                </label>
+                <input
+                  id="hours_estimated"
+                  type="number"
+                  name="hours_estimated"
+                  placeholder="Skriv inn estimerte timer"
+                  value={formData.hours_estimated !== undefined && formData.hours_estimated !== null ? formData.hours_estimated : ''}
+                  onChange={handleInputChange}
+                  min="1"
+                  className="dark:bg-background-dark dark:text-foreground-dark mt-1 w-full rounded-md border p-2
+                             focus:border-primary focus:ring-1 focus:ring-primary"
                 />
               </div>
             </>

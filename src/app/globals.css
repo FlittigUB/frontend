@@ -12,6 +12,11 @@ body {
 .dark body {
   @apply bg-backgroundDark text-foregroundDark;
 }
+@layer base {
+    h1 {
+        @apply mb-4 text-3xl font-bold;
+    }
+}
 /* globals.css */
 .animate-draw-path-reverse {
     animation: drawAndFillReverse 5s ease-in-out infinite;

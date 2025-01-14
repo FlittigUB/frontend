@@ -23,6 +23,9 @@ const ArbeidsgiverHomePage: React.FC = () => {
   const [newJob, setNewJob] = useState<JobFormData>({
     latitude: '',
     longitude: '',
+    hours_estimated: 0,
+    payment_type: '',
+    rate: 0,
     title: '',
     description: '',
     scheduled_at: '',
@@ -42,11 +45,14 @@ const ArbeidsgiverHomePage: React.FC = () => {
     const fetchPublishedJobs = async () => {
       try {
         setIsFetching(true);
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/job`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/job`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
         const jobsData = Array.isArray(response.data) ? response.data : [];
         setPublishedJobs(jobsData);
       } catch (err: any) {
@@ -61,17 +67,22 @@ const ArbeidsgiverHomePage: React.FC = () => {
     const fetchCategories = async () => {
       try {
         setIsFetching(true);
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
         const catData = Array.isArray(response.data) ? response.data : [];
         setCategories(catData);
       } catch (err: any) {
         console.error('Error fetching categories:', err);
         setError(err.response?.data?.message || 'Failed to fetch categories.');
-        toast.error(err.response?.data?.message || 'Failed to fetch categories.');
+        toast.error(
+          err.response?.data?.message || 'Failed to fetch categories.',
+        );
       } finally {
         setIsFetching(false);
       }
@@ -87,6 +98,9 @@ const ArbeidsgiverHomePage: React.FC = () => {
   const openCreateModal = () => {
     setIsCreateModalOpen(true);
     setNewJob({
+      hours_estimated: 0,
+      payment_type: '',
+      rate: 0,
       title: '',
       description: '',
       latitude: '',
@@ -109,6 +123,9 @@ const ArbeidsgiverHomePage: React.FC = () => {
     // If the job has position data (job.position), you could parse it here.
     // For now we default to empty strings if not present.
     setNewJob({
+      hours_estimated: job.hours_estimated || 0,
+      payment_type: job.payment_type || '',
+      rate: job.rate || 0,
       title: job.title || '',
       description: job.description || '',
       latitude: '',
@@ -128,7 +145,9 @@ const ArbeidsgiverHomePage: React.FC = () => {
 
   // Fix TS error for 'checked' by narrowing the target to HTMLInputElement
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const target = e.target;
 
@@ -174,12 +193,16 @@ const ArbeidsgiverHomePage: React.FC = () => {
         },
       };
 
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/job`, payload, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/job`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       setPublishedJobs((prev) => [...prev, response.data]);
       closeCreateModal();
@@ -247,7 +270,9 @@ const ArbeidsgiverHomePage: React.FC = () => {
     } catch (err: any) {
       console.error('Error updating job:', err);
       setError(err.response?.data?.message || 'Kunne ikke oppdatere jobben.');
-      toast.error(err.response?.data?.message || 'Kunne ikke oppdatere jobben.');
+      toast.error(
+        err.response?.data?.message || 'Kunne ikke oppdatere jobben.',
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -255,7 +280,9 @@ const ArbeidsgiverHomePage: React.FC = () => {
 
   // DELETE
   const handleDeleteJob = async (job: Job) => {
-    const confirmDelete = confirm(`Er du sikker på at du vil slette jobben "${job.title}"?`);
+    const confirmDelete = confirm(
+      `Er du sikker på at du vil slette jobben "${job.title}"?`,
+    );
     if (!confirmDelete) return;
 
     try {
@@ -286,15 +313,19 @@ const ArbeidsgiverHomePage: React.FC = () => {
   if (userRole !== 'arbeidsgiver') {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-xl text-red-500">Du har ikke tilgang til denne siden.</p>
+        <p className="text-xl text-red-500">
+          Du har ikke tilgang til denne siden.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
       <h1 className="mb-4 text-3xl font-bold">Dine Publiserte Jobber</h1>
-      <p className="mb-6">Her ser du en oversikt over alle jobbene du har publisert.</p>
+      <p className="mb-6">
+        Her ser du en oversikt over alle jobbene du har publisert.
+      </p>
 
       <button
         onClick={openCreateModal}
@@ -306,9 +337,7 @@ const ArbeidsgiverHomePage: React.FC = () => {
       <input
         type="text"
         placeholder="Søk gjennom dine jobber..."
-        className="dark:bg-background-dark dark:text-foreground-dark mb-6 w-full rounded-lg
-                   bg-background p-3 text-foreground shadow-neumorphic
-                   focus:outline-none focus:ring-2 focus:ring-primary dark:shadow-neumorphic-dark"
+        className="dark:bg-background-dark dark:text-foreground-dark mb-6 w-full rounded-lg bg-background p-3 text-foreground shadow-neumorphic focus:outline-none focus:ring-2 focus:ring-primary dark:shadow-neumorphic-dark"
       />
 
       {isAuthLoading || isFetching ? (
@@ -347,7 +376,7 @@ const ArbeidsgiverHomePage: React.FC = () => {
         isSubmitting={isSubmitting}
         isEdit={true}
       />
-    </div>
+    </>
   );
 };
 

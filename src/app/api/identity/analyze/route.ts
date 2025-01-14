@@ -1,3 +1,5 @@
+// app/api/identity/analyze/route.ts
+
 import { NextResponse } from 'next/server';
 
 export const config = {
@@ -10,7 +12,7 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const idCard = formData.get('id_card');
 
-    // Instead of checking instanceof File, verify essential properties
+    // Validate the id_card file
     if (
       !idCard ||
       typeof idCard === 'string' || // It shouldn't be a string
@@ -26,12 +28,19 @@ export async function POST(req: Request) {
 
     // Prepare form data to send to the backend
     const backendFormData = new FormData();
-    // Append the File object directly instead of its stream
     backendFormData.append('id_card', idCard as Blob, (idCard as any).name);
 
-    // Forward the request to the backend
+    // Extract the Authorization header from the incoming request
+    const authHeader = req.headers.get('Authorization');
+
+    // Forward the request to the backend with the Authorization header
     const backendResponse = await fetch(`${process.env.API_URL}/identity/analyze`, {
       method: 'POST',
+      headers: {
+        // Forward the Authorization header if it exists
+        ...(authHeader ? { 'Authorization': authHeader } : {}),
+        // 'Content-Type' is automatically set when using FormData
+      },
       body: backendFormData,
     });
 

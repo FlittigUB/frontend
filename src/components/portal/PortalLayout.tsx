@@ -67,20 +67,20 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
     const currentPath = window.location.pathname;
 
     if (loggedIn) {
-      // If on /portal/login and logged in, redirect to previousPath or /dashboard
-      if (currentPath.startsWith('/portal/login')) {
-        if (previousPath && !previousPath.startsWith('/portal/login')) {
+      // If on /portal/logg-inn and logged in, redirect to previousPath or /dashboard
+      if (currentPath.startsWith('/portal/logg-inn')) {
+        if (previousPath && !previousPath.startsWith('/portal/logg-inn')) {
           router.replace(previousPath);
         } else {
           router.replace('/dashboard'); // Safe fallback route
         }
       }
     } else {
-      // If on any /portal/... route except /portal/login, redirect to /portal/login with redirect query
-      if (currentPath.startsWith('/portal') && !currentPath.startsWith('/portal/login')) {
+      // If on any /portal/... route except /portal/logg-inn, redirect to /portal/logg-inn with redirect query
+      if (currentPath.startsWith('/portal') && !currentPath.startsWith('/portal/logg-inn') && !currentPath.startsWith('/portal/stillinger')) {
         // Set the previous path to currentPath before redirecting
         setPreviousPath(currentPath);
-        router.replace(`/portal/login?redirect=${encodeURIComponent(currentPath)}`);
+        router.replace(`/portal/logg-inn?redirect=${encodeURIComponent(currentPath)}`);
       }
     }
   }, [loggedIn, isAuthLoading, previousPath, router, setPreviousPath]);
@@ -100,7 +100,7 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
         <Navbar onOpenChat={() => openChatWithReceiver('')} />
 
         <main className="flex flex-1 justify-center overflow-y-auto">
-          <div className="w-full max-w-4xl">{children}</div>
+          <div className="w-full max-w-4xl container mx-auto px-4 py-8">{children}</div>
         </main>
 
         {/* Floating button: only show on md+ */}

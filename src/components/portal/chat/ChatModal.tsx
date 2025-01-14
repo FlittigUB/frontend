@@ -89,7 +89,7 @@ export default function ChatModal({ isOpen, onCloseAction, initialReceiverId = '
         {/* The chat modal container */}
         <div
           className={`
-            mb-4 mr-4
+            md:mb-4 md:mr-4
             h-screen w-screen md:h-[600px] md:w-[400px]
             flex flex-col rounded-t-xl bg-white shadow-lg dark:bg-gray-800 md:rounded-xl
 

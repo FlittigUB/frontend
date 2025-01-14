@@ -46,6 +46,8 @@ export interface Job {
   // place: string; // REMOVED if not needed
   // possibly store position or reversedGeocode if needed
   position: {
+    farm?: string | undefined;
+    suburb?: string | undefined;
     type?: 'Point';
     coordinates?: [number, number];
     latitude?: number;
@@ -64,6 +66,9 @@ export interface Job {
 
 // Updated JobFormData: remove 'place', add lat/long
 export interface JobFormData {
+  rate: number;
+  hours_estimated: number;
+  payment_type: 'hourly' | 'fixed' | '';
   latitude: string;
   longitude: string;
   title: string;
@@ -74,7 +79,7 @@ export interface JobFormData {
 }
 
 
-export type ApplicationStatus = "waiting" | "approved" | "rejected";
+export type ApplicationStatus = "waiting" | "approved" | "rejected" | "finished" | "confirmed";
 // Interface for Application
 export interface Application {
   id: string;

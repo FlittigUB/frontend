@@ -16,7 +16,6 @@ export default function ChatHeader({
   receiver,
   isReceiverOnline,
   ASSETS_URL,
-  onClose,
 }: ChatHeaderProps) {
   return (
     <div className="flex items-center justify-between rounded-t-xl border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">

@@ -62,7 +62,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
         <>
           {/* Greet the user if name is available */}
           {user && (
-            <span className="flex items-center gap-2 rounded-md bg-primary px-2 py-2 font-medium text-foregroundDark">
+            <span className="flex items-center gap-2 rounded-md px-2 py-2 font-medium text-gray-400">
               <HiOutlineUserCircle className="text-xl" />
               Hei, {user.name}!
             </span>
@@ -137,7 +137,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
       ) : (
         <>
           <Link
-            href="/portal/innlogging"
+            href="/portal/logg-inn"
             className="flex items-center gap-2 py-2 hover:text-primary"
             onClick={() => setMenuOpen(false)}
           >
@@ -145,7 +145,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
             Innlogging
           </Link>
           <Link
-            href="/portal/registrering"
+            href="/portal/registrer-deg"
             className="flex items-center gap-2 py-2 hover:text-primary"
             onClick={() => setMenuOpen(false)}
           >

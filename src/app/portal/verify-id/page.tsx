@@ -7,12 +7,13 @@ import axios from 'axios';
 import CaptureResult from '@/components/portal/identity/CaptureResult';
 import Camera from '@/components/portal/identity/Camera';
 import LoadingLogo from '@/components/NSRVLoader';
+import { useAuthContext } from "@/context/AuthContext";
 
 const VerifyID: React.FC = () => {
   const [isCapturing, setIsCapturing] = useState<boolean>(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-
+  const { token } = useAuthContext();
   const handlePhotoCapture = async (photoBlob: Blob | null) => {
     console.log('Foto tatt, laster opp...');
     if (!photoBlob) {
@@ -30,6 +31,7 @@ const VerifyID: React.FC = () => {
       const response = await axios.post('/api/identity/analyze', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
         },
       });
 
