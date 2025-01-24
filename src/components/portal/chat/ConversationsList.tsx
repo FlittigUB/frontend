@@ -10,6 +10,8 @@ export interface Conversation {
     name?: string;
     image?: string;
   };
+  // If your backend returns a broadcast message or system notice for each conversation
+  systemBroadcast?: string;
   lastMessage: {
     content: string;
     timestamp: string;
@@ -22,18 +24,18 @@ interface ConversationsListProps {
   isLoading?: boolean;
   ASSETS_URL?: string;
   onSelectConversationAction: (userId: string) => void;
-  onCloseAction?: () => void; // If you want a "close" button at top
+  onCloseAction?: () => void;
   MESSAGE_CHAR_LIMIT?: number;
 }
 
 export default function ConversationsList({
-  conversations,
-  isLoading,
-  ASSETS_URL,
-  onSelectConversationAction,
-  onCloseAction,
-  MESSAGE_CHAR_LIMIT = 50,
-}: ConversationsListProps) {
+                                            conversations,
+                                            isLoading,
+                                            ASSETS_URL,
+                                            onSelectConversationAction,
+                                            onCloseAction,
+                                            MESSAGE_CHAR_LIMIT = 50,
+                                          }: ConversationsListProps) {
   return (
     <div className="flex h-full w-full flex-col">
       {/* Top bar / header area */}
@@ -71,28 +73,41 @@ export default function ConversationsList({
               <li
                 key={user.id}
                 onClick={() => onSelectConversationAction(user.id)}
-                className="flex items-center space-x-3 rounded-lg bg-white p-2 shadow transition hover:cursor-pointer hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+                className="flex flex-col space-y-1 rounded-lg bg-white p-2 shadow transition hover:cursor-pointer hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
-                <Image
-                  src={`${ASSETS_URL}/${user.image || 'default.png'}`}
-                  alt={`${user.name || user.email}'s avatar`}
-                  width={40}
-                  height={40}
-                  className="rounded-full object-cover"
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-semibold text-gray-800 dark:text-gray-200">
-                    {user.name || user.email}
+                <div className="flex items-center space-x-3">
+                  <Image
+                    src={
+                      user.image
+                        ? `${ASSETS_URL}/${user.image}`
+                        : `${ASSETS_URL}ff6b7c58-020c-4db6-a858-cf0f8dba744c.webp`
+                    }
+                    alt={`${user.name || user.email}'s avatar`}
+                    width={40}
+                    height={40}
+                    className="rounded-full object-cover"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      {user.name || user.email}
+                    </div>
+                    <div className="truncate text-xs text-gray-500 dark:text-gray-400">
+                      {lastMsg.content.length > MESSAGE_CHAR_LIMIT
+                        ? lastMsg.content.slice(0, MESSAGE_CHAR_LIMIT) + '...'
+                        : lastMsg.content}
+                    </div>
                   </div>
-                  <div className="truncate text-xs text-gray-500 dark:text-gray-400">
-                    {lastMsg.content.length > MESSAGE_CHAR_LIMIT
-                      ? lastMsg.content.slice(0, MESSAGE_CHAR_LIMIT) + '...'
-                      : lastMsg.content}
+                  <div className="text-xs text-gray-400 dark:text-gray-500">
+                    {new Date(lastMsg.timestamp).toLocaleDateString()}
                   </div>
                 </div>
-                <div className="text-xs text-gray-400 dark:text-gray-500">
-                  {new Date(lastMsg.timestamp).toLocaleDateString()}
-                </div>
+
+                {/* Optional system broadcast message for this conversation */}
+                {conv.systemBroadcast && (
+                  <div className="rounded bg-blue-50 p-2 text-xs text-blue-700 dark:bg-blue-900 dark:text-blue-100">
+                    {conv.systemBroadcast}
+                  </div>
+                )}
               </li>
             );
           })}

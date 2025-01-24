@@ -1,8 +1,9 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
+import Image from "next/image";
 
 interface NavbarLayoutProps {
   children: ReactNode;
@@ -56,15 +57,19 @@ export default function NavbarLayout({ children }: NavbarLayoutProps) {
       <header className="w-full border-b border-gray-200 bg-secondary shadow-sm">
         <div className="relative container mx-auto flex items-center justify-between px-4 py-3">
           {/* Brand / Logo */}
-          <div className="flex items-center">
-            <Link
-              href="/"
-              className="text-2xl font-bold text-foreground hover:opacity-80 transition-opacity"
-              onClick={() => setMenuOpen(false)}
-            >
-              Flittig
-            </Link>
-          </div>
+          <Link
+            href="/portal"
+            className="relative text-2xl font-bold text-foreground hover:opacity-80 transition-opacity flex flex-row"
+          >
+            <div className="relative w-24 aspect-[16/9]">
+              <Image
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}81b7981a-69c0-4507-be74-d82b3134df3b.png`}
+                alt="Flittig UB Logo"
+                fill
+                className="object-contain" // Ensures the image fits within the container while preserving aspect ratio
+              />
+            </div>
+          </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center space-x-6">

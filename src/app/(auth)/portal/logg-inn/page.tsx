@@ -2,7 +2,7 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import LoginForm from '@/components/login/LoginForm';
+import LoginForm from '@/components/auth/LoginForm';
 import Image from 'next/image';
 
 export default function LoginPage() {

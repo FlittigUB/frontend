@@ -38,6 +38,13 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ onSelectRole }) => {
         >
           Arbeidstaker
         </button>
+        {/* New "Registrer som bedrift" Button */}
+        <button
+          onClick={() => onSelectRole('bedrift')}
+          className="col-span-2 flex items-center justify-center rounded-2xl bg-green-500 mb-1 mt-4 py-2 text-white shadow-lg transition-colors duration-300 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          Registrer som bedrift
+        </button>
       </div>
       <div className="text-center">
         <p className="text-gray-600">

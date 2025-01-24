@@ -7,14 +7,14 @@ import { Job } from '@/common/types';
 
 interface LayoutProps {
   children: React.ReactNode;
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 /**
  * Layout component that fetches job data and provides it to children via context.
  */
 const Layout: React.FC<LayoutProps> = async ({ children, params }) => {
-  const { slug } = params;
+  const { slug } = await params;
   const job: Job | null = await fetchJob(slug);
 
   if (!job) {

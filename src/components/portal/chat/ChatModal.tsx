@@ -14,7 +14,11 @@ interface ChatModalProps {
   initialReceiverId?: string;
 }
 
-export default function ChatModal({ isOpen, onCloseAction, initialReceiverId = '' }: ChatModalProps) {
+export default function ChatModal({
+                                    isOpen,
+                                    onCloseAction,
+                                    initialReceiverId = '',
+                                  }: ChatModalProps) {
   const [view, setView] = useState<'list' | 'chat'>('list');
   const [selectedReceiverId, setSelectedReceiverId] = useState('');
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -73,9 +77,33 @@ export default function ChatModal({ isOpen, onCloseAction, initialReceiverId = '
     setView('chat');
   }
 
+  // Handle any system actions from system messages
+  function handleSystemAction(actionId: string, payload?: any) {
+    if (actionId === 'mark_task_complete') {
+      // Example of calling your backend
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tasks/complete`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ taskId: payload?.taskId }),
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error('Failed to mark task complete');
+          // Possibly refresh messages or show success
+        })
+        .catch((err) => console.error(err));
+    }
+  }
+
+  // Example of a pinned system announcement
+  let someSystemAnnouncement;
+  // someSystemAnnouncement = "This is a pinned system notice.";
+
   return (
     <>
-      {/* The "backdrop" – if you want a dark overlay, uncomment background-color or do something custom */}
+      {/* Dark backdrop (optional) */}
       <div
         className={`
           fixed inset-0 z-50
@@ -83,8 +111,8 @@ export default function ChatModal({ isOpen, onCloseAction, initialReceiverId = '
           transition-opacity duration-300
           ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
         `}
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} // optional backdrop
-        onClick={onCloseAction} // Close modal when clicking on backdrop
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+        onClick={onCloseAction}
       >
         {/* The chat modal container */}
         <div
@@ -93,11 +121,10 @@ export default function ChatModal({ isOpen, onCloseAction, initialReceiverId = '
             h-screen w-screen md:h-[600px] md:w-[400px]
             flex flex-col rounded-t-xl bg-white shadow-lg dark:bg-gray-800 md:rounded-xl
 
-            // Slide/fade in-out transitions
             transform transition-all duration-300 ease-in-out
             ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}
           `}
-          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+          onClick={(e) => e.stopPropagation()}
         >
           {/* If user not logged in */}
           {!loggedIn ? (
@@ -149,12 +176,28 @@ export default function ChatModal({ isOpen, onCloseAction, initialReceiverId = '
                         receiver={receiver}
                         isReceiverOnline={isReceiverOnline}
                         ASSETS_URL={ASSETS_URL}
-                        onClose={onCloseAction}
                       />
+                      {/* Optional pinned system announcement */}
+                      {someSystemAnnouncement && (
+                        <div className="flex items-center justify-between bg-blue-50 p-3 text-blue-700 dark:bg-blue-900 dark:text-blue-100">
+                          <div>{someSystemAnnouncement}</div>
+                          <button
+                            onClick={() =>
+                              handleSystemAction('mark_task_complete', {
+                                taskId: '1234',
+                              })
+                            }
+                            className="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
+                          >
+                            Mark Task Complete
+                          </button>
+                        </div>
+                      )}
                       <ChatMessages
                         messages={messages}
                         messagesEndRef={messagesEndRef}
                         ASSETS_URL={ASSETS_URL}
+                        onSystemAction={handleSystemAction}
                       />
                       <ChatInput
                         messageInput={messageInput}

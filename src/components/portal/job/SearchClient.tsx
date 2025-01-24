@@ -1,16 +1,18 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Job } from "@/common/types";
 import JobList from "@/components/portal/job/JobList";
 
-// Helper function: Haversine formula for distance in km
+/**
+ * Haversine formula for distance in km
+ */
 function getDistanceFromLatLonInKm(
   lat1: number,
   lon1: number,
   lat2: number,
   lon2: number
-): number {
+) {
   const R = 6371; // Earth radius in km
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -23,8 +25,22 @@ function getDistanceFromLatLonInKm(
   return R * c;
 }
 
+/**
+ * Computes total salary (hourly vs. fixed).
+ * If hourly => rate * hours_estimated
+ * If fixed => rate
+ */
+function getTotalSalary(job: Job) {
+  if (job.payment_type === "hourly") {
+    return job.rate * job.hours_estimated;
+  }
+  // fixed
+  return job.rate;
+}
+
 interface ExtendedJob extends Job {
-  distance?: number; // We'll temporarily store computed distance here
+  distance?: number; // store computed distance if user location is known
+  totalSalary?: number; // store computed total salary for sorting/display
 }
 
 interface SearchClientProps {
@@ -33,134 +49,219 @@ interface SearchClientProps {
 
 export default function SearchClient({ jobs }: SearchClientProps) {
   const [query, setQuery] = useState("");
-  const [sortByDistance, setSortByDistance] = useState(false);
+  const [sortOption, setSortOption] = useState<
+    | "none"
+    | "titleAsc"
+    | "titleDesc"
+    | "salaryAsc"
+    | "salaryDesc"
+    | "dateAsc"
+    | "dateDesc"
+    | "distance"
+  >("none");
+
+  // We'll store user location in these states after geolocation request
   const [userLat, setUserLat] = useState<number | null>(null);
   const [userLon, setUserLon] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false); // New loading state
+  const [isLocationLoading, setIsLocationLoading] = useState(false);
 
-  // We'll handle the distance sorting in a button toggle for better UX
-  const handleDistanceToggle = useCallback(async () => {
-    if (!sortByDistance) {
-      // The user is trying to enable distance-based sorting
-      if (!navigator.geolocation) {
+  // If we select "distance" but have no location, request it once
+  useEffect(() => {
+    if (sortOption === "distance" && userLat == null && userLon == null) {
+      if (navigator.geolocation) {
+        setIsLocationLoading(true);
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            setUserLat(pos.coords.latitude);
+            setUserLon(pos.coords.longitude);
+            setIsLocationLoading(false);
+          },
+          (err) => {
+            console.error("Geolocation error:", err);
+            alert("Kunne ikke hente posisjon. Sjekk at du har gitt tillatelse.");
+            setIsLocationLoading(false);
+          }
+        );
+      } else {
         alert("Geolokasjon støttes ikke i denne nettleseren.");
-        return;
-      }
-
-      setIsLoading(true); // Start loading
-
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserLat(pos.coords.latitude);
-          setUserLon(pos.coords.longitude);
-          setSortByDistance(true);
-          setIsLoading(false); // End loading
-        },
-        (err) => {
-          console.error("Geolocation error:", err);
-          alert("Kunne ikke hente posisjon. Sjekk at du har gitt tillatelse.");
-          setIsLoading(false); // End loading even on error
-        }
-      );
-    } else {
-      // Already sorting by distance => turn it off
-      setSortByDistance(false);
-    }
-  }, [sortByDistance]);
-
-  // 1) Filter by text query
-  const filtered = jobs.filter((job) =>
-    job.title.toLowerCase().includes(query.toLowerCase())
-  );
-
-  // 2) Create an array that includes a `distance` field (if we can compute it)
-  const extendedJobs: ExtendedJob[] = filtered.map((job) => {
-    // default to null or undefined
-    let distance: number | undefined;
-    if (sortByDistance && userLat != null && userLon != null) {
-      const jLat = job.position?.latitude;
-      const jLon = job.position?.longitude;
-      if (jLat != null && jLon != null) {
-        distance = getDistanceFromLatLonInKm(userLat, userLon, jLat, jLon);
       }
     }
-    return { ...job, distance };
-  });
+  }, [sortOption, userLat, userLon]);
 
-  // 3) If sorting by distance, sort by `distance`
-  if (sortByDistance && userLat != null && userLon != null) {
-    extendedJobs.sort((a, b) => {
-      if (a.distance == null) return 1; // push unknown-loc to bottom
-      if (b.distance == null) return -1;
-      return a.distance - b.distance;
+  /**
+   * 1) Filter by text
+   */
+  const filteredJobs = useMemo(() => {
+    const lowerQuery = query.toLowerCase();
+    return jobs.filter((job) => job.title.toLowerCase().includes(lowerQuery));
+  }, [jobs, query]);
+
+  /**
+   * 2) Extend with distance & totalSalary for *all* jobs
+   *    so we can display distance or salary on any listing.
+   */
+  const extendedJobs = useMemo<ExtendedJob[]>(() => {
+    return filteredJobs.map((job) => {
+      const { latitude, longitude } = job.position || {};
+
+      let distance: number | undefined = undefined;
+      if (userLat != null && userLon != null && latitude != null && longitude != null) {
+        distance = getDistanceFromLatLonInKm(userLat, userLon, latitude, longitude);
+      }
+
+      const totalSalary = getTotalSalary(job);
+
+      return {
+        ...job,
+        distance,
+        totalSalary,
+      };
     });
-  }
+  }, [filteredJobs, userLat, userLon]);
+
+  /**
+   * 3) Sort the extended jobs based on chosen `sortOption`
+   */
+  const sortedJobs = useMemo<ExtendedJob[]>(() => {
+    const jobsCopy = [...extendedJobs];
+
+    switch (sortOption) {
+      case "titleAsc":
+        jobsCopy.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+
+      case "titleDesc":
+        jobsCopy.sort((a, b) => b.title.localeCompare(a.title));
+        break;
+
+      case "salaryAsc":
+        // Use computed totalSalary
+        jobsCopy.sort((a, b) => (a.totalSalary ?? 0) - (b.totalSalary ?? 0));
+        break;
+
+      case "salaryDesc":
+        jobsCopy.sort((a, b) => (b.totalSalary ?? 0) - (a.totalSalary ?? 0));
+        break;
+
+      case "dateAsc":
+        // If you have date_created or date_updated, pick one
+        // We'll sort by date_created as an example
+        jobsCopy.sort(
+          (a, b) =>
+            new Date(a.date_created).getTime() -
+            new Date(b.date_created).getTime()
+        );
+        break;
+
+      case "dateDesc":
+        jobsCopy.sort(
+          (a, b) =>
+            new Date(b.date_created).getTime() -
+            new Date(a.date_created).getTime()
+        );
+        break;
+
+      case "distance":
+        // Sort by distance (undefined => Infinity => goes to bottom)
+        jobsCopy.sort((a, b) => {
+          const distA = a.distance ?? Infinity;
+          const distB = b.distance ?? Infinity;
+          return distA - distB;
+        });
+        break;
+
+      case "none":
+      default:
+        // no sorting
+        break;
+    }
+
+    return jobsCopy;
+  }, [extendedJobs, sortOption]);
 
   return (
     <div>
       {/* Search input */}
-      <input
-        type="text"
-        placeholder="Søk etter jobber..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        className="
-          mb-6 w-full rounded-lg bg-background p-3 shadow-neumorphic
-          focus:outline-none focus:ring-2 focus:ring-primary
-          dark:bg-background-dark dark:text-foreground-dark
-          dark:shadow-neumorphic-dark
-        "
-      />
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Søk etter jobber..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="
+            w-full rounded-lg bg-background p-3 shadow-neumorphic
+            focus:outline-none focus:ring-2 focus:ring-primary
+            dark:bg-background-dark dark:text-foreground-dark
+            dark:shadow-neumorphic-dark
+          "
+        />
+      </div>
 
-      {/* Distance sort toggle button */}
-      <button
-        type="button"
-        onClick={handleDistanceToggle}
-        disabled={isLoading} // Disable button while loading
-        className={`
-          mb-4 inline-flex items-center
-          rounded-full px-4 py-2 text-sm font-semibold text-white
-          shadow transition-colors focus:outline-none focus:ring-2
-          ${sortByDistance ? "bg-red-500 hover:bg-red-600" : "bg-blue-600 hover:bg-blue-700"}
-          ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
-        `}
-      >
-        {sortByDistance ? "Slå av avstands-sortering" : "Sorter etter avstand"}
-        {isLoading && (
-          <svg
-            className="ml-2 h-5 w-5 animate-spin text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v8H4z"
-            ></path>
-          </svg>
+      {/* Sort dropdown */}
+      <div className="mb-4 flex items-center gap-2">
+        <label htmlFor="sort" className="font-semibold">
+          Sorter:
+        </label>
+        <select
+          id="sort"
+          value={sortOption}
+          onChange={(e) =>
+            setSortOption(e.target.value as typeof sortOption)
+          }
+          className="
+            rounded-md border p-2 text-sm
+            dark:border-gray-700 dark:bg-background-dark dark:text-foreground-dark
+          "
+        >
+          <option value="none">Ingen sortering</option>
+          <option value="titleAsc">Tittel: A-Å</option>
+          <option value="titleDesc">Tittel: Å-A</option>
+          <option value="salaryAsc">Lønn (stigende)</option>
+          <option value="salaryDesc">Lønn (synkende)</option>
+          <option value="dateAsc">Eldste først</option>
+          <option value="dateDesc">Nyeste først</option>
+          <option value="distance">Avstand</option>
+        </select>
+
+        {/* If user chooses distance and location is being fetched, show loader */}
+        {sortOption === "distance" && isLocationLoading && (
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            <svg
+              className="h-4 w-4 animate-spin"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8H4z"
+              />
+            </svg>
+            Henter posisjon...
+          </div>
         )}
-      </button>
+      </div>
 
-      {sortByDistance && (
-        <p className="mb-4 text-sm text-gray-600 dark:text-gray-300">
-          Viser jobber nærmest deg først. Avstanden vises i km under stillingen.
+      {/* Optional: If sorted by distance & location is known, show note */}
+      {sortOption === "distance" && userLat && userLon && (
+        <p className="mb-2 text-sm text-gray-600">
+          Viser jobber nærmest deg først. Avstand vises (i km) der det er mulig.
         </p>
       )}
 
-      {/* Render the final array */}
-      {extendedJobs.length === 0 ? (
+      {sortedJobs.length === 0 ? (
         <p className="text-gray-500">Ingen jobber funnet.</p>
       ) : (
-        <JobList jobs={extendedJobs} isEmployerView={false} />
+        <JobList jobs={sortedJobs} isEmployerView={false} />
       )}
     </div>
   );

@@ -9,31 +9,11 @@ interface FAQ {
   answer: string;
 }
 
-const FAQComponent = async () => {
-  // Determine the API URL based on environment variables
-  const API_URL = process.env.API_URL
-    ? `${process.env.API_URL}/faqs`
-    : 'http://flittig-backend:3003/faqs'; // Internal Docker network URL
+interface FAQComponentProps {
+  faqs: FAQ[];
+}
 
-  let faqs: FAQ[] = [];
-  let error: string | null = null;
-
-  try {
-    const response = await fetch(API_URL, {
-      // Cache the response and revalidate every 60 seconds
-      next: { revalidate: 60 },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    faqs = await response.json();
-  } catch (err) {
-    console.error('Error fetching FAQs:', err);
-    error = 'Failed to load FAQs. Please try again later.';
-  }
-
+const FAQComponent = async ({ faqs }: FAQComponentProps) => {
   return (
     <NavbarLayout>
       <div className="bg-background">
@@ -42,17 +22,11 @@ const FAQComponent = async () => {
           subtitle="For deg som ikke har alle svarene"
         />
         <div className="mx-auto max-w-3xl p-16">
-          {error ? (
-            <div className="flex justify-center items-center h-64">
-              <p className="text-red-500">{error}</p>
-            </div>
-          ) : (
             <div className="space-y-4">
               {faqs.map((faq, index) => (
                 <FAQItem key={index} faq={faq} />
               ))}
             </div>
-          )}
         </div>
       </div>
     </NavbarLayout>

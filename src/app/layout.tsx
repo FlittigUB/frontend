@@ -5,10 +5,12 @@ import './globals.css';
 import React from 'react';
 import { Toaster } from 'sonner';
 import InsightsScript from '@/components/analytics/PlausibleScript';
+import GoogleTagManager from '@/components/analytics/GoogleTagManager';
 
 export const metadata: Metadata = {
-  title: 'Flittig UB | Småjobber gjort enkelt',
-  description: 'Flittig UB gjør det enkelt å finne eller tilby småjobber lokalt. Barnepass, rengjøring og mer – raskt og trygt i ditt nærmiljø!',
+  title: 'Flittig | Småjobber gjort enkelt med Flittig UB',
+  description:
+    'Trenger du barnepass, rengjøring eller hagearbeid? Flittig gjør det enkelt å koble lokalt talent med deg som trenger en hjelpende hånd!',
 };
 
 export default function RootLayout({
@@ -20,6 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         <InsightsScript />
+        <GoogleTagManager/>
         <Toaster richColors position="top-right" closeButton />
         {children}
       </body>

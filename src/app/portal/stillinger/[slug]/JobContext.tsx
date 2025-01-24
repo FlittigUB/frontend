@@ -14,7 +14,7 @@ const JobContext = createContext<JobContextProps | undefined>(undefined);
  * Provider component to supply job data to child components.
  */
 export const JobProvider: React.FC<{ job: Job; children: React.ReactNode }> = ({ job, children }) => {
-  return <JobContext.Provider value={{ job }}>{children}</JobContext.Provider>;
+  return <JobContext.Provider value={{ job: job }}>{children}</JobContext.Provider>;
 };
 
 /**

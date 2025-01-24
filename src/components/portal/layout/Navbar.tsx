@@ -15,6 +15,7 @@ import {
   HiOutlineMenu,
   HiOutlineX,
 } from 'react-icons/hi';
+import Image from "next/image";
 
 interface NavbarProps {
   onOpenChat?: () => void;
@@ -113,12 +114,12 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
           {/* Worker-specific links */}
           {userRole === 'arbeidstaker' && (
             <Link
-              href="/portal/oversikt"
+              href="/portal/mine-soknader"
               className="flex items-center gap-2 py-2 hover:text-primary"
               onClick={() => setMenuOpen(false)}
             >
               <HiOutlineBriefcase className="text-xl" />
-              Min oversikt
+              Mine søknader
             </Link>
           )}
 
@@ -161,14 +162,19 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
     <header className="w-full border-b border-gray-200 bg-secondary shadow-sm">
       <div className="relative container mx-auto flex items-center justify-between px-4 py-3">
         {/* Brand / Logo */}
-        <div className="flex items-center">
-          <Link
-            href="/portal"
-            className="text-2xl font-bold text-foreground hover:opacity-80 transition-opacity"
-          >
-            Flittig
-          </Link>
-        </div>
+        <Link
+          href="/portal"
+          className="relative text-2xl font-bold text-foreground hover:opacity-80 transition-opacity flex flex-row"
+        >
+          <div className="relative w-24 aspect-[16/9]">
+            <Image
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}81b7981a-69c0-4507-be74-d82b3134df3b.png`}
+              alt="Flittig UB Logo"
+              fill
+              className="object-contain" // Ensures the image fits within the container while preserving aspect ratio
+            />
+          </div>
+        </Link>
 
         {/* Desktop Nav (split in two groups) */}
         <nav className="hidden w-full md:flex items-center ml-8">

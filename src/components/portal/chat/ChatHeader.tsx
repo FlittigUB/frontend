@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { FiPhone } from 'react-icons/fi';
 import { User } from '@/common/types';
 
 interface ChatHeaderProps {
@@ -26,7 +25,7 @@ export default function ChatHeader({
             src={
               receiver.image
                 ? `${ASSETS_URL}/${receiver.image}`
-                : '/assets/default.png'
+                : `${ASSETS_URL}ff6b7c58-020c-4db6-a858-cf0f8dba744c.webp`
             }
             alt={`${receiver.name || receiver.email} profile`}
             fill
@@ -44,16 +43,6 @@ export default function ChatHeader({
             {isReceiverOnline ? 'Online' : 'Offline'}
           </span>
         </div>
-      </div>
-      {/* Right side (call or close buttons) */}
-      <div className="flex items-center space-x-4">
-        <a
-          href={`tel:${receiver.mobile}`}
-          className="rounded-full p-2 text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
-          aria-label="Call"
-        >
-          <FiPhone className="h-5 w-5" />
-        </a>
       </div>
     </div>
   );

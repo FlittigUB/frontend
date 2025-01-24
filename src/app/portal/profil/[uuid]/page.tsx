@@ -1,15 +1,19 @@
+// app/portal/stillinger/[slug]/OtherUserProfilePage.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link'; // Import Link
 import Tooltip from '@/components/common/ToolTip';
 import axios from 'axios';
-import { User } from '@/common/types';
+import { User, Review } from '@/common/types';
+import ReviewsSection from "@/components/portal/user/reviews/ReviewsSection";
 
 export default function OtherUserProfilePage() {
   const { uuid } = useParams();
   const [user, setUser] = useState<User | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,20 +31,32 @@ export default function OtherUserProfilePage() {
           throw new Error('No JWT token found. Please log in.');
         }
 
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/${uuid}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
+        const [userResponse, reviewsResponse] = await Promise.all([
+          axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/users/${uuid}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
             },
-          },
-        );
+          ),
+          axios.get<Review[]>(
+            `${process.env.NEXT_PUBLIC_API_URL}/reviews/user/${uuid}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          )
+        ]);
 
-        const data: User = response.data.user;
-        setUser(data);
+        const fetchedUser: User = userResponse.data.user;
+        setUser(fetchedUser);
+        setReviews(reviewsResponse.data);
       } catch (err: any) {
-        setError(err.response?.data?.message || err.message);
+        setError(err.response?.data?.message || err.message || 'Kunne ikke hente data.');
       } finally {
         setLoading(false);
       }
@@ -50,6 +66,15 @@ export default function OtherUserProfilePage() {
       fetchUserData();
     }
   }, [uuid]);
+
+  const calculateAverageRating = (reviews: Review[]) => {
+    if (reviews.length === 0) {
+      return 0;
+    }
+    const total = reviews.reduce((acc, review) => acc + (review.rating || 0), 0);
+    const avg = total / reviews.length;
+    return parseFloat(avg.toFixed(1)); // Round to one decimal place
+  };
 
   if (loading) {
     return (
@@ -79,6 +104,8 @@ export default function OtherUserProfilePage() {
     ? `${process.env.NEXT_PUBLIC_ASSETS_URL}${user.image}`
     : `${process.env.NEXT_PUBLIC_ASSETS_URL}70e5b449-da0a-4d91-af74-8a4592080b98`;
 
+  const averageRating = calculateAverageRating(reviews);
+
   return (
     <div className="flex min-h-screen flex-col items-center px-4 py-10">
       <div className="flex w-full max-w-lg flex-col items-center space-y-6 rounded-3xl p-6">
@@ -89,8 +116,10 @@ export default function OtherUserProfilePage() {
             <Image
               src={profileImageUrl}
               alt="Profile Picture"
-              fill
+              layout="fill"
               className="object-cover"
+              placeholder="blur"
+              blurDataURL="/default-avatar.png" // Low-res placeholder
             />
           </div>
 
@@ -101,7 +130,7 @@ export default function OtherUserProfilePage() {
             </h1>
             {user.verified && (
               <Tooltip text="Denne brukerens identitet er verifisert.">
-                <div className="flex items-center justify-center rounded-full bg-blue-100 p-2 shadow-neumorphic">
+                <div className="flex items-center space-x-1 rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-600 shadow-neumorphic">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5 text-blue-500"
@@ -116,9 +145,7 @@ export default function OtherUserProfilePage() {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span className="ml-1 text-sm font-medium text-blue-600">
-                    Verifisert
-                  </span>
+                  <span>Verifisert</span>
                 </div>
               </Tooltip>
             )}
@@ -145,7 +172,7 @@ export default function OtherUserProfilePage() {
 
         {/* Guardian Field - Conditionally Rendered */}
         {user.needs_guardian && (
-          <div className="flex items-center justify-between rounded-2xl bg-yellow-200 p-4 shadow-neumorphic">
+          <div className="flex items-center justify-between w-full rounded-2xl bg-yellow-200 p-4 shadow-neumorphic">
             <span className="font-medium text-gray-800">Foresatte:</span>
             <span className="text-gray-800">
               {user.guardian || 'Ikke oppgitt'}
@@ -153,90 +180,26 @@ export default function OtherUserProfilePage() {
           </div>
         )}
 
-        {/* Mobile Field */}
-        <div className="flex items-center justify-between rounded-2xl bg-yellow-200 p-4 shadow-neumorphic">
-          <span className="font-medium text-gray-800">Mobil:</span>
-          <span className="text-gray-800">
-            {user.mobile ? user.mobile.toString() : 'Ikke oppgitt'}
-          </span>
-        </div>
-
         {/* Email Field */}
-        <div className="flex items-center justify-between rounded-2xl bg-yellow-200 p-4 shadow-neumorphic">
+        <div className="flex items-center justify-between w-full rounded-2xl bg-yellow-200 p-4 shadow-neumorphic">
           <span className="font-medium text-gray-800">Epost:</span>
           <span className="text-gray-800">{user.email || 'Ikke oppgitt'}</span>
         </div>
 
-        {/* Ratings: Conditionally Render */}
-        <div className="w-full">
-          {role === 'arbeidsgiver' ? (
-            <>
-              <h2 className="mb-4 text-xl font-semibold text-gray-800 dark:text-gray-50">
-                Arbeidsgiver Ratings
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                {['Punktlighet', 'Ledelse', 'Kommunikasjon'].map(
-                  (criteria, index) => (
-                    <div
-                      key={index}
-                      className={`rounded-2xl p-4 text-center shadow-neumorphic ${
-                        index % 2 === 0 ? 'bg-green-200' : 'bg-yellow-200'
-                      }`}
-                    >
-                      <span className="font-medium text-gray-800">
-                        {criteria}
-                      </span>
-                      <div className="mt-2 flex justify-center space-x-1">
-                        {Array.from({ length: 5 }).map((_, starIndex) => (
-                          <span
-                            key={starIndex}
-                            className="text-xl text-yellow-500"
-                          >
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ),
-                )}
-              </div>
-            </>
-          ) : (
-            <>
-              <h2 className="mb-4 text-xl font-semibold text-gray-800 dark:text-gray-50">
-                Task Ratings
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  'Rengjøring',
-                  'Leksehjelp',
-                  'Hagestell',
-                  'Handling',
-                  'Annet',
-                ].map((task, index) => (
-                  <div
-                    key={index}
-                    className={`rounded-2xl p-4 text-center shadow-neumorphic ${
-                      index % 2 === 0 ? 'bg-green-200' : 'bg-yellow-200'
-                    }`}
-                  >
-                    <span className="font-medium text-gray-800">{task}</span>
-                    <div className="mt-2 flex justify-center space-x-1">
-                      {Array.from({ length: 5 }).map((_, starIndex) => (
-                        <span
-                          key={starIndex}
-                          className="text-xl text-yellow-500"
-                        >
-                          ★
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+        {/* Reviews Section - Limited to 5 Reviews */}
+        <ReviewsSection
+          reviews={reviews}
+          averageRating={averageRating}
+          limit={5} // Display up to 5 reviews
+        />
+
+        {/* "View All Reviews" Link */}
+        <Link
+          href={`/portal/profil/${uuid}/anmeldelser`}
+          className="mt-6 rounded bg-blue-500 px-6 py-3 text-white hover:bg-blue-600 transition-colors duration-300"
+        >
+          Se alle anmeldelser
+        </Link>
       </div>
     </div>
   );

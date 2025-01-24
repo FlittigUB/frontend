@@ -4,7 +4,7 @@ const InsightsScript = () => {
   useEffect(() => {
     // Create the script element
     const script = document.createElement('script');
-    script.src = 'https://insights.isora.no/js/script.js';
+    script.src = 'https://insights.flittigub.no/js/script.js';
     script.defer = true;
     script.setAttribute('data-domain', 'flittigub.no');
 

@@ -78,9 +78,9 @@ const JobItem: React.FC<JobItemProps> = ({
             >
               Se søknader
             </Link>
-            <button className="rounded-full bg-gradient-to-r from-yellow-400 to-yellow-500 px-4 py-1 text-sm font-medium text-white shadow-sm transition-colors hover:from-yellow-500 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+            <Link href={`/portal/stillinger/${job.slug}/tjenester`} className="rounded-full bg-gradient-to-r from-yellow-400 to-yellow-500 px-4 py-1 text-sm font-medium text-white shadow-sm transition-colors hover:from-yellow-500 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500">
               Legg til ekstra tjenester
-            </button>
+            </Link>
           </div>
         )}
       </div>

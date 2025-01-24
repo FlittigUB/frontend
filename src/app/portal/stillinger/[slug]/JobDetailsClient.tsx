@@ -1,4 +1,3 @@
-// app/portal/stillinger/[slug]/JobDetailsClient.tsx
 'use client';
 
 import React, { FormEvent, useEffect, useState } from 'react';
@@ -6,15 +5,56 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 import { useAuthContext } from '@/context/AuthContext';
-import { Application, ApplicationStatus } from '@/common/types';
-import { FiClock, FiDollarSign, FiMapPin } from "react-icons/fi";
+import { Application } from '@/common/types';
+import { FiClock, FiDollarSign, FiMapPin } from 'react-icons/fi';
 import Image from 'next/image';
 import { usePortalLayout } from '@/components/portal/PortalLayout';
-import { IoIosTimer } from "react-icons/io";
-import Review from "@/components/portal/job/Review";
+import { IoIosTimer } from 'react-icons/io';
+import Review from '@/components/portal/job/Review';
 
 import { useJob } from './JobContext';
-import Link from "next/link";
+import Link from 'next/link';
+
+//
+// 1. We assume these are the possible statuses in your backend:
+//    waiting, approved, declined, finished, confirmed.
+//
+const statusDetails: Record<string, { label: string; description: string }> = {
+  waiting: {
+    label: 'Venter godkjenning',
+    description: 'Din søknad er mottatt og venter på arbeidsgivers vurdering.',
+  },
+  approved: {
+    label: 'Akseptert',
+    description: 'Din søknad er godkjent av arbeidsgiver.',
+  },
+  declined: {
+    label: 'Avslått',
+    description: 'Din søknad er avslått av arbeidsgiver.',
+  },
+  finished: {
+    label: 'Fullført',
+    description: 'Jobben er fullført. Du kan nå bekrefte fullføringen.',
+  },
+  confirmed: {
+    label: 'Bekreftet fullført',
+    description: 'Jobben er bekreftet fullført. Nå kan du gi en vurdering.',
+  },
+};
+
+//
+// 2. Helper to safely get label/description.
+//    If we get a new or unexpected status from the server, we won't crash;
+//    we just return a fallback.
+//
+function getStatusInfo(status: string) {
+  return (
+    statusDetails[status] || {
+      label: 'Ukjent status',
+      description: 'Status ble ikke gjenkjent.',
+    }
+  );
+}
 
 export default function JobDetailsClient() {
   const job = useJob();
@@ -28,16 +68,19 @@ export default function JobDetailsClient() {
   const [userApplication, setUserApplication] = useState<Application | null>(null);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
+  // Check if the current user is the owner of this job
+  const isOwner = user && job.user && user.id === job.user.id;
+
   // Preload the employer's image or store null
   useEffect(() => {
     if (job.user?.image) {
       setPreviewImage(`${process.env.NEXT_PUBLIC_ASSETS_URL}${job.user.image}`);
     } else {
-      setPreviewImage(null); // don't pass an empty string
+      setPreviewImage(null);
     }
   }, [job.user?.image]);
 
-  // If logged in, fetch the applications (so we know if the user has applied)
+  // If logged in, fetch applications
   useEffect(() => {
     if (!loggedIn || !token) return;
     setLoading(true);
@@ -53,6 +96,7 @@ export default function JobDetailsClient() {
         const fetched = res.data;
         setApplications(fetched);
 
+        // If arbeidstaker, see if user has an existing application
         if (userRole === 'arbeidstaker' && user) {
           const existing = fetched.find((app) => app.user.id === user.id);
           if (existing) setUserApplication(existing);
@@ -97,9 +141,15 @@ export default function JobDetailsClient() {
     }
   };
 
-  // Approve/Decline (arbeidsgiver)
+  // Approve (arbeidsgiver & owner only)
   const handleApprove = async (applicationId: string) => {
     try {
+      // Double-check local side that only owner can do this
+      if (!isOwner) {
+        toast.error('Kun eier av jobben kan godkjenne søknader.');
+        return;
+      }
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/applications/${applicationId}`,
         { status: 'approved' },
@@ -120,17 +170,23 @@ export default function JobDetailsClient() {
     }
   };
 
+  // Decline (arbeidsgiver & owner only)
   const handleDecline = async (applicationId: string) => {
     try {
+      // Double-check local side that only owner can do this
+      if (!isOwner) {
+        toast.error('Kun eier av jobben kan avslå søknader.');
+        return;
+      }
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/applications/${applicationId}`,
         { status: 'declined' },
         { headers: { Authorization: `Bearer ${token}` } },
       );
+      // Also update local state to `declined` for consistency
       setApplications((prev) =>
-        prev.map((a) =>
-          a.id === applicationId ? { ...a, status: 'rejected' } : a,
-        ),
+        prev.map((a) => (a.id === applicationId ? { ...a, status: 'declined' } : a)),
       );
       toast.success('Søknaden ble avslått.');
     } catch (err: any) {
@@ -142,30 +198,6 @@ export default function JobDetailsClient() {
     }
   };
 
-  // Expanded statuses with descriptions
-  const statusDetails: Record<ApplicationStatus, { label: string; description: string }> = {
-    waiting: {
-      label: 'Venter godkjenning',
-      description: 'Din søknad er mottatt og venter på arbeidsgivers vurdering.',
-    },
-    approved: {
-      label: 'Akseptert',
-      description: 'Din søknad er godkjent av arbeidsgiver.',
-    },
-    rejected: {
-      label: 'Avslått',
-      description: 'Din søknad er avslått av arbeidsgiver.',
-    },
-    finished: {
-      label: 'Fullført',
-      description: 'Jobben er fullført. Du kan nå bekrefte fullføringen.',
-    },
-    confirmed: {
-      label: 'Bekreftet fullført',
-      description: 'Jobben er bekreftet fullført. Nå kan du gi en vurdering.',
-    },
-  };
-
   // Quick loading indicator
   if (loading) {
     return (
@@ -174,24 +206,29 @@ export default function JobDetailsClient() {
       </div>
     );
   }
+
   // We'll display either position.formattedAddress or a fallback
-  const displayLocation = job.position?.neighbourhood || job.position?.city || 'Ukjent sted';
+  const displayLocation =
+    job.position?.neighbourhood || job.position?.city || 'Ukjent sted';
 
   // Display payment info
   const displayPayment = () => {
-    if (job.payment_type === "hourly") {
+    if (job.payment_type === 'hourly') {
       return `${job.rate} NOK / time`;
     }
     return `${job.rate} NOK (fast pris)`;
   };
 
-  // Render
+  // Simple counters for total vs. approved applications
+  const approvedCount = applications.filter((a) => a.status === 'approved').length;
+  const totalApps = applications.length;
+
   return (
     <div className="mx-auto my-8 w-full max-w-5xl px-4">
       {/* The big pastel card */}
       <div className="min-h-[400px] rounded-xl bg-yellow-50 p-6 shadow-sm">
         {/* Title & Category & Availability */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-800">{job.title}</h1>
             {/* Category as a pill */}
@@ -201,7 +238,7 @@ export default function JobDetailsClient() {
               </span>
             )}
           </div>
-          {/* Available from date */}
+          {/* Available date/time */}
           <div className="flex items-center gap-1 text-sm text-gray-600">
             <svg
               className="h-4 w-4 text-gray-400"
@@ -226,24 +263,24 @@ export default function JobDetailsClient() {
         {/* Description */}
         <p className="mt-4 text-gray-800">{job.description}</p>
         {/* Payment Information */}
-        <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
           <FiDollarSign className="h-4 w-4 flex-shrink-0" />
           <span>{displayPayment()}</span>
         </div>
+        {/* Hours */}
         {job.hours_estimated && (
-          <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
             <FiClock className="h-4 w-4 flex-shrink-0" />
             <span>{job.hours_estimated} timer</span>
           </div>
         )}
-
         {/* Location */}
-        <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
           <FiMapPin className="h-4 w-4 flex-shrink-0" />
           <span>{displayLocation}</span>
         </div>
         {/* Time */}
-        <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
           <IoIosTimer className="h-4 w-4 flex-shrink-0" />
           <span>
             Planlagt klokkeslett:{' '}
@@ -257,11 +294,11 @@ export default function JobDetailsClient() {
         {/* Divider */}
         <hr className="my-4 border-gray-200" />
 
-        {/* Employer info & chat button */}
-        <div className="flex items-center justify-between">
+        {/* Employer info & chat button - use flex-wrap on small screens */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             {previewImage ? (
-              <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-gray-200 shadow-inner">
+              <div className="relative h-12 w-12 overflow-hidden rounded-full bg-gray-200 shadow-inner">
                 <Image
                   src={previewImage}
                   width={50}
@@ -270,7 +307,7 @@ export default function JobDetailsClient() {
                 />
               </div>
             ) : (
-              <div className="h-12 w-12 flex-shrink-0 rounded-full bg-gray-300" />
+              <div className="h-12 w-12 rounded-full bg-gray-300" />
             )}
             <div>
               <p className="font-medium text-gray-900">{job.user.name}</p>
@@ -281,7 +318,7 @@ export default function JobDetailsClient() {
             </div>
           </div>
           {/* Chat button for any logged-in user */}
-          {loggedIn && (
+          {loggedIn && isOwner === false && (
             <button
               onClick={() => openChatWithReceiver(job.user.id)}
               className="inline-block rounded-full bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
@@ -308,19 +345,21 @@ export default function JobDetailsClient() {
           <div className="mt-6">
             {userApplication ? (
               <div className="text-sm text-gray-700">
+                {/* Use our fallback helper so no crash if the status is unknown */}
                 <p>
-                  <strong>Status:</strong>{' '}
-                  {statusDetails[userApplication.status].label}
+                  <strong>Status: </strong>
+                  {getStatusInfo(userApplication.status).label}
                 </p>
                 <p className="mt-1 text-xs text-gray-500">
-                  {statusDetails[userApplication.status].description}
+                  {getStatusInfo(userApplication.status).description}
                 </p>
+
                 {userApplication.status === 'approved' && (
                   <p className="mt-1 text-green-600">
                     Gratulerer! Din søknad har blitt akseptert.
                   </p>
                 )}
-                {userApplication.status === 'rejected' && (
+                {userApplication.status === 'declined' && (
                   <p className="mt-1 text-red-500">
                     Beklager, din søknad ble avslått.
                   </p>
@@ -347,13 +386,22 @@ export default function JobDetailsClient() {
                 </button>
               </form>
             )}
+
+            {/* Non-owner arbeidstakers: show a brief summary (number of apps, how many approved) */}
+            {!isOwner && (
+              <p className="mt-4 text-sm text-gray-500">
+                Antall søknader: <strong>{totalApps}</strong>. Godkjente
+                søknader: <strong>{approvedCount}</strong>.
+              </p>
+            )}
           </div>
         )}
 
-        {/* If arbeidsgiver => show the list of applications */}
+        {/* If arbeidsgiver => show either the full list if owner, or a summary otherwise */}
         {loggedIn && userRole === 'arbeidsgiver' && (
           <div className="mt-6">
-              {/* "Legg til ekstra tjenester" Button */}
+            {/* Link to add extra tjenester (only useful for the owner, but harmless to hide for non-owner) */}
+            {isOwner && (
               <div className="mb-4">
                 <Link href={`/portal/stillinger/${job.slug}/tjenester`}>
                   <button className="rounded-full bg-gradient-to-r from-yellow-400 to-yellow-500 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:from-yellow-500 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500">
@@ -361,50 +409,80 @@ export default function JobDetailsClient() {
                   </button>
                 </Link>
               </div>
-            <h2 className="mb-2 text-lg font-semibold text-gray-800">
-              Søknader ({applications.length})
-            </h2>
-            {applications.length === 0 ? (
-              <p className="text-gray-500">Ingen søknader ennå.</p>
-            ) : (
-              <ul className="space-y-2">
-                {applications.map((app) => (
-                  <li
-                    key={app.id}
-                    className="flex items-center justify-between rounded bg-white px-4 py-3 shadow-sm"
-                  >
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">
-                        {app.user.name} –{' '}
-                        <span className="italic text-gray-600">
-                          {statusDetails[app.status].label}
-                        </span>
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {statusDetails[app.status].description}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      {app.status === 'waiting' && (
-                        <>
-                          <button
-                            onClick={() => handleApprove(app.id)}
-                            className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-800 hover:bg-green-200"
-                          >
-                            Godkjenn
-                          </button>
-                          <button
-                            onClick={() => handleDecline(app.id)}
-                            className="rounded-full bg-red-100 px-3 py-1 text-sm text-red-800 hover:bg-red-200"
-                          >
-                            Avslå
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
+            )}
+
+            {!isOwner && (
+              // Not the owner => just show how many total & how many approved
+              <p className="text-sm text-gray-600">
+                Det er {totalApps} søknad(er) på denne jobben. {approvedCount}{' '}
+                er godkjent.
+              </p>
+            )}
+
+            {isOwner && (
+              <>
+                <h2 className="mb-2 text-lg font-semibold text-gray-800">
+                  Søknader ({totalApps})
+                </h2>
+
+                {applications.length === 0 ? (
+                  <p className="text-gray-500">Ingen søknader ennå.</p>
+                ) : (
+                  <ul className="space-y-2">
+                    {applications.map((app) => {
+                      const { label, description } = getStatusInfo(app.status);
+                      return (
+                        <li
+                          key={app.id}
+                          className="flex flex-col gap-2 rounded bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+                        >
+                          <div>
+                            {/* Display applicant name because owner can see it */}
+                            <p className="text-sm font-medium text-gray-800">
+                              {app.user.name} –{' '}
+                              <span className="italic text-gray-600">
+                                {label}
+                              </span>
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {description}
+                            </p>
+                          </div>
+                          <div className="flex gap-2 self-end sm:self-auto">
+                            {app.status === 'waiting' && (
+                              <>
+                                <button
+                                  onClick={() => handleApprove(app.id)}
+                                  className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-800 hover:bg-green-200"
+                                >
+                                  Godkjenn
+                                </button>
+                                <button
+                                  onClick={() => handleDecline(app.id)}
+                                  className="rounded-full bg-red-100 px-3 py-1 text-sm text-red-800 hover:bg-red-200"
+                                >
+                                  Avslå
+                                </button>
+                              </>
+                            )}
+                          </div>
+                          {app.status !== 'declined' &&
+                            app.status !== 'waiting' && (
+                              <button
+                                onClick={() =>
+                                  openChatWithReceiver(job.user.id)
+                                }
+                                className="inline-block rounded-full bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+                              >
+                                Chat med arbeidstaker
+                              </button>
+                            )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </>
             )}
           </div>
         )}

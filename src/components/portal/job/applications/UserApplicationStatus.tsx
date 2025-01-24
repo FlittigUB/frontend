@@ -45,7 +45,7 @@ const UserApplicationStatus: React.FC<UserApplicationStatusProps> = ({
           </Link>
         </div>
       )}
-      {userApplication.status === 'rejected' && (
+      {userApplication.status === 'declined' && (
         <p className="mt-2 text-red-600">
           Beklager, din søknad har blitt avslått.
         </p>

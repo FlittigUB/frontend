@@ -13,18 +13,18 @@
               <option name="name" value="NEXT_PUBLIC_API_URL" />
               <option name="value" value="https://api.flittigub.no" />
             </DockerEnvVarImpl>
-              <DockerEnvVarImpl>
-                  <option name="name" value="NEXT_PUBLIC_WEBSOCKET_URL"/>
-                  <option name="value" value="wss://api.flittigub.no"/>
-              </DockerEnvVarImpl>
-              <DockerEnvVarImpl>
-                  <option name="name" value="NEXT_PUBLIC_BACKEND_URL"/>
-                  <option name="value" value="https://api.flittigub.no"/>
-              </DockerEnvVarImpl>
-              <DockerEnvVarImpl>
-                  <option name="name" value="NEXT_PUBLIC_ASSETS_URL"/>
-                  <option name="value" value="https://panel.flittigub.no/assets/"/>
-              </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="NEXT_PUBLIC_WEBSOCKET_URL" />
+              <option name="value" value="wss://api.flittigub.no" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="NEXT_PUBLIC_BACKEND_URL" />
+              <option name="value" value="https://api.flittigub.no" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="NEXT_PUBLIC_ASSETS_URL" />
+              <option name="value" value="https://panel.flittigub.no/assets/" />
+            </DockerEnvVarImpl>
           </list>
         </option>
         <option name="containerName" value="flittig-frontend" />
@@ -32,23 +32,27 @@
           <list>
             <DockerEnvVarImpl>
               <option name="name" value="API_URL" />
-                <option name="value" value="https://api.flittigub.no"/>
+              <option name="value" value="https://api.flittigub.no" />
             </DockerEnvVarImpl>
             <DockerEnvVarImpl>
               <option name="name" value="NEXT_PUBLIC_API_URL" />
               <option name="value" value="https://api.flittigub.no" />
             </DockerEnvVarImpl>
-              <DockerEnvVarImpl>
-                  <option name="name" value="NEXT_PUBLIC_ASSETS_URL"/>
-                  <option name="value" value="https://panel.flittigub.no/assets/"/>
-              </DockerEnvVarImpl>
-              <DockerEnvVarImpl>
-                  <option name="name" value="NEXT_PUBLIC_BACKEND_URL"/>
-                  <option name="value" value="https://api.flittigub.no"/>
-              </DockerEnvVarImpl>
-              <DockerEnvVarImpl>
-                  <option name="name" value="NEXT_PUBLIC_WEBSOCKET_URL"/>
-                  <option name="value" value="wss://api.flittigub.no"/>
+            <DockerEnvVarImpl>
+              <option name="name" value="NEXT_PUBLIC_ASSETS_URL" />
+              <option name="value" value="https://panel.flittigub.no/assets/" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="NEXT_PUBLIC_BACKEND_URL" />
+              <option name="value" value="https://api.flittigub.no" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="NEXT_PUBLIC_MAPBOX_TOKEN" />
+              <option name="value" value="pk.eyJ1IjoibmVyc2tvZ2VuIiwiYSI6ImNtNXpwcGVnazA0dTAyaXNvY2R6aXBqenYifQ.QGBtKOWH40nfstFXmp_Etw" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="NEXT_PUBLIC_WEBSOCKET_URL" />
+              <option name="value" value="wss://api.flittigub.no" />
             </DockerEnvVarImpl>
           </list>
         </option>

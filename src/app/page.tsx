@@ -15,7 +15,7 @@ export default function Home() {
               alt="Flittig Hero Background"
               fill
               className="object-cover"
-              style={{ objectPosition: "50% 80%" }}
+              style={{ objectPosition: '50% 80%' }}
               priority
             />
           </div>
@@ -45,9 +45,9 @@ export default function Home() {
                 Se ledige oppdrag
                 <p className="text-sm text-gray-400">(Krever ikke innlogging)</p>
               </Link>
-              {/* CTA 2: Publiser oppdrag (For those who need help, e.g. seniors) */}
+              {/* CTA 2 */}
               <Link
-                href="/portal" // adjust to your actual route
+                href="/portal"
                 className="bg-white inline-block rounded-md border border-green-500 px-8 py-3 text-lg font-semibold text-green-500 shadow-md transition-transform duration-300 hover:scale-105 hover:bg-green-50"
               >
                 Publiser oppdrag
@@ -74,6 +74,15 @@ export default function Home() {
               Gjennom Flittig kan du enten legge ut oppdrag du vil ha utført, eller
               finne småjobber som passer dine ønsker. Dette gjør det enkelt å koble
               behov og ressurser i nærmiljøet, til alles fordel.
+            </p>
+            <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
+              Som ungdomsbedrift har Flittig UB allerede gjort en merkbar
+              forskjell. For eksempel har en av våre faste oppdragsgivere, Kari
+              Hansen, brukt plattformen jevnlig for hagearbeid og lettere
+              vedlikehold av boligen. Samtidig har unge arbeidstakere som Ola
+              Nordmann og Emma Larsen fått muligheten til å bygge arbeidserfaring
+              og tjene litt ekstra. Slike historier viser hvordan Flittig skaper
+              en vinn-vinn-situasjon for både privatpersoner og lokalsamfunnet.
             </p>
           </div>
         </section>
@@ -184,6 +193,20 @@ export default function Home() {
               </Link>
               .
             </p>
+            {/* External link section for SEO */}
+            <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
+              For mer informasjon om hvordan ungdomsbedrifter fungerer i Norge,
+              kan du lese mer hos
+              <a
+                href="https://ue.no/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-1 font-semibold text-green-900 underline"
+              >
+                Ungt Entreprenørskap
+              </a>
+              .
+            </p>
           </div>
         </section>
 
@@ -205,7 +228,6 @@ export default function Home() {
               -side.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-8">
-              {/* Examples of sponsor logos (replace with your real data) */}
               <Link
                 href="/info/om-oss"
                 aria-label="Les mer om sponsor"
@@ -297,7 +319,6 @@ export default function Home() {
 
         {/* CTA SECTION */}
         <section className="relative flex min-h-[40vh] w-full items-center justify-center bg-green-100">
-          {/* Background Accent */}
           <div className="absolute inset-0 z-0 opacity-10">
             <Image
               src="/Bever-mynt-bg.png"

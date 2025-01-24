@@ -83,7 +83,7 @@ export default async function OmOssPage() {
           <h3 className="text-blueGreen mb-8 text-center text-3xl">
             Møt Teamet
           </h3>
-          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {employees.map((employee: any) => (
               <div
                 key={employee.id}

@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useEffect, useState, createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import LoadingLogo from '@/components/NSRVLoader';
 import ChatModal from '@/components/portal/chat/ChatModal';
 import { FiMessageSquare } from 'react-icons/fi';
 import Navbar from '@/components/portal/layout/Navbar';
 import { useOptionalAuthContext } from '@/context/AuthContext';
-import { useRouter } from "next/navigation";
-import { usePreviousPath } from "@/context/PreviousPathContext";
+import { useRouter } from 'next/navigation';
+import { usePreviousPath } from '@/context/PreviousPathContext';
+import BackButton from '@/components/common/BackButton';
 
 interface PortalLayoutProps {
   children: React.ReactNode;
@@ -17,7 +18,9 @@ interface PortalLayoutProps {
 interface PortalLayoutContextValue {
   openChatWithReceiver: (receiverId: string) => void;
 }
-const PortalLayoutContext = createContext<PortalLayoutContextValue | undefined>(undefined);
+const PortalLayoutContext = createContext<PortalLayoutContextValue | undefined>(
+  undefined,
+);
 
 // 2) A simple hook for child components
 export function usePortalLayout() {
@@ -77,10 +80,16 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
       }
     } else {
       // If on any /portal/... route except /portal/logg-inn, redirect to /portal/logg-inn with redirect query
-      if (currentPath.startsWith('/portal') && !currentPath.startsWith('/portal/logg-inn') && !currentPath.startsWith('/portal/stillinger')) {
+      if (
+        currentPath.startsWith('/portal') &&
+        !currentPath.startsWith('/portal/logg-inn') &&
+        !currentPath.startsWith('/portal/stillinger')
+      ) {
         // Set the previous path to currentPath before redirecting
         setPreviousPath(currentPath);
-        router.replace(`/portal/logg-inn?redirect=${encodeURIComponent(currentPath)}`);
+        router.replace(
+          `/portal/logg-inn?redirect=${encodeURIComponent(currentPath)}`,
+        );
       }
     }
   }, [loggedIn, isAuthLoading, previousPath, router, setPreviousPath]);
@@ -94,13 +103,18 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
     <PortalLayoutContext.Provider value={{ openChatWithReceiver }}>
       <div
         className={`flex h-screen flex-col ${
-          isDarkMode ? 'bg-background-dark text-foreground-dark' : 'bg-gray-50 text-foreground'
+          isDarkMode
+            ? 'bg-background-dark text-foreground-dark'
+            : 'bg-gray-50 text-foreground'
         }`}
       >
         <Navbar onOpenChat={() => openChatWithReceiver('')} />
 
         <main className="flex flex-1 justify-center overflow-y-auto">
-          <div className="w-full max-w-4xl container mx-auto px-4 py-8">{children}</div>
+          <div className="container mx-auto w-full max-w-4xl px-4 py-8">
+            <BackButton />
+            {children}
+          </div>
         </main>
 
         {/* Floating button: only show on md+ */}
@@ -109,13 +123,7 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
             <button
               onClick={() => openChatWithReceiver('')}
               // Or pass some default or empty receiver
-              className="
-                hidden md:flex
-                fixed md:bottom-6 md:right-6
-                p-4 rounded-full shadow-lg
-                bg-yellow-400 hover:bg-yellow-500
-                text-white transition items-center justify-center
-              "
+              className="fixed hidden items-center justify-center rounded-full bg-yellow-400 p-4 text-white shadow-lg transition hover:bg-yellow-500 md:bottom-6 md:right-6 md:flex"
               aria-label="Open Chat"
             >
               Meldinger

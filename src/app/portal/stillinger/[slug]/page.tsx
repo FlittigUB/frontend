@@ -12,9 +12,9 @@ export const revalidate = 0;
 export async function generateMetadata({
                                          params,
                                        }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   try {
     const job: Job | null = await fetchJob(slug);
 
@@ -43,12 +43,10 @@ export async function generateMetadata({
 }
 
 // The main server component
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   // Fetch job details server-side
-  const job: Job | null = await fetchJob(params.slug);
-  if (!job) {
-    notFound();
-  }
+  const job: Job | null = await fetchJob((await params).slug);
+  if (!job) notFound();
 
   // **Do not pass `job` as a prop.**
   // JobDetailsClient will consume `job` via React Context.

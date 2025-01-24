@@ -4,19 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-background text-foreground;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.dark body {
-  @apply bg-backgroundDark text-foregroundDark;
-}
-@layer base {
-    h1 {
-        @apply mb-4 text-3xl font-bold;
-    }
-}
 /* globals.css */
 .animate-draw-path-reverse {
     animation: drawAndFillReverse 5s ease-in-out infinite;
@@ -60,4 +47,29 @@ body {
       fill-opacity: 1; /* Fully visible and filled again */
   }
 }
+.custom-popup {
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle drop shadow */
+    background-color: white; /* Ensure a clean white background */
+    overflow: hidden; /* Prevent content from spilling */
+    font-family: 'Arial', sans-serif; /* Modern font */
+    position: relative; /* Allow positioning of the close button */
+}
 
+.custom-popup .absolute {
+    transition: background-color 0.2s ease;
+}
+
+.custom-popup .absolute:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* Smooth hover effect */
+}
+@layer components {
+    .loader {
+        border-top-color: #3490dc; /* Tailwind's blue-500 */
+        animation: spinner 1.5s linear infinite;
+    }
+
+    @keyframes spinner {
+        to { transform: rotate(360deg); }
+    }
+}

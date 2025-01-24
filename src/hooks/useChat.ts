@@ -2,16 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import useAuth from '@/hooks/useAuth';
-import { User } from "@/common/types";
-
-export interface Message {
-  id: string;
-  content: string;
-  user?: User;
-  timestamp?: string;
-  read?: boolean;
-  sentByCurrentUser?: boolean;
-}
+import { Message, User } from "@/common/types";
 
 interface UseChatProps {
   receiverId?: string;
@@ -82,21 +73,39 @@ export default function useChat({ receiverId }: UseChatProps) {
                 user: payload.data.user,
                 timestamp: payload.data.timestamp,
                 read: payload.data.read,
+                type: payload.data.type ?? 'user',
                 sentByCurrentUser: payload.data.sentByCurrentUser,
               };
               setMessages((prev) => [...prev, newMessage]);
               break;
             }
             case 'messageToClientHistory': {
+              console.log(payload.data.type);
               const history: Message[] = payload.data.map((msg: any) => ({
                 id: msg.id,
                 content: msg.content,
                 user: msg.user,
                 timestamp: msg.timestamp,
                 read: msg.read,
+                type: msg.type ?? 'user',
                 sentByCurrentUser: msg.sentByCurrentUser,
               }));
               setMessages(history);
+              break;
+            }
+            case 'systemMessageToClient': {
+              // A system message from the server
+              const systemMsg: Message = {
+                id: payload.data.id,
+                content: payload.data.content,
+                timestamp: payload.data.timestamp,
+                type: payload.data.type, // 'system'
+                action: payload.data.action ?? undefined,
+                read: payload.data.read ?? false,
+                // Typically false, unless you want to treat system as "sent by me"
+                sentByCurrentUser: false,
+              };
+              setMessages((prev) => [...prev, systemMsg]);
               break;
             }
             case 'userPresenceUpdate': {

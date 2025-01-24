@@ -1,5 +1,4 @@
 // pages/profile.tsx
-
 'use client';
 
 import React, { ChangeEvent, FormEvent, useEffect, useState, useMemo } from 'react';
@@ -10,8 +9,8 @@ import axios from 'axios';
 import { FaCamera } from 'react-icons/fa';
 import LoadingLogo from '@/components/NSRVLoader';
 import { Review } from "@/common/types"; // Importing Review interface
-import { useRouter } from 'next/navigation';
-import { jwtDecode } from 'jwt-decode'; // Corrected import
+import { jwtDecode } from 'jwt-decode';
+import ReviewsSection from "@/components/portal/user/reviews/ReviewsSection"; // Corrected import
 
 interface User {
   id: string;
@@ -53,9 +52,7 @@ export default function ProfilePage() {
   // States for reviews
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState<boolean>(true);
-  const [reviewsError, setReviewsError] = useState<string | null>(null);
-
-  const router = useRouter(); // Initialize router for navigation
+  const [reviewsError] = useState<string | null>(null);
 
   // Function to determine role
   const getRole = () => {
@@ -76,18 +73,30 @@ export default function ProfilePage() {
         const userId = decoded.sub;
         console.log(decoded);
 
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
+        const [userResponse, reviewsResponse] = await Promise.all([
+          axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
             },
-          },
-        );
-        console.log(response.data.user);
+          ),
+          axios.get<Review[]>(
+            `${process.env.NEXT_PUBLIC_API_URL}/reviews/user/${userId}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          )
+        ]);
 
-        const data: User = response.data.user;
+        console.log(userResponse.data.user);
+
+        const data: User = userResponse.data.user;
         setUser(data);
         setName(data.name || '');
         setBio(data.bio || '');
@@ -101,48 +110,12 @@ export default function ProfilePage() {
             : `${process.env.NEXT_PUBLIC_ASSETS_URL}70e5b449-da0a-4d91-af74-8a4592080b98`,
         );
 
-        // Fetch reviews after fetching user data
-        await fetchUserReviews(userId, token);
+        // Set reviews
+        setReviews(reviewsResponse.data);
       } catch (err: any) {
-        setError(err.response?.data?.message || err.message);
+        setError(err.response?.data?.message || err.message || 'Kunne ikke hente data.');
       } finally {
         setLoading(false);
-      }
-    };
-
-    const fetchUserReviews = async (userId: string, token: string) => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/reviews/user/${userId}`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        console.log(response.data);
-        const fetchedReviews: any[] = response.data; // Adjust based on API response
-
-        // Map fetched reviews to match the Review interface
-        const mappedReviews: Review[] = fetchedReviews.map(review => ({
-          id: review.id,
-          date_created: review.date_created,
-          date_updated: review.date_updated,
-          byUserObject: review.by_user,       // Map snake_case to camelCase
-          jobObject: {
-            ...review.job,
-            category: review.job.category, // Ensure category includes 'name'
-          },
-          rating: review.rating,
-          comment: review.comment,
-          userObject: review.user,
-        }));
-
-        setReviews(mappedReviews);
-      } catch (err: any) {
-        setReviewsError(err.response?.data?.message || err.message);
-      } finally {
         setReviewsLoading(false);
       }
     };
@@ -205,30 +178,12 @@ export default function ProfilePage() {
     }
   };
 
-  // Compute average ratings per category dynamically
-  const averageRatings = useMemo(() => {
-    const ratingsMap: { [key: string]: number[] } = {};
-
-    // Aggregate ratings by category name
-    reviews.forEach((review) => {
-      const category = review.jobObject?.category?.name;
-      if (category) {
-        if (!ratingsMap[category]) {
-          ratingsMap[category] = [];
-        }
-        ratingsMap[category].push(review.rating || 0);
-      }
-    });
-
-    // Calculate average ratings per category
-    const averages: { [key: string]: number } = {};
-    Object.entries(ratingsMap).forEach(([category, ratings]) => {
-      const total = ratings.reduce((sum, rating) => sum + rating, 0);
-      averages[category] = parseFloat((total / ratings.length).toFixed(1));
-    });
-
-    console.log("Average Ratings:", averages);
-    return averages;
+  // Calculate overall average rating
+  const overallAverageRating = useMemo(() => {
+    if (reviews.length === 0) return 0;
+    const total = reviews.reduce((acc, review) => acc + (review.rating || 0), 0);
+    const avg = total / reviews.length;
+    return parseFloat(avg.toFixed(1));
   }, [reviews]);
 
   if (loading) {
@@ -269,6 +224,8 @@ export default function ProfilePage() {
               layout="fill"
               objectFit="cover"
               className="object-cover transition duration-300 group-hover:blur-sm group-hover:brightness-50 group-hover:filter"
+              placeholder="blur"
+              blurDataURL="/default-avatar.png" // Low-res placeholder
             />
 
             {/* Overlay for Hover Effects */}
@@ -307,7 +264,7 @@ export default function ProfilePage() {
             {/* Verified Badge */}
             {verified && (
               <Tooltip text="Denne brukerens identitet er verifisert.">
-                <div className="flex items-center justify-center rounded-full bg-blue-100 p-2 shadow-neumorphic">
+                <div className="flex items-center space-x-1 rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-600 shadow-neumorphic">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5 text-blue-500"
@@ -322,9 +279,7 @@ export default function ProfilePage() {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                  <span className="ml-1 text-sm font-medium text-blue-600">
-                    Verifisert
-                  </span>
+                  <span>Verifisert</span>
                 </div>
               </Tooltip>
             )}
@@ -343,11 +298,11 @@ export default function ProfilePage() {
         </div>
 
         {/* Bio */}
-        <div className="w-full rounded-2xl bg-yellow-200 p-4 shadow-neumorphic">
+        <div className="w-full rounded-2xl bg-background p-4 shadow-neumorphic">
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="w-full resize-none border-none bg-transparent text-gray-800 outline-none"
+            className="w-full resize-none border-none bg-transparent text-gray-800 outline-none dark:text-gray-50"
             rows={5}
             placeholder="Skriv din bio her..."
             required
@@ -358,7 +313,7 @@ export default function ProfilePage() {
         <form onSubmit={handleSubmit} className="w-full space-y-4">
           {/* Guardian Field - Conditionally Rendered */}
           {user?.needs_guardian && (
-            <div className="flex items-center justify-between rounded-2xl bg-yellow-200 p-4 shadow-neumorphic">
+            <div className="flex items-center justify-between rounded-2xl bg-background p-4 shadow-neumorphic">
               <label htmlFor="guardian" className="font-medium text-gray-800">
                 Foresatte:
               </label>
@@ -367,7 +322,7 @@ export default function ProfilePage() {
                 id="guardian"
                 value={guardian}
                 onChange={(e) => setGuardian(e.target.value)}
-                className="border-none bg-transparent text-right text-gray-800 outline-none"
+                className="border-none bg-transparent text-right text-gray-800 outline-none dark:text-gray-50"
                 placeholder="Foresatt navn"
                 required={user?.needs_guardian}
               />
@@ -375,7 +330,7 @@ export default function ProfilePage() {
           )}
 
           {/* Mobile Field */}
-          <div className="flex items-center justify-between rounded-2xl bg-yellow-200 p-4 shadow-neumorphic">
+          <div className="flex items-center justify-between rounded-2xl bg-background p-4 shadow-neumorphic">
             <label htmlFor="mobile" className="font-medium text-gray-800">
               Mobil:
             </label>
@@ -384,7 +339,7 @@ export default function ProfilePage() {
               id="mobile"
               value={mobile}
               onChange={(e) => setMobile(e.target.value)}
-              className="border-none bg-transparent text-right text-gray-800 outline-none"
+              className="border-none bg-transparent text-right text-gray-800 outline-none dark:text-gray-50"
               placeholder="Mobilnummer"
               pattern="^(\+47\s?)?([0-9]{2}\s?){3}[0-9]{2}$"
               title="Format: 12 34 567"
@@ -393,7 +348,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Email Field */}
-          <div className="flex items-center justify-between rounded-2xl bg-yellow-200 p-4 shadow-neumorphic">
+          <div className="flex items-center justify-between rounded-2xl bg-background p-4 shadow-neumorphic">
             <label htmlFor="email" className="font-medium text-gray-800">
               Epost:
             </label>
@@ -402,7 +357,7 @@ export default function ProfilePage() {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="border-none bg-transparent text-right text-gray-800 outline-none"
+              className="border-none bg-transparent text-right text-gray-800 outline-none dark:text-gray-50"
               placeholder="Epostadresse"
               required
             />
@@ -415,7 +370,7 @@ export default function ProfilePage() {
             className={`w-full rounded-2xl bg-blue-500 py-2 font-semibold text-white shadow-neumorphic ${
               isSubmitting
                 ? 'cursor-not-allowed opacity-50'
-                : 'hover:bg-blue-600'
+                : 'hover:bg-blue-600 transition-colors duration-300'
             }`}
           >
             {isSubmitting ? 'Oppdaterer...' : 'Oppdater Profil'}
@@ -428,12 +383,12 @@ export default function ProfilePage() {
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-50">
               Anmeldelser
             </h2>
-            <button
-              onClick={() => router.push('/profile/reviews')} // Navigate to reviews page
+            <Link
+              href={`/portal/profil/${user?.id}/anmeldelser`} // Adjust the route as needed
               className="text-blue-500 hover:underline"
             >
               Se alle anmeldelser
-            </button>
+            </Link>
           </div>
 
           {/* Loading and Error States for Reviews */}
@@ -447,35 +402,14 @@ export default function ProfilePage() {
             <p className="text-gray-600">Ingen anmeldelser tilgjengelig.</p>
           ) : (
             <div className="space-y-4">
-              {Object.entries(averageRatings).map(([category, average]) => (
-                <div
-                  key={category}
-                  className="flex items-center justify-between rounded-2xl bg-yellow-200 p-4 shadow-neumorphic"
-                >
-                  <span className="font-medium text-gray-800 dark:text-gray-200">
-                    {category}
-                  </span>
-                  <div className="flex items-center space-x-1">
-                    {/* Display stars based on average rating */}
-                    {Array.from({ length: 5 }).map((_, starIndex) => (
-                      <span
-                        key={starIndex}
-                        className={`text-xl ${
-                          starIndex < Math.floor(average)
-                            ? 'text-yellow-500'
-                            : 'text-gray-300'
-                        }`}
-                      >
-                        ★
-                      </span>
-                    ))}
-                    {/* Display numerical average */}
-                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                      {average > 0 ? average.toFixed(1) : 'Ingen vurdering'}
-                    </span>
-                  </div>
-                </div>
-              ))}
+              {/* Overall Average Rating */}
+              <div className="mb-6">
+                <ReviewsSection
+                  reviews={reviews}
+                  averageRating={overallAverageRating}
+                  limit={5} // Display up to 5 reviews
+                />
+              </div>
             </div>
           )}
         </div>
@@ -483,7 +417,7 @@ export default function ProfilePage() {
         {/* Logout and Customer Service */}
         <div className="w-full space-y-4">
           <Link
-            className="block w-full rounded-2xl bg-yellow-300 py-2 text-center font-semibold text-gray-800 shadow-neumorphic"
+            className="block w-full rounded-2xl bg-primary py-2 text-center font-semibold text-gray-800 shadow-neumorphic hover:bg-yellow-400 transition-colors duration-300"
             href="mailto:kundeservice@flittigub.no"
           >
             Kundeservice
@@ -493,7 +427,7 @@ export default function ProfilePage() {
               localStorage.removeItem('token'); // Ensure consistency with token key
               window.location.href = '/portal/logg-inn'; // Redirect to login page
             }}
-            className="w-full rounded-2xl bg-yellow-300 py-2 font-semibold text-gray-800 shadow-neumorphic"
+            className="w-full rounded-2xl bg-primary py-2 font-semibold text-gray-800 shadow-neumorphic hover:bg-yellow-400 transition-colors duration-300"
           >
             Logg ut
           </button>

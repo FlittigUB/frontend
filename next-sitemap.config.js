@@ -2,21 +2,23 @@
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { get } = require('axios');
+
 module.exports = {
   siteUrl: 'https://flittigub.no',
-  generateRobotsTxt: true, // Genererer robots.txt-fil
+  generateRobotsTxt: true, // Generates robots.txt file
   sitemapSize: 5000,
-  exclude: ['/api/*', '/admin/*'], // Ekskluderer API- og admin-ruter
+  exclude: ['/api/*', '/admin/*'], // Excludes API and admin routes
   transform: async (config, path) => {
     return {
-      loc: path, // Absolutt URL
+      loc: path, // Absolute URL
       changefreq: 'daily',
       priority: 0.7,
     };
   },
   additionalPaths: async () => {
     const paths = [];
-    // Hent ansatt-slugger fra Directus
+
+    // Fetch employee slugs from Directus
     try {
       const employeeResponse = await get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/employee`,
@@ -24,11 +26,11 @@ module.exports = {
           headers: {
             'Content-Type': 'application/json',
           },
-        },
+        }
       );
       const employees = employeeResponse.data;
 
-      // Sjekk at 'data' finnes og er et array
+      // Ensure 'employees' is an array
       if (Array.isArray(employees)) {
         const employeeSlugs = employees.map((info) => info.id);
 
@@ -40,12 +42,13 @@ module.exports = {
           });
         });
       } else {
-        console.error('employees response data is not an array:', employees);
+        console.error('Employees response data is not an array:', employees);
       }
     } catch (error) {
-      console.error('Feil ved henting av infog-slugger for sitemap:', error);
+      console.error('Error fetching employee slugs for sitemap:', error);
     }
-    // Hent infog-slugger fra Directus
+
+    // Fetch info slugs from Directus
     try {
       const infosResponse = await get(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/info`,
@@ -53,11 +56,11 @@ module.exports = {
           headers: {
             'Content-Type': 'application/json',
           },
-        },
+        }
       );
       const infos = infosResponse.data;
 
-      // Sjekk at 'data' finnes og er et array
+      // Ensure 'infos' is an array
       if (Array.isArray(infos)) {
         const infoSlugs = infos.map((info) => info.id);
 
@@ -69,11 +72,42 @@ module.exports = {
           });
         });
       } else {
-        console.error('infos response data is not an array:', infos);
+        console.error('Infos response data is not an array:', infos);
       }
     } catch (error) {
-      console.error('Feil ved henting av infog-slugger for sitemap:', error);
+      console.error('Error fetching info slugs for sitemap:', error);
     }
+
+    // Fetch job slugs from Directus
+    try {
+      const jobsResponse = await get(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/job/all`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const jobs = jobsResponse.data;
+
+      // Ensure 'jobs' is an array
+      if (Array.isArray(jobs)) {
+        const jobSlugs = jobs.map((job) => job.slug);
+
+        jobSlugs.forEach((slug) => {
+          paths.push({
+            loc: `/portal/stillinger/${slug}`,
+            changefreq: 'daily',
+            priority: 0.7,
+          });
+        });
+      } else {
+        console.error('Jobs response data is not an array:', jobs);
+      }
+    } catch (error) {
+      console.error('Error fetching job slugs for sitemap:', error);
+    }
+
     return paths;
   },
 };

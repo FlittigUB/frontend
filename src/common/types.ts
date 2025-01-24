@@ -79,7 +79,7 @@ export interface JobFormData {
 }
 
 
-export type ApplicationStatus = "waiting" | "approved" | "rejected" | "finished" | "confirmed";
+export type ApplicationStatus = "waiting" | "approved" | "declined" | "finished" | "confirmed";
 // Interface for Application
 export interface Application {
   id: string;
@@ -115,21 +115,27 @@ export interface Message {
   receiver?: string; // ID of the receiver
   read?: boolean;
   content?: string;
+  user?: User;
+  timestamp?: string;
+  sentByCurrentUser?: boolean;
   senderObject?: User; // User object of the sender
   receiverObject?: User; // User object of the receiver
+  type?: 'user' | 'system';
+  action?: {
+    id: string;         // some ID or key to trigger
+    label: string;      // button text
+    payload?: any;      // any extra data your action needs
+  };
 }
 
 // Interface for Review
 export interface Review {
   id: string;
   user?: string; // ID of the user being reviewed
-  byUser?: string; // ID of the user who wrote the review
+  by_user?: User; // ID of the user who wrote the review
   rating?: number;
   comment?: string;
-  job?: string; // ID of the associated job
-  userObject?: User; // User object being reviewed
-  byUserObject?: User; // User object of the reviewer
-  jobObject?: Job; // Job object associated with the review
+  job?: Job; // ID of the associated job
 }
 
 // Interface for Parent
