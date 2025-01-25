@@ -16,6 +16,7 @@ import {
   HiOutlineX,
 } from 'react-icons/hi';
 import Image from "next/image";
+import { ModeToggle } from "@/components/portal/theme/ModeToggle";
 
 interface NavbarProps {
   onOpenChat?: () => void;
@@ -59,6 +60,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
   // Right side links (e.g. “Hei, [navn]”, “Meldinger”, “Profil”, etc.)
   const navLinksRight = (
     <>
+      <ModeToggle/>
       {loggedIn ? (
         <>
           {/* Greet the user if name is available */}
@@ -159,7 +161,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
   );
 
   return (
-    <header className="w-full border-b border-gray-200 bg-secondary shadow-sm">
+    <header className="w-full border-b border-secondary bg-background shadow-sm">
       <div className="relative container mx-auto flex items-center justify-between px-4 py-3">
         {/* Brand / Logo */}
         <Link
@@ -208,7 +210,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
             className="
               absolute top-[64px] left-0 w-full
               bg-secondary
-              border-t border-gray-200
+              border-t border-secondary
               z-50
               flex flex-col items-start px-4 py-4
               md:hidden
@@ -216,7 +218,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
           >
             <div className="w-full mb-2">{navLinksLeft}</div>
             {/* Add a line or spacing to separate */}
-            <hr className="w-full border-gray-200 my-4" />
+            <hr className="w-full border-secondary my-4" />
             <div className="w-full">{navLinksRight}</div>
           </div>
         )}

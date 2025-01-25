@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* globals.css */
+/* Custom Animations */
 .animate-draw-path-reverse {
     animation: drawAndFillReverse 5s ease-in-out infinite;
 }
@@ -41,12 +41,13 @@
     80% {
         stroke-dashoffset: 0;
         fill-opacity: 1; /* Fade fill in */
-  }
-  100% {
-      stroke-dashoffset: 0;
-      fill-opacity: 1; /* Fully visible and filled again */
-  }
+    }
+    100% {
+        stroke-dashoffset: 0;
+        fill-opacity: 1; /* Fully visible and filled again */
+    }
 }
+
 .custom-popup {
     border-radius: 8px; /* Rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle drop shadow */
@@ -63,13 +64,118 @@
 .custom-popup .absolute:hover {
     background-color: rgba(0, 0, 0, 0.1); /* Smooth hover effect */
 }
+
+/* Loader Animation */
 @layer components {
     .loader {
-        border-top-color: #3490dc; /* Tailwind's blue-500 */
+        border-top-color: hsl(var(--primary)); /* Tailwind's primary color */
         animation: spinner 1.5s linear infinite;
     }
 
     @keyframes spinner {
         to { transform: rotate(360deg); }
+    }
+}
+
+/* Color Variables */
+@layer base {
+    :root {
+        /* Brand Colors */
+        --primary: 50 94% 55%; /* Brand Color */
+        --primary-foreground: 0 0% 10%; /* Dark text on primary backgrounds */
+
+        /* Neutral Colors */
+        --background: 0 0% 100%; /* White */
+        --foreground: 0 0% 10%; /* Near Black */
+        --card: 45 100% 97.1%; /* Equivalent to Tailwind's bg-amber-50 */
+        --card-foreground: 0 0% 10%; /* Dark text on card backgrounds */
+        --popover: 0 0% 100%; /* White */
+        --popover-foreground: 0 0% 10%; /* Near Black */
+        --secondary: 210 10% 90%; /* Light Gray */
+        --secondary-foreground: 0 0% 10%; /* Near Black */
+        --muted: 210 10% 95%; /* Very Light Gray */
+        --muted-foreground: 0 0% 50%; /* Medium Gray */
+
+        /* Accent Colors */
+        --accent: 50 94% 55%; /* Same as Primary */
+        --accent-foreground: 0 0% 10%; /* Dark text on accent backgrounds */
+
+        /* Feedback Colors */
+        --destructive: 0 84% 60.2%; /* Vibrant Red */
+        --destructive-foreground: 0 0% 100%; /* White */
+
+        /* UI Elements */
+        --border: 210 10% 90%; /* Light Gray Borders */
+        --input: 210 10% 90%; /* Light Gray Inputs */
+        --ring: 50 94% 55%; /* Primary Ring */
+
+        /* Chart Colors */
+        --chart-1: 50 94% 55%; /* Brand Color */
+        --chart-2: 160 60% 45%; /* Teal */
+        --chart-3: 30 80% 55%; /* Orange */
+        --chart-4: 220 70% 50%; /* Blue */
+        --chart-5: 340 75% 55%; /* Pink */
+
+        /* Radius */
+        --radius: 0.5rem;
+    }
+
+    /* Dark Mode */
+    .dark {
+        /* Brand Colors */
+        --primary: 50 94% 55%; /* Brand Color remains the same */
+        --primary-foreground: 0 0% 10%; /* Dark text on primary backgrounds */
+
+        /* Neutral Colors */
+        --background: 210 10% 15%; /* Dark Background */
+        --foreground: 0 0% 90%; /* Near White */
+        --card: 0 0% 20%; /* Dark Amber Equivalent */
+        --card-foreground: 0 0% 95%; /* Light text on dark card backgrounds */
+        --popover: 210 10% 15%; /* Dark Popover */
+        --popover-foreground: 0 0% 95%; /* Near White */
+        --secondary: 210 10% 30%; /* Dark Gray */
+        --secondary-foreground: 0 0% 90%; /* Near White */
+        --muted: 210 10% 30%; /* Dark Gray */
+        --muted-foreground: 0 0% 63.9%; /* Medium Gray */
+
+        /* Accent Colors */
+        --accent: 50 94% 55%; /* Same as Primary */
+        --accent-foreground: 0 0% 10%; /* Dark text on accent backgrounds */
+
+        /* Feedback Colors */
+        --destructive: 0 62.8% 30.6%; /* Dark Red */
+        --destructive-foreground: 0 0% 100%; /* White */
+
+        /* UI Elements */
+        --border: 210 10% 30%; /* Dark Gray Borders */
+        --input: 210 10% 30%; /* Dark Gray Inputs */
+        --ring: 50 94% 55%; /* Primary Ring */
+
+        /* Chart Colors */
+        --chart-1: 50 94% 55%; /* Brand Color */
+        --chart-2: 160 60% 45%; /* Teal */
+        --chart-3: 30 80% 55%; /* Orange */
+        --chart-4: 220 70% 50%; /* Blue */
+        --chart-5: 340 75% 55%; /* Pink */
+    }
+
+    /* Apply Base Styles */
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+    }
+
+    /* Custom Card Background and Foreground */
+    .card {
+        background-color: hsl(var(--card));
+        color: hsl(var(--card-foreground));
+    }
+
+    .dark .card {
+        background-color: hsl(var(--card));
+        color: hsl(var(--card-foreground));
     }
 }

@@ -102,11 +102,7 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
   return (
     <PortalLayoutContext.Provider value={{ openChatWithReceiver }}>
       <div
-        className={`flex h-screen flex-col ${
-          isDarkMode
-            ? 'bg-background-dark text-foreground-dark'
-            : 'bg-gray-50 text-foreground'
-        }`}
+        className={`flex h-screen flex-col bg-background`}
       >
         <Navbar onOpenChat={() => openChatWithReceiver('')} />
 

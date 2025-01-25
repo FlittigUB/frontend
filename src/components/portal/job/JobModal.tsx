@@ -3,6 +3,29 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { Category, JobFormData } from '@/common/types';
 import AddressSearch from './AddressSearch';
 import { FaArrowRight, FaMapMarkerAlt, FaInfoCircle, FaList, FaDollarSign } from 'react-icons/fa';
+import {
+  Button,
+} from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Alert } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
 
 interface JobModalProps {
   isOpen: boolean;
@@ -124,7 +147,7 @@ const JobModal: React.FC<JobModalProps> = ({
   const stepLabels = ['Grunnleggende Info', 'Posisjon', 'Detaljer', 'Betalingsinformasjon'];
   const progressPercent = ((step + 1) / stepLabels.length) * 100;
 
-  // Definer ikoner for hvert steg
+  // Define icons for each step
   const stepIcons = [
     <FaInfoCircle key="icon-0" />,      // Grunnleggende Info
     <FaMapMarkerAlt key="icon-1" />,    // Posisjon
@@ -201,316 +224,277 @@ const JobModal: React.FC<JobModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 p-4">
-      <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
-        <h2 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
-          {isEdit ? 'Rediger Jobb' : 'Opprett Ny Jobb'}
-        </h2>
-
-        {error && <p className="mb-4 text-red-500">{error}</p>}
+      <Card className="w-full max-w-lg">
+        <CardHeader>
+          <CardTitle>{isEdit ? 'Rediger Jobb' : 'Opprett Ny Jobb'}</CardTitle>
+          {error && <CardDescription className="text-red-500">{error}</CardDescription>}
+        </CardHeader>
 
         {/* Progress Bar */}
-        <div className="mb-2 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-          <div
-            className="h-2 rounded-full bg-primary transition-all"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-        {/* Step Labels */}
-        <div className="mb-4 flex items-center justify-between text-sm">
-          {stepLabels.map((label, index) => {
-            const isActive = index === step;
-            const isCompleted = index < step;
-            return (
-              <div
-                key={index}
-                className={`flex flex-col items-center text-center ${
-                  isActive ? 'font-semibold text-primary' : 'text-gray-400'
-                } ${isCompleted ? 'opacity-70' : ''}`}
-              >
-                {isActive ? (
-                  <span>{label}</span>
-                ) : (
-                  <div className="flex flex-col items-center">
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700">
-                      {stepIcons[index]}
+        <CardContent>
+          <Progress value={progressPercent} className="mb-4" />
+          {/* Step Labels */}
+          <div className="mb-6 flex items-center justify-between text-sm">
+            {stepLabels.map((label, index) => {
+              const isActive = index === step;
+              const isCompleted = index < step;
+              return (
+                <div
+                  key={index}
+                  className={`flex flex-col items-center text-center ${
+                    isActive ? 'font-semibold text-primary' : 'text-gray-400'
+                  } ${isCompleted ? 'opacity-70' : ''}`}
+                >
+                  {isActive ? (
+                    <span>{label}</span>
+                  ) : (
+                    <div className="flex flex-col items-center">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700">
+                        {stepIcons[index]}
+                      </div>
+                      <span className="mt-1">{index + 1}</span>
                     </div>
-                    <span className="mt-1">{index + 1}</span>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {stepError && (
-          <div className="mb-4 rounded-md border border-red-500 bg-red-50 p-2 text-red-700">
-            {stepError}
-          </div>
-        )}
-
-        <form onSubmit={handleFormSubmit} noValidate>
-          {/* STEP 0 */}
-          {step === 0 && (
-            <>
-              <div className="mb-4">
-                <label
-                  htmlFor="title"
-                  className="block font-medium text-gray-700 dark:text-gray-200"
-                >
-                  Tittel <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="title"
-                  type="text"
-                  name="title"
-                  placeholder="Skriv inn tittel"
-                  value={formData.title || ''}
-                  onChange={handleInputChange}
-                  required
-                  className="dark:bg-background-dark dark:text-foreground-dark mt-1 w-full rounded-md border p-2
-                             focus:border-primary focus:ring-1 focus:ring-primary"
-                  aria-required="true"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label
-                  htmlFor="description"
-                  className="block font-medium text-gray-700 dark:text-gray-200"
-                >
-                  Beskrivelse <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  placeholder="Skriv en kort beskrivelse"
-                  value={formData.description || ''}
-                  onChange={handleInputChange}
-                  required
-                  rows={3}
-                  maxLength={MAX_DESCRIPTION_LENGTH}
-                  className="dark:bg-background-dark dark:text-foreground-dark mt-1 w-full rounded-md border p-2
-                             focus:border-primary focus:ring-1 focus:ring-primary"
-                  aria-required="true"
-                />
-                <div className="mt-1 text-right text-sm text-gray-500 dark:text-gray-400">
-                  {descriptionCount}/{MAX_DESCRIPTION_LENGTH}
+                  )}
                 </div>
-              </div>
-            </>
+              );
+            })}
+          </div>
+
+          {stepError && (
+            <Alert variant="destructive" className="mb-4">
+              {stepError}
+            </Alert>
           )}
 
-          {/* STEP 1 */}
-          {step === 1 && (
-            <>
-              <div className="mb-4">
-                <label className="mb-1 block font-medium text-gray-700 dark:text-gray-200">
-                  Søk etter adresse
-                </label>
-                <AddressSearch onSelectLocation={handleSelectLocation} />
+          <form onSubmit={handleFormSubmit} noValidate>
+            {/* STEP 0 */}
+            {step === 0 && (
+              <>
+                <div className="mb-4">
+                  <Label htmlFor="title">Tittel <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="title"
+                    type="text"
+                    name="title"
+                    placeholder="Skriv inn tittel"
+                    value={formData.title || ''}
+                    onChange={handleInputChange}
+                    required
+                    aria-required="true"
+                  />
+                </div>
 
-                {selectedAddressLines && (
-                  <div className="mt-4 rounded-md border border-primary bg-primary bg-opacity-10 p-3">
-                    <h4 className="mb-1 font-semibold text-primary">Valgt posisjon/område</h4>
-                    {selectedAddressLines.map((line, idx) => (
-                      <p key={idx} className="text-gray-700 dark:text-gray-200">
-                        {line}
-                      </p>
-                    ))}
+                <div className="mb-4">
+                  <Label htmlFor="description">Beskrivelse <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="description"
+                    name="description"
+                    placeholder="Skriv en kort beskrivelse"
+                    value={formData.description || ''}
+                    onChange={handleInputChange}
+                    required
+                    maxLength={MAX_DESCRIPTION_LENGTH}
+                    className="resize-none"
+                    aria-required="true"
+                  />
+                  <div className="mt-1 text-right text-sm text-gray-500 dark:text-gray-400">
+                    {descriptionCount}/{MAX_DESCRIPTION_LENGTH}
                   </div>
-                )}
+                </div>
+              </>
+            )}
 
-                <div className="mt-3">
-                  <button
-                    type="button"
-                    onClick={handleUseMyLocation}
-                    className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2
-                               font-medium text-white hover:bg-blue-700 focus:outline-none
-                               focus:ring-2 focus:ring-blue-400"
+            {/* STEP 1 */}
+            {step === 1 && (
+              <>
+                <div className="mb-4">
+                  <Label>Søk etter adresse</Label>
+                  <AddressSearch onSelectLocation={handleSelectLocation} />
+
+                  {selectedAddressLines && (
+                    <div className="mt-4 rounded-md border border-primary bg-primary bg-opacity-10 p-3">
+                      <h4 className="mb-1 font-semibold text-primary">Valgt posisjon/område</h4>
+                      {selectedAddressLines.map((line, idx) => (
+                        <p key={idx} className="text-gray-700 dark:text-gray-200">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="mt-3">
+                    <Button
+                      type="button"
+                      onClick={handleUseMyLocation}
+                      variant="default"
+                      className="inline-flex items-center"
+                      disabled={isSubmitting}
+                    >
+                      <FaMapMarkerAlt className="mr-2" aria-hidden="true" />
+                      Bruk min nåværende posisjon
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* STEP 2 */}
+            {step === 2 && (
+              <>
+                <div className="mb-4">
+                  <Label htmlFor="scheduled_at">Planlagt dato <span className="text-red-500">*</span></Label>
+                  <Input
+                    type="date"
+                    id="scheduled_at"
+                    name="scheduled_at"
+                    value={formData.scheduled_at || ''}
+                    onChange={handleInputChange}
+                    required
+                    aria-required="true"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <Label htmlFor="category">Kategori <span className="text-red-500">*</span></Label>
+                  <Select
+                    onValueChange={(value) => {
+                      const event = {
+                        target: { name: 'category', value },
+                      } as unknown as React.ChangeEvent<HTMLSelectElement>;
+                      handleInputChange(event);
+                    }}
+                    value={formData.category || undefined}
+                    aria-label="Kategori"
                   >
-                    <FaMapMarkerAlt className="mr-2" aria-hidden="true" />
-                    Bruk min nåværende posisjon
-                  </button>
+                    <SelectTrigger id="category">
+                      <SelectValue placeholder="Velg en kategori" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-              </div>
-            </>
-          )}
 
-          {/* STEP 2 */}
-          {step === 2 && (
-            <>
-              <div className="mb-4">
-                <label className="block font-medium text-gray-700 dark:text-gray-200">
-                  Planlagt dato
-                </label>
-                <input
-                  type="date"
-                  name="scheduled_at"
-                  value={formData.scheduled_at || ''}
-                  onChange={handleInputChange}
-                  required
-                  className="dark:bg-background-dark dark:text-foreground-dark mt-1 w-full rounded-md border p-2
-                             focus:border-primary focus:ring-1 focus:ring-primary"
-                />
-              </div>
+                <div className="mb-4 flex items-center">
+                  <Checkbox
+                    id="email_notifications"
+                    name="email_notifications"
+                    checked={formData.email_notifications || false}
+                    onCheckedChange={(checked) => {
+                      const event = {
+                        target: { name: 'email_notifications', value: checked },
+                      } as unknown as React.ChangeEvent<HTMLInputElement>;
+                      handleInputChange(event);
+                    }}
+                  />
+                  <Label htmlFor="email_notifications" className="ml-2">
+                    Få e-postvarsel ved nye søknader?
+                  </Label>
+                </div>
+              </>
+            )}
 
-              <div className="mb-4">
-                <label className="mb-2 block font-medium text-gray-700 dark:text-gray-200">
-                  Kategori <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="category"
-                  value={formData.category || ''}
-                  onChange={handleInputChange}
-                  required
-                  className="dark:bg-background-dark dark:text-foreground-dark w-full rounded-md border p-2
-                             focus:border-primary focus:ring-1 focus:ring-primary"
-                >
-                  <option value="" disabled>
-                    Velg en kategori
-                  </option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            {/* STEP 3 - Payment Information */}
+            {step === 3 && (
+              <>
+                <div className="mb-4">
+                  <Label htmlFor="rate">Sats (NOK) <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="rate"
+                    type="number"
+                    name="rate"
+                    placeholder="Skriv inn sats"
+                    value={formData.rate !== undefined && formData.rate !== null ? formData.rate : ''}
+                    onChange={handleInputChange}
+                    required
+                    min="0"
+                    step="0.01"
+                    aria-required="true"
+                  />
+                </div>
 
-              <div className="mb-4 flex items-center">
-                <label className="mr-4 font-medium text-gray-700 dark:text-gray-200">
-                  Få e-postvarsel ved nye søknader?
-                </label>
-                <input
-                  type="checkbox"
-                  name="email_notifications"
-                  checked={formData.email_notifications || false}
-                  onChange={handleInputChange}
-                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary
-                             dark:border-gray-600 dark:bg-gray-700"
-                />
-              </div>
-            </>
-          )}
+                <div className="mb-4">
+                  <Label htmlFor="payment_type">Betalingstype <span className="text-red-500">*</span></Label>
+                  <Select
+                    onValueChange={(value) => {
+                      const event = {
+                        target: { name: 'payment_type', value },
+                      } as unknown as React.ChangeEvent<HTMLSelectElement>;
+                      handleInputChange(event);
+                    }}
+                    value={formData.payment_type || undefined}
+                    aria-label="Betalingstype"
+                  >
+                    <SelectTrigger id="payment_type">
+                      <SelectValue placeholder="Velg en betalingstype" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fixed">Fast</SelectItem>
+                      <SelectItem value="hourly">Timebasert</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-          {/* STEP 3 - Payment Information */}
-          {step === 3 && (
-            <>
-              <div className="mb-4">
-                <label
-                  htmlFor="sats"
-                  className="block font-medium text-gray-700 dark:text-gray-200"
-                >
-                  Sats (NOK) <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="sats"
-                  type="number"
-                  name="rate"
-                  placeholder="Skriv inn sats"
-                  value={formData.rate !== undefined && formData.rate !== null ? formData.rate : ''}
-                  onChange={handleInputChange}
-                  required
-                  min="0"
-                  step="0.01"
-                  className="dark:bg-background-dark dark:text-foreground-dark mt-1 w-full rounded-md border p-2
-                             focus:border-primary focus:ring-1 focus:ring-primary"
-                  aria-required="true"
-                />
-              </div>
+                <div className="mb-4">
+                  <Label htmlFor="hours_estimated">Estimerte Timer</Label>
+                  <Input
+                    id="hours_estimated"
+                    type="number"
+                    name="hours_estimated"
+                    placeholder="Skriv inn estimerte timer"
+                    value={formData.hours_estimated !== undefined && formData.hours_estimated !== null ? formData.hours_estimated : ''}
+                    onChange={handleInputChange}
+                    min="1"
+                  />
+                </div>
+              </>
+            )}
 
-              <div className="mb-4">
-                <label
-                  htmlFor="payment_type"
-                  className="block font-medium text-gray-700 dark:text-gray-200"
-                >
-                  Betalingstype <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="payment_type"
-                  name="payment_type"
-                  value={formData.payment_type || ''}
-                  onChange={handleInputChange}
-                  required
-                  className="dark:bg-background-dark dark:text-foreground-dark mt-1 w-full rounded-md border p-2
-                             focus:border-primary focus:ring-1 focus:ring-primary"
-                  aria-required="true"
-                  defaultValue="" // Ensures placeholder is shown initially
-                >
-                  <option value="" disabled hidden>
-                    Velg en betalingstype
-                  </option>
-                  <option value="fixed">Fast</option>
-                  <option value="hourly">Timebasert</option>
-                </select>
-              </div>
+            {/* Step Navigation */}
+            <div className="mt-6 flex justify-between space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  if (step === 0) {
+                    onClose();
+                  } else {
+                    prevStep();
+                  }
+                }}
+                disabled={isSubmitting}
+                aria-label={step === 0 ? 'Avbryt' : 'Gå tilbake til forrige steg'}
+              >
+                {step === 0 ? 'Avbryt' : 'Tilbake'}
+              </Button>
 
-              <div className="mb-4">
-                <label
-                  htmlFor="hours_estimated"
-                  className="block font-medium text-gray-700 dark:text-gray-200"
-                >
-                  Estimerte Timer
-                </label>
-                <input
-                  id="hours_estimated"
-                  type="number"
-                  name="hours_estimated"
-                  placeholder="Skriv inn estimerte timer"
-                  value={formData.hours_estimated !== undefined && formData.hours_estimated !== null ? formData.hours_estimated : ''}
-                  onChange={handleInputChange}
-                  min="1"
-                  className="dark:bg-background-dark dark:text-foreground-dark mt-1 w-full rounded-md border p-2
-                             focus:border-primary focus:ring-1 focus:ring-primary"
-                />
-              </div>
-            </>
-          )}
-
-          {/* Step Navigation */}
-          <div className="mt-6 flex justify-between space-x-2">
-            <button
-              type="button"
-              onClick={() => {
-                if (step === 0) {
-                  onClose();
-                } else {
-                  prevStep();
-                }
-              }}
-              disabled={isSubmitting}
-              aria-label={step === 0 ? 'Avbryt' : 'Gå tilbake til forrige steg'}
-              className="inline-flex items-center rounded-md bg-gray-300 px-4 py-2
-                         font-medium text-gray-700 hover:bg-gray-400 focus:outline-none
-                         focus:ring-2 focus:ring-gray-400 disabled:opacity-70"
-            >
-              {step === 0 ? 'Avbryt' : 'Tilbake'}
-            </button>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              aria-label={step < stepLabels.length - 1 ? 'Neste steg' : 'Send inn'}
-              className="inline-flex items-center rounded-md bg-primary px-4 py-2 font-medium text-white
-                         hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary-dark
-                         disabled:opacity-70"
-            >
-              {step < stepLabels.length - 1 ? (
-                <>
-                  Neste
-                  <FaArrowRight className="ml-2" aria-hidden="true" />
-                </>
-              ) : isSubmitting ? (
-                'Lagrer...'
-              ) : isEdit ? (
-                'Oppdater'
-              ) : (
-                'Opprett'
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                aria-label={step < stepLabels.length - 1 ? 'Neste steg' : 'Send inn'}
+              >
+                {step < stepLabels.length - 1 ? (
+                  <>
+                    Neste
+                    <FaArrowRight className="ml-2" aria-hidden="true" />
+                  </>
+                ) : isSubmitting ? (
+                  'Lagrer...'
+                ) : isEdit ? (
+                  'Oppdater'
+                ) : (
+                  'Opprett'
+                )}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+        <CardFooter />
+      </Card>
     </div>
   );
 };

@@ -61,7 +61,7 @@ const JobItem: React.FC<JobItemProps> = ({
     'Ukjent sted';
 
   return (
-    <div className="dark:bg-background-dark dark:text-foreground-dark flex flex-col rounded-xl bg-amber-50 p-6 text-foreground shadow-neumorphic transition-shadow hover:shadow-lg dark:shadow-neumorphic-dark">
+    <div className="flex flex-col rounded-xl bg-card p-6 text-foreground shadow-neumorphic transition-shadow hover:shadow-lg dark:shadow-neumorphic-dark">
       {/* Title row & "Se søknader" (only for employers) */}
       <div className="relative flex items-center justify-between">
         <Link
@@ -74,7 +74,7 @@ const JobItem: React.FC<JobItemProps> = ({
           <div className="absolute right-2 flex justify-between gap-2">
             <Link
               href={`/portal/stillinger/${job.slug}`}
-              className="hidden rounded-full border border-gray-200 bg-white px-4 py-1 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary sm:inline-block"
+              className="hidden rounded-full border border-secondary bg-white px-4 py-1 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary sm:inline-block"
             >
               Se søknader
             </Link>
