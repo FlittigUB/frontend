@@ -1,11 +1,18 @@
 // src/components/portal/job/JobModal.tsx
-import React, { useCallback, useState, useEffect } from 'react';
-import { Category, JobFormData } from '@/common/types';
-import AddressSearch from './AddressSearch';
-import { FaArrowRight, FaMapMarkerAlt, FaInfoCircle, FaList, FaDollarSign } from 'react-icons/fa';
+"use client";
+
+import React, { useCallback, useState, useEffect } from "react";
+import { Category, JobFormData } from "@/common/types";
+import AddressSearch from "./AddressSearch";
 import {
-  Button,
-} from "@/components/ui/button";
+  FaArrowRight,
+  FaMapMarkerAlt,
+  FaInfoCircle,
+  FaList,
+  FaDollarSign,
+} from "react-icons/fa";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -14,6 +21,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -27,6 +41,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 
+// Import format from date-fns
+import { format } from "date-fns";
+// Import Norwegian locale from date-fns
+import { nb } from "date-fns/locale";
+
 interface JobModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -34,7 +53,11 @@ interface JobModalProps {
   formData: JobFormData;
   categories: Category[];
   handleInputChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | HTMLSelectElement
+    >
   ) => void;
   error: string;
   isEdit?: boolean;
@@ -64,15 +87,16 @@ const JobModal: React.FC<JobModalProps> = ({
                                              isEdit = false,
                                              isSubmitting,
                                            }) => {
-
   // Steps: 0 => Title & Description, 1 => Address / Position, 2 => Date/Category, 3 => Payment Info
   const [step, setStep] = useState<number>(0);
 
   // Display lines for the chosen address
-  const [selectedAddressLines, setSelectedAddressLines] = useState<string[] | null>(null);
+  const [selectedAddressLines, setSelectedAddressLines] = useState<
+    string[] | null
+  >(null);
 
   // Step-specific error
-  const [stepError, setStepError] = useState<string>('');
+  const [stepError, setStepError] = useState<string>("");
 
   // Track description length
   const [descriptionCount, setDescriptionCount] = useState<number>(
@@ -84,15 +108,20 @@ const JobModal: React.FC<JobModalProps> = ({
 
   // Handler from AddressSearch
   const handleSelectLocation = useCallback(
-    (lat: number, lon: number, displayName: string, addressDetails?: NominatimAddress) => {
+    (
+      lat: number,
+      lon: number,
+      displayName: string,
+      addressDetails?: NominatimAddress
+    ) => {
       // Update lat/lon in formData
       const latitudeInputEvent = {
-        target: { name: 'latitude', value: lat },
+        target: { name: "latitude", value: lat },
       } as unknown as React.ChangeEvent<HTMLInputElement>;
       handleInputChange(latitudeInputEvent);
 
       const longitudeInputEvent = {
-        target: { name: 'longitude', value: lon },
+        target: { name: "longitude", value: lon },
       } as unknown as React.ChangeEvent<HTMLInputElement>;
       handleInputChange(longitudeInputEvent);
 
@@ -107,36 +136,36 @@ const JobModal: React.FC<JobModalProps> = ({
         ].filter(Boolean) as string[];
         setSelectedAddressLines(lines.length ? lines : [displayName]);
       } else {
-        const splitted = displayName.split(',').map((s) => s.trim());
+        const splitted = displayName.split(",").map((s) => s.trim());
         setSelectedAddressLines(splitted);
       }
     },
-    [handleInputChange],
+    [handleInputChange]
   );
 
   // “Bruk min nåværende posisjon”
   const handleUseMyLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      alert('Geolokasjon er ikke støttet i denne nettleseren.');
+      alert("Geolokasjon er ikke støttet i denne nettleseren.");
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const latitudeInputEvent = {
-          target: { name: 'latitude', value: pos.coords.latitude },
+          target: { name: "latitude", value: pos.coords.latitude },
         } as unknown as React.ChangeEvent<HTMLInputElement>;
         handleInputChange(latitudeInputEvent);
 
         const longitudeInputEvent = {
-          target: { name: 'longitude', value: pos.coords.longitude },
+          target: { name: "longitude", value: pos.coords.longitude },
         } as unknown as React.ChangeEvent<HTMLInputElement>;
         handleInputChange(longitudeInputEvent);
 
-        setSelectedAddressLines(['Nåværende posisjon']);
+        setSelectedAddressLines(["Nåværende posisjon"]);
       },
       (err) => {
-        console.error('Error fetching geolocation:', err);
-        alert('Kunne ikke hente posisjon. Sjekk at du har gitt tillatelse.');
+        console.error("Error fetching geolocation:", err);
+        alert("Kunne ikke hente posisjon. Sjekk at du har gitt tillatelse.");
       }
     );
   }, [handleInputChange]);
@@ -144,59 +173,70 @@ const JobModal: React.FC<JobModalProps> = ({
   // If modal is not open, return null
   if (!isOpen) return null;
 
-  const stepLabels = ['Grunnleggende Info', 'Posisjon', 'Detaljer', 'Betalingsinformasjon'];
+  const stepLabels = [
+    "Grunnleggende Info",
+    "Posisjon",
+    "Detaljer",
+    "Betalingsinformasjon",
+  ];
   const progressPercent = ((step + 1) / stepLabels.length) * 100;
 
   // Define icons for each step
   const stepIcons = [
-    <FaInfoCircle key="icon-0" />,      // Grunnleggende Info
-    <FaMapMarkerAlt key="icon-1" />,    // Posisjon
-    <FaList key="icon-2" />,            // Detaljer
-    <FaDollarSign key="icon-3" />,      // Betalingsinformasjon
+    <FaInfoCircle key="icon-0" />, // Grunnleggende Info
+    <FaMapMarkerAlt key="icon-1" />, // Posisjon
+    <FaList key="icon-2" />, // Detaljer
+    <FaDollarSign key="icon-3" />, // Betalingsinformasjon
   ];
 
   // Validate fields per step
   const validateStep = (currentStep: number): boolean => {
     if (currentStep === 0) {
       if (!formData.title?.trim()) {
-        setStepError('Tittel er påkrevd.');
+        setStepError("Tittel er påkrevd.");
         return false;
       }
       if (!formData.description?.trim()) {
-        setStepError('Beskrivelse er påkrevd.');
+        setStepError("Beskrivelse er påkrevd.");
         return false;
       }
       if (formData.description.length > MAX_DESCRIPTION_LENGTH) {
-        setStepError(`Beskrivelse kan ikke overstige ${MAX_DESCRIPTION_LENGTH} tegn.`);
+        setStepError(
+          `Beskrivelse kan ikke overstige ${MAX_DESCRIPTION_LENGTH} tegn.`
+        );
         return false;
       }
     } else if (currentStep === 1) {
       if (!formData.latitude || !formData.longitude) {
-        setStepError('Posisjon er påkrevd.');
+        setStepError("Posisjon er påkrevd.");
         return false;
       }
     } else if (currentStep === 2) {
       if (!formData.scheduled_at) {
-        setStepError('Tilgjengelig dato er påkrevd.');
+        setStepError("Tilgjengelig dato er påkrevd.");
         return false;
       }
       if (!formData.category) {
-        setStepError('Kategori er påkrevd.');
+        setStepError("Kategori er påkrevd.");
         return false;
       }
     } else if (currentStep === 3) {
-      if (formData.rate === undefined || formData.rate === null || formData.rate === 0) {
-        setStepError('Honorar er påkrevd.');
+      if (
+        formData.rate === undefined ||
+        formData.rate === null ||
+        formData.rate === 0
+      ) {
+        setStepError("Honorar er påkrevd.");
         return false;
       }
       if (!formData.payment_type) {
-        setStepError('Betalingstype er påkrevd.');
+        setStepError("Betalingstype er påkrevd.");
         return false;
       }
       // Remove condition for hours_estimated based on payment_type
       // Now, it's always optional
     }
-    setStepError('');
+    setStepError("");
     return true;
   };
 
@@ -222,12 +262,28 @@ const JobModal: React.FC<JobModalProps> = ({
     }
   };
 
+  // Define selectedDate and handleDateChange
+  const selectedDate = formData.scheduled_at
+    ? new Date(formData.scheduled_at)
+    : undefined;
+
+  const handleDateChange = (date: Date | undefined) => {
+    if (date) {
+      const event = {
+        target: { name: "scheduled_at", value: date.toISOString() },
+      } as React.ChangeEvent<HTMLInputElement>;
+      handleInputChange(event);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 p-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
-          <CardTitle>{isEdit ? 'Rediger Jobb' : 'Opprett Ny Jobb'}</CardTitle>
-          {error && <CardDescription className="text-red-500">{error}</CardDescription>}
+          <CardTitle>{isEdit ? "Rediger Jobb" : "Opprett Ny Jobb"}</CardTitle>
+          {error && (
+            <CardDescription className="text-red-500">{error}</CardDescription>
+          )}
         </CardHeader>
 
         {/* Progress Bar */}
@@ -242,14 +298,14 @@ const JobModal: React.FC<JobModalProps> = ({
                 <div
                   key={index}
                   className={`flex flex-col items-center text-center ${
-                    isActive ? 'font-semibold text-primary' : 'text-gray-400'
-                  } ${isCompleted ? 'opacity-70' : ''}`}
+                    isActive ? "font-semibold text-primary" : "text-gray-400"
+                  } ${isCompleted ? "opacity-70" : ""}`}
                 >
                   {isActive ? (
                     <span>{label}</span>
                   ) : (
                     <div className="flex flex-col items-center">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
                         {stepIcons[index]}
                       </div>
                       <span className="mt-1">{index + 1}</span>
@@ -271,13 +327,15 @@ const JobModal: React.FC<JobModalProps> = ({
             {step === 0 && (
               <>
                 <div className="mb-4">
-                  <Label htmlFor="title">Tittel <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="title">
+                    Tittel <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="title"
                     type="text"
                     name="title"
                     placeholder="Skriv inn tittel"
-                    value={formData.title || ''}
+                    value={formData.title || ""}
                     onChange={handleInputChange}
                     required
                     aria-required="true"
@@ -285,12 +343,14 @@ const JobModal: React.FC<JobModalProps> = ({
                 </div>
 
                 <div className="mb-4">
-                  <Label htmlFor="description">Beskrivelse <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="description">
+                    Beskrivelse <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="description"
                     name="description"
                     placeholder="Skriv en kort beskrivelse"
-                    value={formData.description || ''}
+                    value={formData.description || ""}
                     onChange={handleInputChange}
                     required
                     maxLength={MAX_DESCRIPTION_LENGTH}
@@ -313,9 +373,14 @@ const JobModal: React.FC<JobModalProps> = ({
 
                   {selectedAddressLines && (
                     <div className="mt-4 rounded-md border border-primary bg-primary bg-opacity-10 p-3">
-                      <h4 className="mb-1 font-semibold text-primary">Valgt posisjon/område</h4>
+                      <h4 className="mb-1 font-semibold text-primary">
+                        Valgt posisjon/område
+                      </h4>
                       {selectedAddressLines.map((line, idx) => (
-                        <p key={idx} className="text-gray-700 dark:text-gray-200">
+                        <p
+                          key={idx}
+                          className="text-gray-700 dark:text-gray-200"
+                        >
                           {line}
                         </p>
                       ))}
@@ -342,24 +407,47 @@ const JobModal: React.FC<JobModalProps> = ({
             {step === 2 && (
               <>
                 <div className="mb-4">
-                  <Label htmlFor="scheduled_at">Planlagt dato <span className="text-red-500">*</span></Label>
-                  <Input
-                    type="date"
-                    id="scheduled_at"
-                    name="scheduled_at"
-                    value={formData.scheduled_at || ''}
-                    onChange={handleInputChange}
-                    required
-                    aria-required="true"
-                  />
+                  <Label htmlFor="scheduled_at">
+                    Planlagt dato <span className="text-red-500">*</span>
+                  </Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id="scheduled_at"
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !selectedDate && "text-muted-foreground"
+                        )}
+                        aria-required="true"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {selectedDate ? (
+                          format(selectedDate, "PPP", { locale: nb })
+                        ) : (
+                          <span>Velg en dato</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={handleDateChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 <div className="mb-4">
-                  <Label htmlFor="category">Kategori <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="category">
+                    Kategori <span className="text-red-500">*</span>
+                  </Label>
                   <Select
                     onValueChange={(value) => {
                       const event = {
-                        target: { name: 'category', value },
+                        target: { name: "category", value },
                       } as unknown as React.ChangeEvent<HTMLSelectElement>;
                       handleInputChange(event);
                     }}
@@ -386,7 +474,7 @@ const JobModal: React.FC<JobModalProps> = ({
                     checked={formData.email_notifications || false}
                     onCheckedChange={(checked) => {
                       const event = {
-                        target: { name: 'email_notifications', value: checked },
+                        target: { name: "email_notifications", value: checked },
                       } as unknown as React.ChangeEvent<HTMLInputElement>;
                       handleInputChange(event);
                     }}
@@ -402,13 +490,19 @@ const JobModal: React.FC<JobModalProps> = ({
             {step === 3 && (
               <>
                 <div className="mb-4">
-                  <Label htmlFor="rate">Sats (NOK) <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="rate">
+                    Sats (NOK) <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="rate"
                     type="number"
                     name="rate"
                     placeholder="Skriv inn sats"
-                    value={formData.rate !== undefined && formData.rate !== null ? formData.rate : ''}
+                    value={
+                      formData.rate !== undefined && formData.rate !== null
+                        ? formData.rate
+                        : ""
+                    }
                     onChange={handleInputChange}
                     required
                     min="0"
@@ -418,11 +512,13 @@ const JobModal: React.FC<JobModalProps> = ({
                 </div>
 
                 <div className="mb-4">
-                  <Label htmlFor="payment_type">Betalingstype <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="payment_type">
+                    Betalingstype <span className="text-red-500">*</span>
+                  </Label>
                   <Select
                     onValueChange={(value) => {
                       const event = {
-                        target: { name: 'payment_type', value },
+                        target: { name: "payment_type", value },
                       } as unknown as React.ChangeEvent<HTMLSelectElement>;
                       handleInputChange(event);
                     }}
@@ -446,7 +542,12 @@ const JobModal: React.FC<JobModalProps> = ({
                     type="number"
                     name="hours_estimated"
                     placeholder="Skriv inn estimerte timer"
-                    value={formData.hours_estimated !== undefined && formData.hours_estimated !== null ? formData.hours_estimated : ''}
+                    value={
+                      formData.hours_estimated !== undefined &&
+                      formData.hours_estimated !== null
+                        ? formData.hours_estimated
+                        : ""
+                    }
                     onChange={handleInputChange}
                     min="1"
                   />
@@ -467,15 +568,19 @@ const JobModal: React.FC<JobModalProps> = ({
                   }
                 }}
                 disabled={isSubmitting}
-                aria-label={step === 0 ? 'Avbryt' : 'Gå tilbake til forrige steg'}
+                aria-label={
+                  step === 0 ? "Avbryt" : "Gå tilbake til forrige steg"
+                }
               >
-                {step === 0 ? 'Avbryt' : 'Tilbake'}
+                {step === 0 ? "Avbryt" : "Tilbake"}
               </Button>
 
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                aria-label={step < stepLabels.length - 1 ? 'Neste steg' : 'Send inn'}
+                aria-label={
+                  step < stepLabels.length - 1 ? "Neste steg" : "Send inn"
+                }
               >
                 {step < stepLabels.length - 1 ? (
                   <>
@@ -483,11 +588,11 @@ const JobModal: React.FC<JobModalProps> = ({
                     <FaArrowRight className="ml-2" aria-hidden="true" />
                   </>
                 ) : isSubmitting ? (
-                  'Lagrer...'
+                  "Lagrer..."
                 ) : isEdit ? (
-                  'Oppdater'
+                  "Oppdater"
                 ) : (
-                  'Opprett'
+                  "Opprett"
                 )}
               </Button>
             </div>

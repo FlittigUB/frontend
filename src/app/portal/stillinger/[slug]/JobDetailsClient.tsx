@@ -470,7 +470,7 @@ export default function JobDetailsClient() {
                             app.status !== 'waiting' && (
                               <button
                                 onClick={() =>
-                                  openChatWithReceiver(job.user.id)
+                                  openChatWithReceiver(app.user.id)
                                 }
                                 className="inline-block rounded-full bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
                               >

@@ -5,15 +5,53 @@
 import React, { useEffect, useState, FormEvent } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { FaStar, FaRegStar } from 'react-icons/fa';
 import { Job, User } from "@/common/types";
 import { useAuthContext } from "@/context/AuthContext";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
-interface ReviewProps {
-  receiverId: string; // ID of the arbeidsgiver
-  jobId: string;
+/**
+ * Updated StarIcon component with adjusted colors for less contrast.
+ */
+function StarIcon({ filled, ...props }: { filled: boolean } & React.SVGProps<SVGSVGElement>) {
+  return filled ? (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="currentColor" // Changed to use currentColor for better control
+      stroke="none" // Removed stroke for filled stars
+    >
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  ) : (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor" // Use a lighter stroke color
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
 }
 
+// Define the structure of existing reviews
 interface ExistingReview {
   id: string;
   user: User;
@@ -23,6 +61,12 @@ interface ExistingReview {
   created_at: string;
 }
 
+// Define the props for the Review component
+interface ReviewProps {
+  receiverId: string; // ID of the employer
+  jobId: string;
+}
+
 const Review: React.FC<ReviewProps> = ({ receiverId, jobId }) => {
   const [hasReviewed, setHasReviewed] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -30,7 +74,7 @@ const Review: React.FC<ReviewProps> = ({ receiverId, jobId }) => {
   const [rating, setRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [comment, setComment] = useState<string>('');
-  const { token } = useAuthContext();
+  const { token, user } = useAuthContext(); // Assuming user info is available
 
   // Fetch existing reviews to check if the user has already reviewed
   useEffect(() => {
@@ -38,17 +82,22 @@ const Review: React.FC<ReviewProps> = ({ receiverId, jobId }) => {
       try {
         const response = await axios.get<ExistingReview[]>(
           `${process.env.NEXT_PUBLIC_API_URL}/reviews/user/${receiverId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
-        console.log(response);
-        console.log(receiverId);
-        // Assuming that the current user is the one who might have reviewed
-        // Filter reviews by jobId and current user
+
+        // Find if the current user has reviewed the specific job
         const currentUserReview = response.data.find(
-          (review) => review.job.id === jobId
+          (review) => review.job.id === jobId && review.user.id === user?.id
         );
-        console.log(currentUserReview);
+
         if (currentUserReview) {
           setHasReviewed(true);
+          setRating(currentUserReview.rating);
+          setComment(currentUserReview.comment);
         }
       } catch (err: any) {
         // If there's an error fetching, assume no review exists
@@ -59,8 +108,9 @@ const Review: React.FC<ReviewProps> = ({ receiverId, jobId }) => {
     };
 
     fetchReview();
-  }, [receiverId, jobId]);
+  }, [receiverId, jobId, token, user]);
 
+  // Handle form submission
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -72,7 +122,6 @@ const Review: React.FC<ReviewProps> = ({ receiverId, jobId }) => {
         comment,
         job: jobId,
       };
-      console.log(payload);
       await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/reviews`,
         payload,
@@ -80,7 +129,7 @@ const Review: React.FC<ReviewProps> = ({ receiverId, jobId }) => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
       toast.success('Takk for din vurdering!');
       setHasReviewed(true);
@@ -97,111 +146,141 @@ const Review: React.FC<ReviewProps> = ({ receiverId, jobId }) => {
     }
   };
 
+  // Handle rating reset
+  const handleReset = () => {
+    setRating(0);
+    setComment('');
+  };
+
+  // Display a loading state while fetching review status
   if (loading) {
     return (
-      <div className="flex items-center space-x-2 p-4 rounded bg-blue-50">
-        <svg
-          className="h-5 w-5 animate-spin text-blue-500"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          ></circle>
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v8H4z"
-          ></path>
-        </svg>
-        <span className="text-blue-500">Laster vurderingsstatus...</span>
-      </div>
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Laster vurdering</CardTitle>
+          <CardDescription>Vennligst vent mens vi laster din vurderingsstatus.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex justify-center items-center">
+          <svg
+            className="h-6 w-6 animate-spin text-primary"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v8H4z"
+            ></path>
+          </svg>
+        </CardContent>
+      </Card>
     );
   }
 
+  // If the user has already reviewed, display their review
   if (hasReviewed) {
     return (
-      <div className="mt-4 p-4 rounded bg-green-100">
-        <p className="text-sm text-green-800">
-          Du har allerede gitt en vurdering for denne jobben.
-        </p>
-      </div>
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Takk for din vurdering!</CardTitle>
+          <CardDescription>Vi setter pris på din tilbakemelding.</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <div className="flex items-center gap-1">
+            {Array.from({ length: 5 }, (_, i) => i + 1).map((star) => (
+              <StarIcon
+                key={star}
+                filled={star <= rating}
+                className={`w-6 h-6 ${
+                  star <= rating ? 'text-yellow-400' : 'text-gray-300'
+                }`}
+              />
+            ))}
+          </div>
+          {comment && (
+            <p className="text-sm text-gray-700">
+              "{comment}"
+            </p>
+          )}
+        </CardContent>
+      </Card>
     );
   }
 
+  // Render the review form if the user has not yet reviewed
   return (
-    <div className="mt-4 p-6 rounded-xl bg-blue-50 shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-800">Gi en vurdering</h3>
-      <form onSubmit={handleSubmit} className="mt-4 space-y-6">
-        {/* Rating */}
-        <div>
-          <label htmlFor="rating" className="block text-sm font-medium text-gray-700 mb-1">
-            Vurdering
-          </label>
-          <div className="flex items-center">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                onClick={() => setRating(star)}
-                onMouseEnter={() => setHoverRating(star)}
-                onMouseLeave={() => setHoverRating(0)}
-                className="focus:outline-none"
-                aria-label={`${star} star${star > 1 ? 'er' : ''}`}
-              >
-                {(hoverRating || rating) >= star ? (
-                  <FaStar
-                    className={`h-8 w-8 text-yellow-400 hover:text-yellow-500 transition-colors duration-200`}
-                  />
-                ) : (
-                  <FaRegStar
-                    className={`h-8 w-8 text-gray-300 hover:text-yellow-500 transition-colors duration-200`}
-                  />
-                )}
-              </button>
-            ))}
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle>Gi en vurdering</CardTitle>
+        <CardDescription>La oss få vite hva du synes om denne jobben.</CardDescription>
+      </CardHeader>
+      <form onSubmit={handleSubmit}>
+        <CardContent className="grid gap-4">
+          {/* Rating */}
+          <div className="flex items-center gap-2">
+            <Label htmlFor="rating">Vurdering:</Label>
+            <div className="flex items-center gap-2">
+              {Array.from({ length: 5 }, (_, i) => i + 1).map((star) => (
+                <StarIcon
+                  key={star}
+                  filled={star <= (hoverRating || rating)}
+                  className={`w-6 h-6 cursor-pointer transition-colors duration-200 ${
+                    star <= (hoverRating || rating) ? 'text-yellow-400' : 'text-gray-300 hover:text-yellow-400'
+                  }`}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => setRating(star)}
+                  aria-label={`${star} star`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Comment */}
-        <div>
-          <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
-            Kommentar
-          </label>
-          <textarea
-            id="comment"
-            name="comment"
-            rows={4}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            className="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm resize-none transition-colors duration-200"
-            placeholder="Del dine erfaringer..."
-            required
-          ></textarea>
-        </div>
+          {/* Comment */}
+          <div>
+            <Label htmlFor="comment">Kommentar:</Label>
+            <textarea
+              id="comment"
+              name="comment"
+              rows={4}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="mt-1 block w-full rounded-md border border-gray-300 p-3 shadow-sm focus:border-primary focus:ring-primary sm:text-sm resize-none"
+              placeholder="Del dine erfaringer..."
+              required
+            ></textarea>
+          </div>
 
-        {/* Submit Button */}
-        <div>
-          <button
-            type="submit"
-            disabled={submitting || rating === 0} // Disable if not rated
-            className={`w-full inline-flex justify-center rounded-full ${
-              rating === 0
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700'
-            } px-4 py-2 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-colors duration-200`}
-          >
-            {submitting ? 'Sender vurdering...' : 'Send vurdering'}
-          </button>
-        </div>
+          {/* Buttons */}
+          <div className="flex justify-between">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleReset}
+              disabled={submitting || rating === 0}
+            >
+              Reset
+            </Button>
+            <Button
+              type="submit"
+              disabled={submitting || rating === 0}
+              className={`${submitting || rating === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-yellow-400 hover:bg-yellow-500'} text-white`}
+            >
+              {submitting ? 'Sender vurdering...' : 'Submit'}
+            </Button>
+          </div>
+        </CardContent>
       </form>
-    </div>
+    </Card>
   );
 };
 

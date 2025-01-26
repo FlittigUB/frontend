@@ -77,44 +77,43 @@
     }
 }
 
-/* Color Variables */
 @layer base {
     :root {
-        /* Brand Colors */
-        --primary: 50 94% 55%; /* Brand Color */
+        /* Brand (Primary) */
+        --primary: 50 94% 55%;        /* Your recognized yellow */
         --primary-foreground: 0 0% 10%; /* Dark text on primary backgrounds */
 
-        /* Neutral Colors */
-        --background: 0 0% 100%; /* White */
-        --foreground: 0 0% 10%; /* Near Black */
-        --card: 45 100% 97.1%; /* Equivalent to Tailwind's bg-amber-50 */
-        --card-foreground: 0 0% 10%; /* Dark text on card backgrounds */
-        --popover: 0 0% 100%; /* White */
-        --popover-foreground: 0 0% 10%; /* Near Black */
-        --secondary: 210 10% 90%; /* Light Gray */
-        --secondary-foreground: 0 0% 10%; /* Near Black */
-        --muted: 210 10% 95%; /* Very Light Gray */
-        --muted-foreground: 0 0% 50%; /* Medium Gray */
+        /* New Accent (Teal) */
+        --accent: 160 70% 45%;        /* A teal hue to complement yellow */
+        --accent-foreground: 0 0% 100%; /* White or near-white text on accent */
 
-        /* Accent Colors */
-        --accent: 50 94% 55%; /* Same as Primary */
-        --accent-foreground: 0 0% 10%; /* Dark text on accent backgrounds */
+        /* Neutral Colors */
+        --background: 0 0% 100%;         /* White */
+        --foreground: 0 0% 10%;          /* Near Black */
+        --card: 45 100% 97.1%;           /* Light amber/cream background */
+        --card-foreground: 0 0% 10%;     /* Dark text on card backgrounds */
+        --popover: 0 0% 100%;            /* White */
+        --popover-foreground: 0 0% 10%;  /* Near Black */
+        --secondary: 210 10% 90%;        /* Light Gray */
+        --secondary-foreground: 0 0% 10%;/* Near Black */
+        --muted: 210 10% 95%;            /* Very Light Gray */
+        --muted-foreground: 0 0% 50%;    /* Medium Gray */
 
         /* Feedback Colors */
-        --destructive: 0 84% 60.2%; /* Vibrant Red */
-        --destructive-foreground: 0 0% 100%; /* White */
+        --destructive: 0 84% 60.2%;      /* Vibrant Red */
+        --destructive-foreground: 0 0% 100%; /* White text on red */
 
         /* UI Elements */
-        --border: 210 10% 90%; /* Light Gray Borders */
-        --input: 210 10% 90%; /* Light Gray Inputs */
-        --ring: 50 94% 55%; /* Primary Ring */
+        --border: 210 10% 90%;           /* Light Gray Borders */
+        --input: 210 10% 90%;            /* Light Gray Inputs */
+        --ring: 50 94% 55%;              /* Match primary for ring focus */
 
         /* Chart Colors */
-        --chart-1: 50 94% 55%; /* Brand Color */
-        --chart-2: 160 60% 45%; /* Teal */
-        --chart-3: 30 80% 55%; /* Orange */
-        --chart-4: 220 70% 50%; /* Blue */
-        --chart-5: 340 75% 55%; /* Pink */
+        --chart-1: 50 94% 55%;           /* Same as Primary (yellow) */
+        --chart-2: 160 70% 45%;          /* Same as Accent (teal) */
+        --chart-3: 340 75% 55%;          /* Pinkish hue */
+        --chart-4: 220 70% 50%;          /* Blue hue */
+        --chart-5: 30 80% 55%;           /* Orange hue */
 
         /* Radius */
         --radius: 0.5rem;
@@ -122,44 +121,44 @@
 
     /* Dark Mode */
     .dark {
-        /* Brand Colors */
-        --primary: 50 94% 55%; /* Brand Color remains the same */
-        --primary-foreground: 0 0% 10%; /* Dark text on primary backgrounds */
+        /* Keep the brand color the same */
+        --primary: 50 94% 55%;
+        --primary-foreground: 0 0% 10%;
 
-        /* Neutral Colors */
-        --background: 210 10% 15%; /* Dark Background */
-        --foreground: 0 0% 90%; /* Near White */
-        --card: 0 0% 20%; /* Dark Amber Equivalent */
-        --card-foreground: 0 0% 95%; /* Light text on dark card backgrounds */
-        --popover: 210 10% 15%; /* Dark Popover */
-        --popover-foreground: 0 0% 95%; /* Near White */
-        --secondary: 210 10% 30%; /* Dark Gray */
-        --secondary-foreground: 0 0% 90%; /* Near White */
-        --muted: 210 10% 30%; /* Dark Gray */
-        --muted-foreground: 0 0% 63.9%; /* Medium Gray */
+        /* Accent remains teal */
+        --accent: 160 70% 45%;
+        --accent-foreground: 0 0% 100%;
 
-        /* Accent Colors */
-        --accent: 50 94% 55%; /* Same as Primary */
-        --accent-foreground: 0 0% 10%; /* Dark text on accent backgrounds */
+        /* Darken neutrals */
+        --background: 210 10% 15%;          /* Dark Background */
+        --foreground: 0 0% 90%;            /* Near White text */
+        --card: 0 0% 20%;                  /* Darker card background */
+        --card-foreground: 0 0% 95%;       /* Light text on dark card */
+        --popover: 210 10% 15%;            /* Dark Popover */
+        --popover-foreground: 0 0% 95%;    /* Near White */
+        --secondary: 210 10% 30%;          /* Dark Gray */
+        --secondary-foreground: 0 0% 90%;  /* Near White */
+        --muted: 210 10% 30%;              /* Dark Gray */
+        --muted-foreground: 0 0% 63.9%;    /* Medium Gray */
 
         /* Feedback Colors */
-        --destructive: 0 62.8% 30.6%; /* Dark Red */
-        --destructive-foreground: 0 0% 100%; /* White */
+        --destructive: 0 62.8% 30.6%;      /* Dark Red */
+        --destructive-foreground: 0 0% 100%;
 
         /* UI Elements */
-        --border: 210 10% 30%; /* Dark Gray Borders */
-        --input: 210 10% 30%; /* Dark Gray Inputs */
-        --ring: 50 94% 55%; /* Primary Ring */
+        --border: 210 10% 30%;
+        --input: 210 10% 30%;
+        --ring: 50 94% 55%;
 
         /* Chart Colors */
-        --chart-1: 50 94% 55%; /* Brand Color */
-        --chart-2: 160 60% 45%; /* Teal */
-        --chart-3: 30 80% 55%; /* Orange */
-        --chart-4: 220 70% 50%; /* Blue */
-        --chart-5: 340 75% 55%; /* Pink */
+        --chart-1: 50 94% 55%;
+        --chart-2: 160 70% 45%;
+        --chart-3: 340 75% 55%;
+        --chart-4: 220 70% 50%;
+        --chart-5: 30 80% 55%;
     }
 
-    /* Apply Base Styles */
+    /* Global element styles remain the same */
     * {
         @apply border-border;
     }
@@ -168,7 +167,6 @@
         @apply bg-background text-foreground;
     }
 
-    /* Custom Card Background and Foreground */
     .card {
         background-color: hsl(var(--card));
         color: hsl(var(--card-foreground));

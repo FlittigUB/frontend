@@ -209,9 +209,9 @@ export default function SearchClient({ jobs }: SearchClientProps) {
             setSortOption(e.target.value as typeof sortOption)
           }
           className="
-            rounded-md border p-2 text-sm
-            dark:border-gray-700 dark:bg-background-dark dark:text-foreground-dark
-          "
+      rounded-md border p-2 text-sm
+      dark:border-gray-700 dark:bg-background-dark dark:text-foreground-dark
+    "
         >
           <option value="none">Ingen sortering</option>
           <option value="titleAsc">Tittel: A-Å</option>
@@ -222,6 +222,14 @@ export default function SearchClient({ jobs }: SearchClientProps) {
           <option value="dateDesc">Nyeste først</option>
           <option value="distance">Avstand</option>
         </select>
+
+        {/* If user chooses distance and location is being fetched, show loader */}
+        {sortOption === "distance" && isLocationLoading && (
+          <div className="flex items-center gap-1 text-sm text-gray-600">
+            {/* Loader SVG */}
+          </div>
+        )}
+
 
         {/* If user chooses distance and location is being fetched, show loader */}
         {sortOption === "distance" && isLocationLoading && (

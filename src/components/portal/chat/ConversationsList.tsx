@@ -1,7 +1,11 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export interface Conversation {
   user: {
@@ -10,7 +14,6 @@ export interface Conversation {
     name?: string;
     image?: string;
   };
-  // If your backend returns a broadcast message or system notice for each conversation
   systemBroadcast?: string;
   lastMessage: {
     content: string;
@@ -31,88 +34,93 @@ interface ConversationsListProps {
 export default function ConversationsList({
                                             conversations,
                                             isLoading,
-                                            ASSETS_URL,
+                                            ASSETS_URL = '',
                                             onSelectConversationAction,
                                             onCloseAction,
                                             MESSAGE_CHAR_LIMIT = 50,
                                           }: ConversationsListProps) {
   return (
     <div className="flex h-full w-full flex-col">
-      {/* Top bar / header area */}
-      <div className="flex items-center justify-between rounded-t-xl border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-          Dine Meldinger
-        </h2>
+      {/* Header */}
+      <div className="flex items-center justify-between border-b p-4">
+        <h2 className="text-lg font-semibold">Dine Meldinger</h2>
         {onCloseAction && (
-          <button
-            onClick={onCloseAction}
-            className="rounded-full p-2 text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
-          >
+          <Button variant="ghost" size="sm" onClick={onCloseAction}>
             ✕
-          </button>
+          </Button>
         )}
       </div>
 
-      {/* Body */}
-      <div className="flex-1 overflow-y-auto bg-gray-50 p-4 dark:bg-gray-900">
-        {isLoading && (
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            Laster samtaler...
+      <ScrollArea className="flex-1 bg-muted px-4 py-2">
+        {isLoading ? (
+          <div className="space-y-4">
+            {/* You can show a few skeleton items */}
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Card key={i} className="flex items-center p-3">
+                <Skeleton className="h-10 w-10 rounded-full mr-3" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-3 w-3/4" />
+                </div>
+              </Card>
+            ))}
           </div>
-        )}
-        {!isLoading && conversations.length === 0 && (
-          <div className="text-center text-gray-500 dark:text-gray-400">
+        ) : conversations.length === 0 ? (
+          <div className="text-center text-sm text-muted-foreground py-8">
             Ingen samtaler funnet.
           </div>
-        )}
-        <ul className="space-y-4">
-          {conversations.map((conv) => {
-            const user = conv.user;
-            const lastMsg = conv.lastMessage;
-            return (
-              <li
-                key={user.id}
-                onClick={() => onSelectConversationAction(user.id)}
-                className="flex flex-col space-y-1 rounded-lg bg-white p-2 shadow transition hover:cursor-pointer hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
-              >
-                <div className="flex items-center space-x-3">
-                  <Image
-                    src={
-                      user.image
-                        ? `${ASSETS_URL}/${user.image}`
-                        : `${ASSETS_URL}ff6b7c58-020c-4db6-a858-cf0f8dba744c.webp`
-                    }
-                    alt={`${user.name || user.email}'s avatar`}
-                    width={40}
-                    height={40}
-                    className="rounded-full object-cover"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-semibold text-gray-800 dark:text-gray-200">
-                      {user.name || user.email}
-                    </div>
-                    <div className="truncate text-xs text-gray-500 dark:text-gray-400">
-                      {lastMsg.content.length > MESSAGE_CHAR_LIMIT
-                        ? lastMsg.content.slice(0, MESSAGE_CHAR_LIMIT) + '...'
-                        : lastMsg.content}
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-400 dark:text-gray-500">
-                    {new Date(lastMsg.timestamp).toLocaleDateString()}
-                  </div>
-                </div>
+        ) : (
+          <ul className="space-y-4 pb-4">
+            {conversations.map((conv) => {
+              const { user, lastMessage, systemBroadcast } = conv;
+              const shortMessage =
+                lastMessage.content.length > MESSAGE_CHAR_LIMIT
+                  ? lastMessage.content.slice(0, MESSAGE_CHAR_LIMIT) + '...'
+                  : lastMessage.content;
 
-                {/* Optional system broadcast message for this conversation */}
-                {conv.systemBroadcast && (
-                  <div className="rounded bg-blue-50 p-2 text-xs text-blue-700 dark:bg-blue-900 dark:text-blue-100">
-                    {conv.systemBroadcast}
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+              return (
+                <li key={user.id}>
+                  <Card
+                    onClick={() => onSelectConversationAction(user.id)}
+                    className="flex w-full cursor-pointer items-center p-3 transition hover:bg-card/50"
+                  >
+                    <Avatar className="mr-3 h-10 w-10">
+                      <AvatarImage
+                        src={
+                          user.image
+                            ? `${ASSETS_URL}/${user.image}`
+                            : `${ASSETS_URL}ff6b7c58-020c-4db6-a858-cf0f8dba744c.webp`
+                        }
+                        alt={user.name || user.email}
+                      />
+                      <AvatarFallback>
+                        {(user.name || user.email).charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold">
+                        {user.name || user.email}
+                      </div>
+                      <div className="text-xs text-muted-foreground">{shortMessage}</div>
+                    </div>
+
+                    <div className="ml-auto text-xs text-muted-foreground">
+                      {new Date(lastMessage.timestamp).toLocaleDateString()}
+                    </div>
+                  </Card>
+
+                  {systemBroadcast && (
+                    <div className="mt-1 rounded-md bg-blue-50 p-2 text-xs text-blue-700 dark:bg-blue-900 dark:text-blue-100">
+                      {systemBroadcast}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </ScrollArea>
     </div>
   );
 }

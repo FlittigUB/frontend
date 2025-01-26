@@ -18,10 +18,10 @@ const ArbeidstakerHomePage: React.FC = () => {
   useEffect(() => {
     const fetchFeaturedJobs = async () => {
       try {
-        const response = await axios.get<Job[]>(
+        const response = await axios.get<{data: Job[]}>(
           `${process.env.NEXT_PUBLIC_API_URL}/job/all`,
         );
-        setJobs(response.data)
+        setJobs(response.data.data)
       } catch (error) {
         console.error('Error fetching jobs:', error);
       }

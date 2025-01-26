@@ -17,6 +17,7 @@ import {
 } from 'react-icons/hi';
 import Image from "next/image";
 import { ModeToggle } from "@/components/portal/theme/ModeToggle";
+import UserDropdown from "@/components/portal/ui/UserDropdown";
 
 interface NavbarProps {
   onOpenChat?: () => void;
@@ -60,7 +61,6 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
   // Right side links (e.g. “Hei, [navn]”, “Meldinger”, “Profil”, etc.)
   const navLinksRight = (
     <>
-      <ModeToggle/>
       {loggedIn ? (
         <>
           {/* Greet the user if name is available */}
@@ -70,72 +70,9 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
               Hei, {user.name}!
             </span>
           )}
-
-          <button
-            className="flex items-center gap-2 py-2 hover:text-primary"
-            onClick={() => {
-              onOpenChat?.();
-              setMenuOpen(false);
-            }}
-          >
-            <HiOutlineChat className="text-xl" />
-            Meldinger
-          </button>
-
-          <Link
-            href="/portal/profil"
-            className="flex items-center gap-2 py-2 hover:text-primary"
-            onClick={() => setMenuOpen(false)}
-          >
-            <HiOutlineUserCircle className="text-xl" />
-            Profil
-          </Link>
-
-          {/* Employer-specific links */}
-          {userRole === 'arbeidsgiver' && (
-            <>
-              <Link
-                href="/portal/mine-stillinger"
-                className="flex items-center gap-2 py-2 hover:text-primary"
-                onClick={() => setMenuOpen(false)}
-              >
-                <HiOutlineBriefcase className="text-xl" />
-                Mine stillinger
-              </Link>
-              <Link
-                href="/portal/ny-stilling"
-                className="flex items-center gap-2 py-2 font-semibold hover:text-primary"
-                onClick={() => setMenuOpen(false)}
-              >
-                <HiOutlineBriefcase className="text-xl" />
-                Opprett ny stilling
-              </Link>
-            </>
+          {user && (
+            <UserDropdown user={user} onLogout={handleLogout} onOpenChat={onOpenChat}/>
           )}
-
-          {/* Worker-specific links */}
-          {userRole === 'arbeidstaker' && (
-            <Link
-              href="/portal/mine-soknader"
-              className="flex items-center gap-2 py-2 hover:text-primary"
-              onClick={() => setMenuOpen(false)}
-            >
-              <HiOutlineBriefcase className="text-xl" />
-              Mine søknader
-            </Link>
-          )}
-
-          {/* Logout */}
-          <button
-            onClick={() => {
-              handleLogout();
-              setMenuOpen(false);
-            }}
-            className="flex items-center gap-2 py-2 hover:text-primary"
-          >
-            <HiOutlineLogout className="text-xl" />
-            Logg ut
-          </button>
         </>
       ) : (
         <>
@@ -157,6 +94,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
           </Link>
         </>
       )}
+      <ModeToggle/>
     </>
   );
 
