@@ -11,6 +11,8 @@
 !.yarn/versions
 .idea
 
+/deployment
+
 # testing
 /coverage
 

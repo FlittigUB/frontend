@@ -37,7 +37,7 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
   const { previousPath, setPreviousPath } = usePreviousPath();
 
   // Manage dark mode state
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [, setIsDarkMode] = useState(false);
 
   // State to control whether ChatModal is open
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -101,13 +101,11 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
 
   return (
     <PortalLayoutContext.Provider value={{ openChatWithReceiver }}>
-      <div
-        className={`flex h-screen flex-col bg-background`}
-      >
+      <div className={`mb-16 flex h-screen flex-col bg-background md:mb-0`}>
         <Navbar onOpenChat={() => openChatWithReceiver('')} />
 
         <main className="flex flex-1 justify-center overflow-y-auto">
-          <div className="container mx-auto w-full max-w-4xl px-4 py-8">
+          <div className="pd:mb-0 container mx-auto w-full max-w-4xl px-4 py-8 pb-16">
             <BackButton />
             {children}
           </div>

@@ -10,6 +10,7 @@ import { useAuthContext } from '@/context/AuthContext';
 import JobModal from '@/components/portal/job/JobModal';
 import LoadingLogo from '@/components/NSRVLoader';
 import { toast } from 'sonner';
+import { Button } from "@/components/ui/button";
 
 const ArbeidsgiverHomePage: React.FC = () => {
   // State variables
@@ -53,7 +54,7 @@ const ArbeidsgiverHomePage: React.FC = () => {
             },
           },
         );
-        const jobsData = Array.isArray(response.data) ? response.data : [];
+        const jobsData = Array.isArray(response.data.data) ? response.data.data : [];
         setPublishedJobs(jobsData);
       } catch (err: any) {
         console.error('Error fetching jobs:', err);
@@ -326,13 +327,7 @@ const ArbeidsgiverHomePage: React.FC = () => {
       <p className="mb-6">
         Her ser du en oversikt over alle jobbene du har publisert.
       </p>
-
-      <button
-        onClick={openCreateModal}
-        className="hover:bg-primary-dark mb-6 rounded bg-primary px-4 py-2 text-white"
-      >
-        Opprett Ny Jobb
-      </button>
+      <Button className="mb-6" variant={"default"} onClick={openCreateModal}>Opprett Ny Jobb</Button>
 
       <input
         type="text"

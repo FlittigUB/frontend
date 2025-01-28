@@ -144,7 +144,7 @@ const ArbeidstakerHomePage: React.FC = () => {
           href="/portal/stillinger"
           className="rounded bg-blue-500 px-4 py-2 text-white shadow hover:opacity-90"
         >
-          Se stillinger
+          Se Jobber
         </Link>
         <Link
           href="/portal/mine-soknader"

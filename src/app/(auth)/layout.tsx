@@ -9,10 +9,10 @@ interface AuthLayoutProps {
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
   return (
-    <div className="flex h-screen flex-col bg-gradient-to-r from-yellow-200 to-yellow-300 text-foreground">
-      <main className="flex flex-1 justify-center overflow-y-auto">
+    <div className="">
+      <main className="">
         {/* Centered Card */}
-        <div className="mt-12 w-full max-w-4xl">{children}</div>
+        <div className="">{children}</div>
       </main>
     </div>
   );

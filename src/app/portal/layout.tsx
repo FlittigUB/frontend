@@ -8,7 +8,9 @@ import { AuthProvider } from '@/context/AuthContext';
 import { PreviousPathProvider } from '@/context/PreviousPathContext';
 import { StripeProvider } from '@/context/StripeContext';
 import { GlobalChatProvider } from '@/context/GlobalChatProvider';
-import { ThemeProvider } from '@/components/theme-provider'; // Import for typing
+import { ThemeProvider } from '@/components/theme-provider';
+import { NotificationsProvider } from "@/context/NotificationsContext";
+import NotificationsList from "@/components/portal/ui/NotificationsList"; // Import for typing
 
 interface PortalRouteLayoutProps {
   children: React.ReactNode;
@@ -35,11 +37,14 @@ const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
           disableTransitionOnChange
         >
           <PreviousPathProvider>
+            <NotificationsProvider>
             <GlobalChatProvider>
               <PortalLayout>
                 {children}
+                <NotificationsList/>
               </PortalLayout>
             </GlobalChatProvider>
+            </NotificationsProvider>
           </PreviousPathProvider>
         </DynamicThemeProvider>
       </StripeProvider>

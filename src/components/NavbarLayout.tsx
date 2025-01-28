@@ -114,7 +114,7 @@ export default function NavbarLayout({ children }: NavbarLayoutProps) {
       </header>
 
       {/* Content */}
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1">{children}</main>
     </div>
   );
 }

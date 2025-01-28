@@ -7,18 +7,22 @@ import PaginationComponent from '@/components/portal/ui/Pagination'; // Adjust t
 // Force dynamic rendering if needed (e.g., reading cookies)
 export const dynamic = 'force-dynamic';
 
+
+type SearchParams = {
+  page?: string;
+  limit?: string;
+  // Add other search parameters if needed
+};
+
 type StillingerPageProps = {
-  searchParams: {
-    page?: string;
-    limit?: string;
-    // Add other search parameters if needed
-  };
+  searchParams: Promise<SearchParams>;
 };
 
 export default async function StillingerPage({ searchParams }: StillingerPageProps) {
   // Extract and parse query parameters with default values
-  let currentPage = parseInt(searchParams.page || '1', 10);
-  let limit = parseInt(searchParams.limit || '10', 10);
+  const params = await searchParams;
+  let currentPage = parseInt(params.page || '1', 10);
+  let limit = parseInt(params.limit || '10', 10);
 
   // Validate query parameters
   if (isNaN(currentPage) || currentPage < 1) currentPage = 1;

@@ -577,6 +577,7 @@ const JobModal: React.FC<JobModalProps> = ({
 
               <Button
                 type="submit"
+                variant="default"
                 disabled={isSubmitting}
                 aria-label={
                   step < stepLabels.length - 1 ? "Neste steg" : "Send inn"

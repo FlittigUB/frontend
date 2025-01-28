@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogPortal, DialogContent } from '@/components/ui/dialog';
 import ConversationsList, { Conversation } from './ConversationsList';
 import ChatHeader from './ChatHeader';
 import ChatMessages from './ChatMessages';
@@ -26,6 +26,7 @@ export default function ChatModal({
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loadingConversations, setLoadingConversations] = useState<boolean>(false);
 
+  // If `initialReceiverId` changes, open directly to the chat view
   useEffect(() => {
     if (initialReceiverId) {
       setSelectedReceiverId(initialReceiverId);
@@ -33,6 +34,7 @@ export default function ChatModal({
     }
   }, [initialReceiverId]);
 
+  // Hook-based chat functionality
   const {
     loggedIn,
     receiver,
@@ -41,10 +43,13 @@ export default function ChatModal({
     messageInput,
     setMessageInput,
     handleSendMessage,
-    messagesEndRef,
     ASSETS_URL,
   } = useChat({ receiverId: selectedReceiverId });
 
+  // Create a ref for autoscroll in ChatMessages
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load conversation list when user is logged in & in 'list' view
   useEffect(() => {
     if (loggedIn && view === 'list') {
       (async function loadConversations() {
@@ -73,12 +78,13 @@ export default function ChatModal({
     }
   }, [loggedIn, view]);
 
+  // Select a conversation => switch to chat view
   function handleSelectConversation(receiverId: string) {
     setSelectedReceiverId(receiverId);
     setView('chat');
   }
 
-  // Handle any system actions from system messages
+  // Example: handle system actions (e.g., "mark task complete")
   function handleSystemAction(actionId: string, payload?: any) {
     if (actionId === 'mark_task_complete') {
       fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/tasks/complete`, {
@@ -97,99 +103,113 @@ export default function ChatModal({
     }
   }
 
-  // Example pinned system announcement
+  // Example pinned system announcement; set to null if unused
   const someSystemAnnouncement: string | null = null;
   // someSystemAnnouncement = "This is a pinned system notice.";
 
   return (
     <Dialog open={isOpen} onOpenChange={onCloseAction}>
-      <DialogContent className="flex flex-col p-0 md:h-[600px] md:w-[400px]">
-        {!loggedIn ? (
-          <div className="flex h-full flex-col items-center justify-center p-4">
-            <p className="mb-2 text-sm text-muted-foreground">Ikke innlogget...</p>
-            <Button variant="secondary" onClick={onCloseAction}>
-              Lukk
-            </Button>
-          </div>
-        ) : (
-          <>
-            {view === 'list' ? (
-              <ConversationsList
-                conversations={conversations}
-                isLoading={loadingConversations}
-                ASSETS_URL={ASSETS_URL}
-                onCloseAction={onCloseAction}
-                onSelectConversationAction={handleSelectConversation}
-              />
+      <DialogPortal>
+        {/*
+          We remove DialogOverlay to avoid a backdrop
+          and position the dialog in bottom-right
+        */}
+        <div className="fixed bottom-4 right-4 z-50 flex items-end justify-end">
+          <DialogContent
+            className="
+              m-0 p-0
+              h-[600px] w-[400px]
+            "
+          >
+            {/* If not logged in, display a fallback */}
+            {!loggedIn ? (
+              <div className="flex h-full flex-col items-center justify-center p-4">
+                <p className="mb-2 text-sm text-muted-foreground">
+                  Ikke innlogget...
+                </p>
+                <Button variant="secondary" onClick={onCloseAction}>
+                  Lukk
+                </Button>
+              </div>
             ) : (
-              <div className="flex h-full flex-col">
-                {/* Header */}
-                <div className="flex items-center justify-between border-b p-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setView('list')}
-                  >
-                    <FiArrowLeft className="mr-1.5 h-4 w-4" />
-                    Tilbake
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={onCloseAction}>
-                    ✕
-                  </Button>
-                </div>
+              <>
+                {view === 'list' ? (
+                  <ConversationsList
+                    conversations={conversations}
+                    isLoading={loadingConversations}
+                    ASSETS_URL={ASSETS_URL}
+                    onCloseAction={onCloseAction}
+                    onSelectConversationAction={handleSelectConversation}
+                  />
+                ) : (
+                  <div className="flex h-full flex-col">
+                    {/* Header area */}
+                    <div className="flex items-center justify-between border-b p-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setView('list')}
+                      >
+                        <FiArrowLeft className="mr-1.5 h-4 w-4" />
+                        Tilbake
+                      </Button>
+                    </div>
 
-                {!receiver && (
-                  <div className="flex flex-1 items-center justify-center">
-                    <p className="text-sm text-muted-foreground">Laster chat...</p>
-                  </div>
-                )}
-
-                {receiver && (
-                  <>
-                    <ChatHeader
-                      receiver={receiver}
-                      isReceiverOnline={isReceiverOnline}
-                      ASSETS_URL={ASSETS_URL}
-                    />
-
-                    {/* Optional pinned system announcement */}
-                    {someSystemAnnouncement && (
-                      <div className="bg-blue-50 p-3 text-sm text-blue-700 dark:bg-blue-900 dark:text-blue-100">
-                        <div className="flex items-center justify-between">
-                          <span>{someSystemAnnouncement}</span>
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() =>
-                              handleSystemAction('mark_task_complete', {
-                                taskId: '1234',
-                              })
-                            }
-                          >
-                            Mark Task Complete
-                          </Button>
-                        </div>
+                    {!receiver && (
+                      <div className="flex flex-1 items-center justify-center">
+                        <p className="text-sm text-muted-foreground">Laster chat...</p>
                       </div>
                     )}
 
-                    <ChatMessages
-                      messages={messages}
-                      messagesEndRef={messagesEndRef}
-                      ASSETS_URL={ASSETS_URL}
-                      onSystemAction={handleSystemAction}
-                    />
-                    <ChatInput
-                      messageInput={messageInput}
-                      setMessageInputAction={setMessageInput}
-                      handleSendMessageAction={handleSendMessage}
-                    />
-                  </>
+                    {receiver && (
+                      <>
+                        <ChatHeader
+                          receiver={receiver}
+                          isReceiverOnline={isReceiverOnline}
+                          ASSETS_URL={ASSETS_URL}
+                        />
+
+                        {/* Optional pinned system announcement */}
+                        {someSystemAnnouncement && (
+                          <div className="bg-blue-50 p-3 text-sm text-blue-700 dark:bg-blue-900 dark:text-blue-100">
+                            <div className="flex items-center justify-between">
+                              <span>{someSystemAnnouncement}</span>
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() =>
+                                  handleSystemAction('mark_task_complete', {
+                                    taskId: '1234',
+                                  })
+                                }
+                              >
+                                Mark Task Complete
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+
+                        <ChatMessages
+                          messages={messages}
+                          messagesEndRef={messagesEndRef}
+                          ASSETS_URL={ASSETS_URL}
+                          onSystemAction={handleSystemAction}
+                        />
+
+                        <ChatInput
+                          messageInput={messageInput}
+                          setMessageInputAction={setMessageInput}
+                          handleSendMessageAction={handleSendMessage}
+                        />
+                      </>
+                    )}
+                  </div>
                 )}
-              </div>
+              </>
             )}
-          </>
-        )}
-      </DialogContent>
+          </DialogContent>
+        </div>
+      </DialogPortal>
     </Dialog>
   );
 }

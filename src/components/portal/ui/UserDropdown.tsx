@@ -102,7 +102,7 @@ export default function UserDropdown({
                 className="opacity-60"
                 aria-hidden="true"
               />
-              <Link href={`/portal`}>Mine stillinger</Link>
+              <Link href={`/portal`}>Mine Jobber</Link>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem>

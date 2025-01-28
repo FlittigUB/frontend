@@ -1,31 +1,38 @@
 // app/layout.tsx or app/layout.jsx
-
-import type { Metadata } from 'next';
+'use client'
 import './globals.css';
-import React from 'react';
-import { Toaster } from 'sonner';
+import React, { ReactNode } from "react";
 import InsightsScript from '@/components/analytics/PlausibleScript';
 import GoogleTagManager from '@/components/analytics/GoogleTagManager';
+import { AnimatePresence, motion  } from "framer-motion";
+import { usePathname } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: 'Flittig | Småjobber gjort enkelt med Flittig UB',
-  description:
-    'Trenger du barnepass, rengjøring eller hagearbeid? Flittig gjør det enkelt å koble lokalt talent med deg som trenger en hjelpende hånd!',
-};
+export default function RootLayout({ children }: { children: ReactNode }) {
+  // We track the current route to create a key for the motion.div
+  const pathname = usePathname();
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
   return (
     <html lang="en">
-      <body className="antialiased">
-        <InsightsScript />
+    <body>
+    {/* AnimatePresence tracks route changes and can animate out the old page, in the new page */}
+    <AnimatePresence mode="wait">
+      {/*
+            The key must change on route change, so we use pathname.
+            This triggers exit animations, then enter animations.
+          */}
+      <motion.div
+        key={pathname}
+        initial={{ opacity: 0, x: 80 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -80 }}
+        transition={{ duration: 0.5 }}
+      >
+        <InsightsScript/>
         <GoogleTagManager/>
-        <Toaster richColors position="top-right" closeButton />
-        {children}
-      </body>
+          {children}
+      </motion.div>
+    </AnimatePresence>
+    </body>
     </html>
   );
 }

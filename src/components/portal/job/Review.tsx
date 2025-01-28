@@ -208,7 +208,7 @@ const Review: React.FC<ReviewProps> = ({ receiverId, jobId }) => {
           </div>
           {comment && (
             <p className="text-sm text-gray-700">
-              "{comment}"
+              &#34;{comment}&#34;
             </p>
           )}
         </CardContent>
@@ -271,6 +271,7 @@ const Review: React.FC<ReviewProps> = ({ receiverId, jobId }) => {
               Reset
             </Button>
             <Button
+              variant="default"
               type="submit"
               disabled={submitting || rating === 0}
               className={`${submitting || rating === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-yellow-400 hover:bg-yellow-500'} text-white`}

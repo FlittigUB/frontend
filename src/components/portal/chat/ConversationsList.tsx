@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -32,23 +31,17 @@ interface ConversationsListProps {
 }
 
 export default function ConversationsList({
-                                            conversations,
-                                            isLoading,
-                                            ASSETS_URL = '',
-                                            onSelectConversationAction,
-                                            onCloseAction,
-                                            MESSAGE_CHAR_LIMIT = 50,
-                                          }: ConversationsListProps) {
+  conversations,
+  isLoading,
+  ASSETS_URL = '',
+  onSelectConversationAction,
+  MESSAGE_CHAR_LIMIT = 50,
+}: ConversationsListProps) {
   return (
     <div className="flex h-full w-full flex-col">
       {/* Header */}
       <div className="flex items-center justify-between border-b p-4">
         <h2 className="text-lg font-semibold">Dine Meldinger</h2>
-        {onCloseAction && (
-          <Button variant="ghost" size="sm" onClick={onCloseAction}>
-            ✕
-          </Button>
-        )}
       </div>
 
       <ScrollArea className="flex-1 bg-muted px-4 py-2">
@@ -57,7 +50,7 @@ export default function ConversationsList({
             {/* You can show a few skeleton items */}
             {Array.from({ length: 5 }).map((_, i) => (
               <Card key={i} className="flex items-center p-3">
-                <Skeleton className="h-10 w-10 rounded-full mr-3" />
+                <Skeleton className="mr-3 h-10 w-10 rounded-full" />
                 <div className="flex-1 space-y-2">
                   <Skeleton className="h-4 w-1/2" />
                   <Skeleton className="h-3 w-3/4" />
@@ -66,7 +59,7 @@ export default function ConversationsList({
             ))}
           </div>
         ) : conversations.length === 0 ? (
-          <div className="text-center text-sm text-muted-foreground py-8">
+          <div className="py-8 text-center text-sm text-muted-foreground">
             Ingen samtaler funnet.
           </div>
         ) : (
@@ -102,7 +95,9 @@ export default function ConversationsList({
                       <div className="text-sm font-semibold">
                         {user.name || user.email}
                       </div>
-                      <div className="text-xs text-muted-foreground">{shortMessage}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {shortMessage}
+                      </div>
                     </div>
 
                     <div className="ml-auto text-xs text-muted-foreground">

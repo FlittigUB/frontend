@@ -1,7 +1,7 @@
 // components/ReviewCard.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { JSX, useState } from 'react';
 import { Review } from "@/common/types";
 import Image from 'next/image';
 

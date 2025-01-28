@@ -8,9 +8,29 @@ export default {
 			animation: {
 				'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
 				'spin-smooth': 'spin-smooth 1.2s linear infinite',
-				'draw-path': 'draw 2s ease-out forwards, fill 0.5s ease-out 2.5s forwards'
+				'draw-path': 'draw 2s ease-out forwards, fill 0.5s ease-out 2.5s forwards',
+				overlayIn: "overlayIn 0.2s cubic-bezier(0.16,1,0.3,1) forwards",
+				overlayOut: "overlayOut 0.2s cubic-bezier(0.16,1,0.3,1) forwards",
+				dialogIn: "dialogIn 0.2s cubic-bezier(0.16,1,0.3,1) forwards",
+				dialogOut: "dialogOut 0.2s cubic-bezier(0.16,1,0.3,1) forwards",
 			},
 			keyframes: {
+				overlayIn: {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' },
+				},
+				overlayOut: {
+					'0%': { opacity: '1' },
+					'100%': { opacity: '0' },
+				},
+				dialogIn: {
+					'0%': { opacity: '0', transform: 'translateY(8px) scale(0.95)' },
+					'100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+				},
+				dialogOut: {
+					'0%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+					'100%': { opacity: '0', transform: 'translateY(8px) scale(0.95)' },
+				},
 				'fade-in-up': {
 					'0%': {
 						opacity: '0',

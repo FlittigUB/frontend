@@ -177,3 +177,46 @@
         color: hsl(var(--card-foreground));
     }
 }
+@keyframes overlayIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+@keyframes overlayOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@keyframes dialogIn {
+    0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+@keyframes dialogOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.95);
+    }
+}
+
+/* Then define the utility classes: */
+.animate-overlayIn {
+    animation: overlayIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-overlayOut {
+    animation: overlayOut 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-dialogIn {
+    animation: dialogIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-dialogOut {
+    animation: dialogOut 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

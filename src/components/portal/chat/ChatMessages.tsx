@@ -7,7 +7,7 @@ import { Message } from "@/common/types";
 
 interface ChatMessagesProps {
   messages: Message[];
-  messagesEndRef: React.RefObject<HTMLDivElement>;
+  messagesEndRef: React.RefObject<HTMLDivElement | null>;
   ASSETS_URL: string | undefined;
   onSystemAction?: (actionId: string, payload?: any) => void;
 }
