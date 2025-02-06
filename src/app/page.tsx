@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"; // or your custom button
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ParallaxLayer } from "@/components/effects/ParallaxLayer";
 import { PinnedStorySection } from "@/components/PinnedStorySection";
+import { HeroScrollMobile } from "@/components/HeroScrollMobile";
 
 export default function Home() {
   return (
@@ -426,6 +427,8 @@ export default function Home() {
           (Optional; you can keep or remove this if you want that scrollytelling effect)
         */}
         <PinnedStorySection />
+
+        <HeroScrollMobile/>
 
 
         {/*
