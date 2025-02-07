@@ -2,128 +2,96 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export function PinnedStorySection() {
+  // 1. Hook into scroll
   const ref = useRef<HTMLDivElement>(null);
-
-  // Track scroll on the 300vh container
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
 
-  /**
-   * We'll divide the scroll into thirds for 3 steps.
-   * Each step fades in/out over about 10% of its chunk for a more drawn-out transition.
-   */
-  const step1Opacity = useTransform(scrollYProgress, [0.00, 0.10, 0.23, 0.33], [0, 1, 1, 0]);
-  const step2Opacity = useTransform(scrollYProgress, [0.33, 0.43, 0.56, 0.66], [0, 1, 1, 0]);
-  const step3Opacity = useTransform(scrollYProgress, [0.66, 0.76, 0.90, 1.00], [0, 1, 1, 0]);
+  // 2. Animate horizontal sliding (0% to -200% for 3 steps)
+  const xTransform = useTransform(scrollYProgress, [0, 1], ["0%", "-200%"]);
 
-  // A larger translate range from 75% down to -75% for a noticeable "float up"
-  const step1Y = useTransform(scrollYProgress, [0.00, 0.33], ["75%", "-75%"]);
-  const step2Y = useTransform(scrollYProgress, [0.33, 0.66], ["75%", "-75%"]);
-  const step3Y = useTransform(scrollYProgress, [0.66, 1.00], ["75%", "-75%"]);
+  // 3. Create a parallax effect for a background element (moves slower than the content)
+  const bgTransform = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+
+  // 4. Define animation variants for the step cards
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  // 5. Data for each step (allows for dynamic mapping)
+  const steps = [
+    {
+      id: 1,
+      title: "Steg 1: Kontakt",
+      description:
+        "Kari Hansen har et travelt liv, men drømmer om en nyoppryddet hage. ...",
+    },
+    {
+      id: 2,
+      title: "Steg 2: Avtale",
+      description:
+        "Kari og Ola avtaler tid, sted og lønn på en enkel måte. ...",
+    },
+    {
+      id: 3,
+      title: "Steg 3: Resultat",
+      description:
+        "Hagen er striglet, bedene luket og avfallet fjernet. ...",
+    },
+  ];
 
   return (
     <section
       ref={ref}
-      className="relative h-[300vh] w-full bg-gray-50"
+      className="relative h-[300vh] w-full bg-gray-50 overflow-hidden"
     >
-      {/* Sticky container for the multistep story */}
-      <div className="sticky top-0 left-0 right-0 flex h-screen items-center justify-center">
-        <div className="relative w-full max-w-4xl px-4">
-          {/*
-            STEP 1
-            "Neumorphic" style: subtle, soft shadows with rounded corners.
-            Tailwind's arbitrary values for box-shadow or you can define them in your CSS.
-          */}
-          <motion.div
-            style={{ opacity: step1Opacity, y: step1Y }}
-            className="absolute inset-x-0 flex justify-center"
-          >
-            <Card
-              className="rounded-2xl bg-[#e0e0e0] p-6 shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] md:p-8"
-            >
-              <CardHeader>
-                <CardTitle className="mb-2 text-center text-3xl font-extrabold text-green-900 md:text-4xl">
-                  Steg 1: Kontakt
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-gray-700 md:text-lg">
-                <p>
-                  Kari Hansen har et travelt liv, men drømmer om en nyoppryddet
-                  hage. Hun oppdager <strong>Flittig</strong> og legger ut en
-                  forespørsel.
-                </p>
-                <p>
-                  Hun får raskt kontakt med Ola Nordmann — en student som
-                  elsker hagearbeid og ønsker å tjene litt ekstra ved siden av
-                  studiene.
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+      {/* Parallax background element */}
+      <motion.div
+        style={{ x: bgTransform }}
+        className="absolute inset-0 bg-gradient-to-r from-green-100 to-blue-100"
+      />
 
-          {/*
-            STEP 2
-          */}
-          <motion.div
-            style={{ opacity: step2Opacity, y: step2Y }}
-            className="absolute inset-x-0 flex justify-center"
-          >
-            <Card
-              className="rounded-2xl bg-[#e0e0e0] p-6 shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] md:p-8"
-            >
-              <CardHeader>
-                <CardTitle className="mb-2 text-center text-3xl font-extrabold text-green-900 md:text-4xl">
-                  Steg 2: Avtale
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-gray-700 md:text-lg">
-                <p>
-                  Kari og Ola avtaler tid, sted og lønn på en enkel måte. Begge
-                  føler seg trygge, siden Flittig sørger for en smidig prosess
-                  uten unødvendige gebyrer.
-                </p>
-                <p>
-                  Gjennom Flittig kan de også sjekke hverandres tidligere
-                  evalueringer, så tilliten er høy fra starten.
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+      {/* Sticky container to pin content during scroll */}
+      <div className="sticky top-0 left-0 right-0 flex h-screen overflow-hidden">
+        {/* Horizontal container that slides as we scroll */}
+        <motion.div style={{ x: xTransform }} className="flex w-[300vw] relative z-10">
+          {/* Background timeline line (stays static) */}
+          <div className="absolute top-1/2 left-0 right-0 z-0 h-[2px] bg-gray-300"></div>
 
-          {/*
-            STEP 3
-          */}
-          <motion.div
-            style={{ opacity: step3Opacity, y: step3Y }}
-            className="absolute inset-x-0 flex justify-center"
-          >
-            <Card
-              className="rounded-2xl bg-[#e0e0e0] p-6 shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] md:p-8"
+          {/* Map through each step to render the cards */}
+          {steps.map((step, index) => (
+            <div
+              key={step.id}
+              className="relative flex h-full w-screen items-center justify-center p-4"
             >
-              <CardHeader>
-                <CardTitle className="mb-2 text-center text-3xl font-extrabold text-green-900 md:text-4xl">
-                  Steg 3: Resultat
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-gray-700 md:text-lg">
-                <p>
-                  I løpet av en helg er hagen striglet, bedene luket og avfallet
-                  fjernet. Kari er strålende fornøyd, og Ola får betalt for
-                  innsatsen.
-                </p>
-                <p className="font-semibold text-green-700">
-                  En enkel og lønnsom ordning for begge – og et grønnere
-                  nabolag i samme slengen!
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
+              {/* Step indicator circle with a micro-animation on hover */}
+              <motion.div
+                whileHover={{ scale: 1.2 }}
+                className="absolute top-1/2 left-1/2 z-10 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-600"
+              />
+
+              {/* Animated card that appears when in view */}
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.5 }}
+                variants={cardVariants}
+                transition={{ delay: index * 0.3, duration: 0.6, ease: "easeOut" }}
+                className="relative z-20 w-full max-w-md rounded-2xl bg-white p-8 shadow-lg"
+              >
+                <h2 className="mb-2 text-center text-2xl font-extrabold text-green-900">
+                  {step.title}
+                </h2>
+                <p className="text-gray-700">{step.description}</p>
+              </motion.div>
+            </div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogPortal, DialogContent } from '@/components/ui/dialog';
+import { DialogChat, DialogPortal, DialogContent } from '@/components/ui/dialogChat';
 import ConversationsList, { Conversation } from './ConversationsList';
 import ChatHeader from './ChatHeader';
 import ChatMessages from './ChatMessages';
@@ -108,7 +108,7 @@ export default function ChatModal({
   // someSystemAnnouncement = "This is a pinned system notice.";
 
   return (
-    <Dialog open={isOpen} onOpenChange={onCloseAction}>
+    <DialogChat open={isOpen} onOpenChange={onCloseAction}>
       <DialogPortal>
         {/*
           We remove DialogOverlay to avoid a backdrop
@@ -210,6 +210,6 @@ export default function ChatModal({
           </DialogContent>
         </div>
       </DialogPortal>
-    </Dialog>
+    </DialogChat>
   );
 }

@@ -9,6 +9,8 @@ const nextConfig: import('next').NextConfig = {
         hostname: 'panel.flittigub.no',
       },
       {
+        hostname: 'via.placeholder.com'},
+      {
         protocol: 'https',
         hostname: 'localhost',
         port: '3000',

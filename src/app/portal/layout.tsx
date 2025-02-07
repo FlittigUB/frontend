@@ -10,7 +10,7 @@ import { StripeProvider } from '@/context/StripeContext';
 import { GlobalChatProvider } from '@/context/GlobalChatProvider';
 import { ThemeProvider } from '@/components/theme-provider';
 import { NotificationsProvider } from "@/context/NotificationsContext";
-import NotificationsList from "@/components/portal/ui/NotificationsList"; // Import for typing
+//import NotificationsList from "@/components/portal/ui/NotificationsList"; // Import for typing
 
 interface PortalRouteLayoutProps {
   children: React.ReactNode;
@@ -41,7 +41,9 @@ const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
             <GlobalChatProvider>
               <PortalLayout>
                 {children}
-                <NotificationsList/>
+                {
+                  //<NotificationsList/>
+                }
               </PortalLayout>
             </GlobalChatProvider>
             </NotificationsProvider>
