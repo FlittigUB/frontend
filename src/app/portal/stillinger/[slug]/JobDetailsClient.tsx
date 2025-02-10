@@ -1,7 +1,7 @@
 // app/portal/stillinger/[slug]/JobDetailsClient.tsx
 "use client";
 
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { useAuthContext } from "@/context/AuthContext";
@@ -12,10 +12,10 @@ import { usePortalLayout } from "@/components/portal/PortalLayout";
 import { IoIosTimer } from "react-icons/io";
 import Review from "@/components/portal/job/Review";
 import { useJob } from "./JobContext";
-import Link from "next/link";
 
 // Import the new employer approval component
 import ApproveApplicationWithPayment from "./ApproveApplicationWithPayment";
+import MarkJobConfirmed from "@/app/portal/stillinger/[slug]/MarkJobConfirmed";
 
 const statusDetails: Record<string, { label: string; description: string }> = {
   waiting: {
@@ -38,6 +38,14 @@ const statusDetails: Record<string, { label: string; description: string }> = {
     label: "Bekreftet fullført",
     description: "Jobben er bekreftet fullført. Nå kan du gi en vurdering.",
   },
+  waitingOnGuardian: {
+    label: 'Venter på foresatt',
+    description: 'Søknaden venter på godkjenning av foresatt'
+  },
+  deniedByGuardian: {
+    label: 'Avslått av foresatt',
+    description: 'Søknaden er avslått av foresatt'
+  }
 };
 
 function getStatusInfo(status: string) {
@@ -73,7 +81,7 @@ export default function JobDetailsClient() {
   }, [job.user?.image]);
 
   // Function to refresh/fetch application data from the API
-  const refreshApplications = () => {
+  const refreshApplications = useCallback(() => {
     if (!loggedIn || !token) return;
     setLoading(true);
     axios
@@ -99,12 +107,12 @@ export default function JobDetailsClient() {
       .finally(() => {
         setLoading(false);
       });
-  };
+  }, [job.id, loggedIn, token, user, userRole]);
 
   useEffect(() => {
     if (!loggedIn || !token) return;
     refreshApplications();
-  }, [loggedIn, token, user, job.id, userRole]);
+  }, [loggedIn, token, user, job.id, userRole, refreshApplications]);
 
   // Handler for sending a job application (for non‑applicants)
   const handleApply = async (e: FormEvent) => {

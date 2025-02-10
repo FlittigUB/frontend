@@ -75,15 +75,6 @@ export default function Home() {
               finne småjobber som passer dine ønsker. Dette gjør det enkelt å koble
               behov og ressurser i nærmiljøet, til alles fordel.
             </p>
-            <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
-              Som ungdomsbedrift har Flittig UB allerede gjort en merkbar
-              forskjell. For eksempel har en av våre faste oppdragsgivere, Kari
-              Hansen, brukt plattformen jevnlig for hagearbeid og lettere
-              vedlikehold av boligen. Samtidig har unge arbeidstakere som Ola
-              Nordmann og Emma Larsen fått muligheten til å bygge arbeidserfaring
-              og tjene litt ekstra. Slike historier viser hvordan Flittig skaper
-              en vinn-vinn-situasjon for både privatpersoner og lokalsamfunnet.
-            </p>
           </div>
         </section>
 

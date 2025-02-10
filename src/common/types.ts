@@ -79,7 +79,7 @@ export interface JobFormData {
 }
 
 
-export type ApplicationStatus = "waiting" | "approved" | "declined" | "finished" | "confirmed";
+export type ApplicationStatus = "waiting" | "approved" | "declined" | "finished" | "confirmed" | "waitingOnGuardian" | "deniedByGuardian";
 // Interface for Application
 export interface Application {
   id: string;

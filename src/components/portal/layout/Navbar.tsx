@@ -16,6 +16,7 @@ import {
 import Image from 'next/image';
 import { ModeToggle } from '@/components/portal/theme/ModeToggle';
 import UserDropdown from '@/components/portal/ui/UserDropdown';
+import MobileUserDropdown from "@/components/portal/ui/MobileUserDropdown";
 
 interface NavbarProps {
   onOpenChat?: () => void;
@@ -38,7 +39,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
   const navLinksLeft = (
     <>
       <Link
-        href="/portal"
+        href="/"
         className="flex items-center gap-2 py-2 hover:text-primary"
         onClick={() => setMenuOpen(false)}
       >
@@ -69,11 +70,23 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
             </span>
           )}
           {user && (
-            <UserDropdown
-              user={user}
-              onLogout={handleLogout}
-              onOpenChat={onOpenChat}
-            />
+            <>
+              <div className="hidden md:block">
+                <UserDropdown
+                  user={user}
+                  onLogout={handleLogout}
+                  onOpenChat={onOpenChat}
+                />
+              </div>
+              {/* Mobile user dropdown, hidden on medium and larger screens */}
+              <div className="block md:hidden">
+                <MobileUserDropdown
+                  user={user}
+                  onLogout={handleLogout}
+                  onOpenChat={onOpenChat}
+                />
+              </div>
+            </>
           )}
         </>
       ) : (

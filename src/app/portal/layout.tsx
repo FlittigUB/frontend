@@ -10,6 +10,7 @@ import { StripeProvider } from '@/context/StripeContext';
 import { GlobalChatProvider } from '@/context/GlobalChatProvider';
 import { ThemeProvider } from '@/components/theme-provider';
 import { NotificationsProvider } from "@/context/NotificationsContext";
+import { Toaster } from "sonner";
 //import NotificationsList from "@/components/portal/ui/NotificationsList"; // Import for typing
 
 interface PortalRouteLayoutProps {
@@ -39,6 +40,10 @@ const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
           <PreviousPathProvider>
             <NotificationsProvider>
             <GlobalChatProvider>
+              {
+                // TODO FIX toast
+              }
+              <Toaster richColors closeButton position="top-right"/>
               <PortalLayout>
                 {children}
                 {

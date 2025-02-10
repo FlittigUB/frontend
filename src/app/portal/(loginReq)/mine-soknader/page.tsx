@@ -46,6 +46,8 @@ const MyApplicationsPage: React.FC = () => {
     declined: 'Avslått',
     finished: 'Fullført',
     confirmed: 'Bekreftet',
+    waitingOnGuardian: 'Venter på foresatt',
+    deniedByGuardian: 'Avslått av foresatt'
   };
 
   const statusColors: Record<ApplicationStatus, string> = {
@@ -54,6 +56,8 @@ const MyApplicationsPage: React.FC = () => {
     declined: 'bg-red-100 text-red-800',
     finished: 'bg-blue-100 text-blue-800',
     confirmed: 'bg-purple-100 text-purple-800',
+    waitingOnGuardian: 'bg-gray-100 text-gray-800',
+    deniedByGuardian: 'bg-red-100 text-red-800'
   };
 
   const filteredApplications = applications.filter((application) => {

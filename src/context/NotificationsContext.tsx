@@ -27,11 +27,11 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   // Example fetch function, if you want to load from an API
   const fetchNotifications = async () => {
     try {
-      const res = await fetch("/api/notifications");
+      //const res = await fetch("/api/notifications");
       // E.g. an endpoint that returns an array of
       // { id, title, description, avatar, timestamp }
-      const data = await res.json();
-      setNotifications(data);
+      //const data = await res.json();
+      //setNotifications(data);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
     }
@@ -53,7 +53,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
 
   // Optionally fetch notifications on mount
   useEffect(() => {
-    fetchNotifications();
+    //fetchNotifications();
   }, []);
 
   const value: NotificationsContextType = {

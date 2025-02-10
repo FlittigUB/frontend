@@ -6,7 +6,7 @@ import InsightsScript from '@/components/analytics/PlausibleScript';
 import GoogleTagManager from '@/components/analytics/GoogleTagManager';
 import { AnimatePresence, motion  } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { Footerdemo } from "@/components/ui/footer-section";
+import { FooterSection } from "@/components/ui/footer-section";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   // We track the current route to create a key for the motion.div
@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <InsightsScript/>
         <GoogleTagManager/>
           {children}
-        <Footerdemo/>
+        <FooterSection/>
       </motion.div>
     </AnimatePresence>
     </body>

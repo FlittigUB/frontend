@@ -1,10 +1,10 @@
 // app/portal/stillinger/[slug]/MarkJobFinished.tsx
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import axios from "axios";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 import {
   DialogChat,
   DialogTrigger,
@@ -13,41 +13,49 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialogChat";
-import PaymentForm from "./PaymentForm";
+} from '@/components/ui/dialogChat';
+import PaymentForm from './PaymentForm';
 
 interface MarkJobFinishedProps {
   applicationId: string;
   paymentIntentId?: string; // if in‑platform settlement is available
+  clientSecret: string;
   onRefresh: () => void;
 }
 
 const MarkJobFinished: React.FC<MarkJobFinishedProps> = ({
-                                                           applicationId,
-                                                           paymentIntentId,
-                                                           onRefresh,
-                                                         }) => {
+  applicationId,
+  paymentIntentId,
+  clientSecret,
+  onRefresh,
+}) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   // This handler calls the backend to mark the job as finished.
-  const handleFinish = async (settlement: "private" | "in-platform") => {
+  const handleFinish = async (settlement: 'private' | 'in-platform') => {
     setSubmitting(true);
     try {
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/applications/${applicationId}/finish`);
-      toast.success("Job marked as finished");
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/applications/${applicationId}/finish`,
+      );
+      toast.success('Job marked as finished');
       onRefresh();
-      if (settlement === "in-platform") {
+      if (settlement === 'in-platform') {
         if (!paymentIntentId) {
-          toast.error("Payment Intent not available for in‑platform settlement");
+          toast.error(
+            'Payment Intent not available for in‑platform settlement',
+          );
         } else {
           setPaymentModalOpen(true);
         }
       }
     } catch (err: any) {
       toast.error(
-        err.response?.data?.message || err.message || "Failed to mark as finished"
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to mark as finished',
       );
     } finally {
       setSubmitting(false);
@@ -70,16 +78,26 @@ const MarkJobFinished: React.FC<MarkJobFinishedProps> = ({
               Choose your settlement method:
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-around my-4">
-            <Button variant="outline" onClick={() => handleFinish("private")} disabled={submitting}>
+          <div className="my-4 flex justify-around">
+            <Button
+              variant="outline"
+              onClick={() => handleFinish('private')}
+              disabled={submitting}
+            >
               Private Settlement
             </Button>
-            <Button variant="outline" onClick={() => handleFinish("in-platform")} disabled={submitting}>
+            <Button
+              variant="outline"
+              onClick={() => handleFinish('in-platform')}
+              disabled={submitting}
+            >
               In‑Platform Settlement
             </Button>
           </div>
           <DialogFooter>
-            <Button variant="secondary" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
           </DialogFooter>
         </DialogContent>
       </DialogChat>
@@ -90,6 +108,7 @@ const MarkJobFinished: React.FC<MarkJobFinishedProps> = ({
           onClose={() => setPaymentModalOpen(false)}
           paymentIntentId={paymentIntentId}
           onPaymentSuccess={onRefresh}
+          clientSecret={clientSecret}
         />
       )}
     </>

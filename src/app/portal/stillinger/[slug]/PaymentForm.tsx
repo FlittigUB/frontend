@@ -1,35 +1,37 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import {
   PaymentElement,
+  useElements,
   useStripe,
-  useElements
-} from "@stripe/react-stripe-js";
-import axios from "axios";
-import { toast } from "sonner";
+} from '@stripe/react-stripe-js';
+import { toast } from 'sonner';
 
 interface PaymentFormProps {
   isOpen: boolean;
   onClose: () => void;
   clientSecret: string;
   onPaymentSuccess: () => void;
+  paymentIntentId?: string;
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({
-                                                   isOpen,
-                                                   onClose,
-                                                   clientSecret,
-                                                   onPaymentSuccess,
-                                                 }) => {
+  isOpen,
+  onClose,
+  clientSecret,
+  onPaymentSuccess,
+                                                   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  paymentIntentId,
+}) => {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -37,7 +39,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stripe || !elements) {
-      toast.error("Stripe has not loaded yet.");
+      toast.error('Stripe has not loaded yet.');
       return;
     }
 
@@ -46,6 +48,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     try {
       // Confirm the PaymentIntent using the Payment Element:
       const { error } = await stripe.confirmPayment({
+        redirect: 'if_required',
         elements,
         clientSecret,
         // Optionally redirect after success, but for now we won't:
@@ -56,16 +59,18 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
       if (error) {
         // If there's an immediate error (e.g., card declined, etc.)
-        toast.error(error.message || "Payment confirmation failed");
+        toast.error(error.message || 'Payment confirmation failed');
       } else {
         // Payment was confirmed with no immediate error
-        toast.success("Payment confirmed successfully");
+        toast.success('Payment confirmed successfully');
         onPaymentSuccess();
         onClose();
       }
     } catch (err: any) {
       toast.error(
-        err.response?.data?.message || err.message || "Payment confirmation failed"
+        err.response?.data?.message ||
+          err.message ||
+          'Payment confirmation failed',
       );
     } finally {
       setSubmitting(false);
@@ -91,7 +96,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           </div>
           <DialogFooter>
             <Button type="submit" disabled={submitting} variant="default">
-              {submitting ? "Confirming…" : "Confirm Payment"}
+              {submitting ? 'Confirming…' : 'Confirm Payment'}
             </Button>
           </DialogFooter>
         </form>

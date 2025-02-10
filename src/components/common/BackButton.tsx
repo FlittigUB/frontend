@@ -31,8 +31,13 @@ const BackButton: React.FC = () => {
     }
   };
 
+  const excludedPaths = [
+    '/portal/arbeidsgiver',
+    '/portal/arbeidstaker',
+    '/portal',
+  ];
   // Hide the button for specific paths
-  if (pathName === '/portal/arbeidsgiver' || pathName === '/portal/arbeidstaker') {
+  if (excludedPaths.includes(pathName) || pathName.includes('/portal/godkjenning-foresatt') ) {
     return null;
   }
 

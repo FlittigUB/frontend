@@ -117,7 +117,7 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({ children }) => {
             <button
               onClick={() => openChatWithReceiver('')}
               // Or pass some default or empty receiver
-              className="fixed hidden items-center justify-center rounded-full bg-yellow-400 p-4 text-white shadow-lg transition hover:bg-yellow-500 md:bottom-6 md:right-6 md:flex"
+              className="fixed hidden items-center justify-center rounded-full bg-yellow-400 p-4 text-white shadow-lg transition hover:bg-yellow-500 md:bottom-6 md:right-6 md:flex z-50"
               aria-label="Open Chat"
             >
               Meldinger
