@@ -25,13 +25,13 @@ interface PaymentFormProps {
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({
-  isOpen,
-  onClose,
-  clientSecret,
-  onPaymentSuccess,
+                                                   isOpen,
+                                                   onClose,
+                                                   clientSecret,
+                                                   onPaymentSuccess,
                                                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  paymentIntentId,
-}) => {
+                                                   paymentIntentId,
+                                                 }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -39,38 +39,46 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stripe || !elements) {
-      toast.error('Stripe has not loaded yet.');
+      toast.error('Stripe har ikke lastet inn ennå.');
       return;
     }
 
     setSubmitting(true);
 
     try {
-      // Confirm the PaymentIntent using the Payment Element:
+      // Call elements.submit() before confirming payment (as required for deferred payments)
+      const submitResult = await elements.submit();
+      if (submitResult.error) {
+        toast.error(
+          submitResult.error.message ||
+          'Det oppsto en feil ved innsending av betalingsdetaljer.'
+        );
+        setSubmitting(false);
+        return;
+      }
+
+      // Confirm the PaymentIntent using the Payment Element
       const { error } = await stripe.confirmPayment({
         redirect: 'if_required',
         elements,
         clientSecret,
-        // Optionally redirect after success, but for now we won't:
         confirmParams: {
-          // return_url: "https://example.com/payment-complete"
+          // Optionally set return_url if needed
         },
       });
 
       if (error) {
-        // If there's an immediate error (e.g., card declined, etc.)
-        toast.error(error.message || 'Payment confirmation failed');
+        toast.error(error.message || 'Bekreftelse av betaling mislyktes');
       } else {
-        // Payment was confirmed with no immediate error
-        toast.success('Payment confirmed successfully');
+        toast.success('Betalingen ble bekreftet!');
         onPaymentSuccess();
         onClose();
       }
     } catch (err: any) {
       toast.error(
         err.response?.data?.message ||
-          err.message ||
-          'Payment confirmation failed',
+        err.message ||
+        'Bekreftelse av betaling mislyktes'
       );
     } finally {
       setSubmitting(false);
@@ -86,17 +94,17 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm Payment</DialogTitle>
+          <DialogTitle>Bekreft betaling</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
           <div className="my-4 space-y-4">
-            {/* This displays payment method UI (card, etc.) based on your PaymentIntent settings */}
+            {/* Displays the payment method UI based on your PaymentIntent settings */}
             <PaymentElement />
           </div>
           <DialogFooter>
             <Button type="submit" disabled={submitting} variant="default">
-              {submitting ? 'Confirming…' : 'Confirm Payment'}
+              {submitting ? 'Bekrefter…' : 'Bekreft betaling'}
             </Button>
           </DialogFooter>
         </form>

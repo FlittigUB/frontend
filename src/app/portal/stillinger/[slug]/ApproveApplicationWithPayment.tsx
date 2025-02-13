@@ -1,4 +1,3 @@
-// app/portal/stillinger/[slug]/ApproveApplicationWithPayment.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -14,7 +13,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import PaymentFormWrapper from "./PaymentFormWrapper";
+import PaymentModal from "./PaymentModal";
 import { useAuthContext } from "@/context/AuthContext";
 
 interface ApproveApplicationWithPaymentProps {
@@ -29,31 +28,39 @@ const ApproveApplicationWithPayment: React.FC<ApproveApplicationWithPaymentProps
                                                                                        onRefresh,
                                                                                      }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [showPaymentFormWrapper, setShowPaymentFormWrapper] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [paymentClientSecret, setPaymentClientSecret] = useState<string | null>(null);
   const { token } = useAuthContext();
 
   const handleApprove = async (settlement: "private" | "in-platform") => {
     setSubmitting(true);
     try {
-      // Call the approval endpoint.
-      await axios.patch(
+      const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/applications/${applicationId}/approve`,
         { amount: jobRate, settlement },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("Application approved successfully");
       if (settlement === "private") {
-        // For private settlement, close the dialog and refresh immediately.
+        toast.success("Søknaden ble godkjent!");
         setDialogOpen(false);
         onRefresh();
       } else {
-        // For in-platform settlement, close the approval dialog and open the PaymentFormWrapper.
-        setDialogOpen(false);
-        setShowPaymentFormWrapper(true);
+        // For in‑platform settlement: hent clientSecret fra backend
+        const data = response.data;
+        if (data.clientSecret) {
+          toast.info("Søknaden ble godkjent. Vennligst fullfør betalingen.");
+          setDialogOpen(false);
+          setPaymentClientSecret(data.clientSecret);
+        } else {
+          toast.error("Klarte ikke å hente betalingsdetaljer.");
+        }
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || err.message || "Approval failed");
+      toast.error(
+        err.response?.data?.message ||
+        err.message ||
+        "Godkjenning mislyktes"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -69,9 +76,9 @@ const ApproveApplicationWithPayment: React.FC<ApproveApplicationWithPaymentProps
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Approve Application</DialogTitle>
+            <DialogTitle>Godkjenn søknad</DialogTitle>
             <DialogDescription>
-              Choose the settlement method. Your choice will secure the worker’s payment.
+              Velg betalingsmåte. Ditt valg vil sikre at arbeidstakeren får sin betaling.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-around my-4">
@@ -80,33 +87,34 @@ const ApproveApplicationWithPayment: React.FC<ApproveApplicationWithPaymentProps
               onClick={() => handleApprove("private")}
               disabled={submitting}
             >
-              Private Settlement
+              Privat oppgjør
             </Button>
             <Button
               variant="outline"
               onClick={() => handleApprove("in-platform")}
               disabled={submitting}
             >
-              In‑Platform Settlement
+              Plattformoppgjør
             </Button>
           </div>
           <DialogFooter>
             <Button onClick={() => setDialogOpen(false)} variant="secondary">
-              Cancel
+              Avbryt
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {showPaymentFormWrapper && (
-        <PaymentFormWrapper
-          applicationId={applicationId}
-          amount={jobRate}
+      {paymentClientSecret && (
+        <PaymentModal
+          isOpen={true}
+          clientSecret={paymentClientSecret}
           onPaymentSuccess={() => {
+            toast.success("Betalingen ble fullført og søknaden er godkjent!");
             onRefresh();
-            setShowPaymentFormWrapper(false);
+            setPaymentClientSecret(null);
           }}
-          onClose={() => setShowPaymentFormWrapper(false)}
+          onClose={() => setPaymentClientSecret(null)}
         />
       )}
     </>

@@ -39,7 +39,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
   const navLinksLeft = (
     <>
       <Link
-        href="/"
+        href="/portal"
         className="flex items-center gap-2 py-2 hover:text-primary"
         onClick={() => setMenuOpen(false)}
       >
@@ -118,7 +118,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
       <div className="container relative mx-auto flex items-center justify-between px-4 py-3">
         {/* Brand / Logo */}
         <Link
-          href="/portal"
+          href="/"
           className="relative flex flex-row text-2xl font-bold text-foreground transition-opacity hover:opacity-80"
         >
           <div className="relative aspect-[16/9] w-24">

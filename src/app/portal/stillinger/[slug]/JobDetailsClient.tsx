@@ -1,4 +1,3 @@
-// app/portal/stillinger/[slug]/JobDetailsClient.tsx
 "use client";
 
 import React, { FormEvent, useCallback, useEffect, useState } from "react";
@@ -13,9 +12,10 @@ import { IoIosTimer } from "react-icons/io";
 import Review from "@/components/portal/job/Review";
 import { useJob } from "./JobContext";
 
-// Import the new employer approval component
+// Import approval and finish/confirm components
 import ApproveApplicationWithPayment from "./ApproveApplicationWithPayment";
-import MarkJobConfirmed from "@/app/portal/stillinger/[slug]/MarkJobConfirmed";
+import MarkJobFinished from "./MarkJobFinished";
+import MarkJobConfirmed from "./MarkJobConfirmed";
 
 const statusDetails: Record<string, { label: string; description: string }> = {
   waiting: {
@@ -32,7 +32,7 @@ const statusDetails: Record<string, { label: string; description: string }> = {
   },
   finished: {
     label: "Fullført",
-    description: "Jobben er fullført. Du kan nå bekrefte fullføringen.",
+    description: "Jobben er fullført og arbeidstaker har merket den som ferdig.",
   },
   confirmed: {
     label: "Bekreftet fullført",
@@ -68,10 +68,9 @@ export default function JobDetailsClient() {
   const [userApplication, setUserApplication] = useState<Application | null>(null);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  // Determine if the logged-in user is the job owner (employer)
+  // Determine if the logged-in user is the job owner (arbeidsgiver)
   const isOwner = user && job.user && user.id === job.user.id;
 
-  // Preload the employer's image
   useEffect(() => {
     if (job.user?.image) {
       setPreviewImage(`${process.env.NEXT_PUBLIC_ASSETS_URL}${job.user.image}`);
@@ -80,7 +79,6 @@ export default function JobDetailsClient() {
     }
   }, [job.user?.image]);
 
-  // Function to refresh/fetch application data from the API
   const refreshApplications = useCallback(() => {
     if (!loggedIn || !token) return;
     setLoading(true);
@@ -114,7 +112,6 @@ export default function JobDetailsClient() {
     refreshApplications();
   }, [loggedIn, token, user, job.id, userRole, refreshApplications]);
 
-  // Handler for sending a job application (for non‑applicants)
   const handleApply = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -140,7 +137,6 @@ export default function JobDetailsClient() {
     }
   };
 
-  // Handler for the employer to decline an application
   const handleDecline = async (applicationId: string) => {
     try {
       if (!isOwner) {
@@ -175,7 +171,6 @@ export default function JobDetailsClient() {
     );
   }
 
-  // Helper functions to display location and payment info
   const displayLocation =
     job.position?.neighbourhood || job.position?.city || "Ukjent sted";
 
@@ -191,9 +186,7 @@ export default function JobDetailsClient() {
 
   return (
     <div className="mx-auto my-8 w-full max-w-5xl px-4">
-      {/* Main job details card */}
       <div className="min-h-[400px] rounded-xl bg-yellow-50 p-6 shadow-sm">
-        {/* Header: Job title, category and scheduled date/time */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-800">{job.title}</h1>
@@ -224,16 +217,13 @@ export default function JobDetailsClient() {
           </div>
         </div>
 
-        {/* Job description */}
         <p className="mt-4 text-gray-800">{job.description}</p>
 
-        {/* Payment info */}
         <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
           <FiDollarSign className="h-4 w-4 flex-shrink-0" />
           <span>{displayPayment()}</span>
         </div>
 
-        {/* Estimated hours */}
         {job.hours_estimated && (
           <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
             <FiClock className="h-4 w-4 flex-shrink-0" />
@@ -241,13 +231,11 @@ export default function JobDetailsClient() {
           </div>
         )}
 
-        {/* Location */}
         <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
           <FiMapPin className="h-4 w-4 flex-shrink-0" />
           <span>{displayLocation}</span>
         </div>
 
-        {/* Scheduled time (only time) */}
         <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
           <IoIosTimer className="h-4 w-4 flex-shrink-0" />
           <span>
@@ -259,10 +247,8 @@ export default function JobDetailsClient() {
           </span>
         </div>
 
-        {/* Divider */}
         <hr className="my-4 border-gray-200" />
 
-        {/* Employer info and chat button */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             {previewImage ? (
@@ -289,7 +275,6 @@ export default function JobDetailsClient() {
           )}
         </div>
 
-        {/* If not logged in, prompt to log in */}
         {!loggedIn && (
           <div className="mt-6">
             <a
@@ -301,7 +286,6 @@ export default function JobDetailsClient() {
           </div>
         )}
 
-        {/* Actions for arbeidstaker */}
         {loggedIn && userRole === "arbeidstaker" && (
           <div className="mt-6">
             {userApplication ? (
@@ -314,12 +298,12 @@ export default function JobDetailsClient() {
                   {getStatusInfo(userApplication.status).description}
                 </p>
                 {userApplication.status === "approved" && (
-                  <>
-                    <p className="mt-1 text-green-600">
-                      Gratulerer! Din søknad har blitt akseptert.
-                    </p>
-                    {/* Worker’s actions if needed can be added here */}
-                  </>
+                  <div className="mt-4">
+                    <MarkJobFinished
+                      applicationId={userApplication.id}
+                      onRefresh={refreshApplications}
+                    />
+                  </div>
                 )}
                 {userApplication.status === "finished" && (
                   <p className="mt-1 text-yellow-600">
@@ -352,7 +336,6 @@ export default function JobDetailsClient() {
           </div>
         )}
 
-        {/* Actions for arbeidsgiver (job owner) */}
         {loggedIn && userRole === "arbeidsgiver" && isOwner && (
           <div className="mt-6">
             <h2 className="mb-2 text-lg font-semibold text-gray-800">
@@ -416,7 +399,6 @@ export default function JobDetailsClient() {
         )}
       </div>
 
-      {/* Additional information card */}
       <div className="mt-6 rounded-lg bg-white p-4 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-800">Mer om denne stillingen</h2>
         <p className="mt-2 text-sm text-gray-600">

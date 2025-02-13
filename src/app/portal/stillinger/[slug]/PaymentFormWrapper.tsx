@@ -1,4 +1,3 @@
-// app/portal/stillinger/[slug]/PaymentFormWrapper.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -42,20 +41,20 @@ const PaymentFormWrapper: React.FC<PaymentFormWrapperProps> = ({
         if (cs) {
           setClientSecret(cs);
         } else {
-          toast.error("Failed to get client secret");
+          toast.error("Kunne ikke hente betalingsdetaljer");
         }
       })
       .catch((err) => {
         toast.error(
           err.response?.data?.message ||
           err.message ||
-          "Error creating PaymentIntent"
+          "Feil ved opprettelse av PaymentIntent"
         );
       });
   }, [applicationId, amount, token]);
 
   if (!clientSecret) {
-    return <div>Loading payment details...</div>;
+    return <div>Laster betalingsdetaljer...</div>;
   }
 
   const options = { clientSecret };

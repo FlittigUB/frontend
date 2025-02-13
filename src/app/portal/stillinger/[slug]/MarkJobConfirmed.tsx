@@ -1,38 +1,54 @@
-// app/portal/stillinger/[slug]/MarkJobConfirmed.tsx
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import axios from "axios";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 import {
-  DialogChat,
+  Dialog,
   DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialogChat";
+} from '@/components/ui/dialog';
+import { useAuthContext } from "@/context/AuthContext";
 
 interface MarkJobConfirmedProps {
   applicationId: string;
   onRefresh: () => void;
 }
 
-const MarkJobConfirmed: React.FC<MarkJobConfirmedProps> = ({ applicationId, onRefresh }) => {
+const MarkJobConfirmed: React.FC<MarkJobConfirmedProps> = ({
+  applicationId,
+  onRefresh,
+}) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  const { token } = useAuthContext();
+
+  // Handler for å bekrefte jobben og fange betalingen (brukes av arbeidsgiver)
   const handleConfirm = async () => {
     setSubmitting(true);
     try {
-      await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/applications/${applicationId}/confirm`);
-      toast.success("Job confirmed and payment captured");
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/applications/${applicationId}/confirm`,{},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      toast.success('Jobben er bekreftet og betalingen er gjennomført.');
       onRefresh();
     } catch (err: any) {
       toast.error(
-        err.response?.data?.message || err.message || "Failed to confirm job"
+        err.response?.data?.message ||
+          err.message ||
+          'Kunne ikke bekrefte jobben.',
       );
     } finally {
       setSubmitting(false);
@@ -41,29 +57,34 @@ const MarkJobConfirmed: React.FC<MarkJobConfirmedProps> = ({ applicationId, onRe
   };
 
   return (
-    <DialogChat open={dialogOpen} onOpenChange={setDialogOpen}>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" onClick={() => setDialogOpen(true)}>
-          Mark as Confirmed
+          Bekreft utført jobb
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm Job Completion</DialogTitle>
+          <DialogTitle>Bekreft at jobben er utført</DialogTitle>
           <DialogDescription>
-            Are you sure you want to confirm the job completion and capture payment?
+            Er du sikker på at du vil bekrefte at jobben er fullført? Dette vil
+            gjennomføre betalingen.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="default" onClick={handleConfirm} disabled={submitting}>
-            {submitting ? "Confirming…" : "Confirm"}
+          <Button
+            variant="default"
+            onClick={handleConfirm}
+            disabled={submitting}
+          >
+            {submitting ? 'Sender…' : 'Bekreft'}
           </Button>
           <Button variant="outline" onClick={() => setDialogOpen(false)}>
-            Cancel
+            Avbryt
           </Button>
         </DialogFooter>
       </DialogContent>
-    </DialogChat>
+    </Dialog>
   );
 };
 
