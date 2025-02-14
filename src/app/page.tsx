@@ -250,6 +250,19 @@ export default function Home() {
                 className="transition-transform hover:scale-105"
               >
                 <Image
+                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}c6fa24d0-07dc-4ada-9747-ba60679b8439.png`}
+                  alt="Jalla Jalla Logo"
+                  width={120}
+                  height={60}
+                  className="object-contain"
+                />
+              </Link>
+              <Link
+                href="/info/om-oss"
+                aria-label="Les mer om sponsor"
+                className="transition-transform hover:scale-105"
+              >
+                <Image
                   src={`${process.env.NEXT_PUBLIC_ASSETS_URL}ccf4234a-f3f4-4a60-a225-bcbadd67dfda.png`}
                   alt="Dyreparken Logo"
                   width={120}
