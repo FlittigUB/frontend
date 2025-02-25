@@ -1,3 +1,5 @@
+/*
+PASSWORD PROTECT
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -21,3 +23,4 @@ export function middleware(req: NextRequest) {
 export const config = {
   matcher: '/portal/:path*', // Apply only to /portal and subpaths
 };
+*/
