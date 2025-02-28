@@ -7,6 +7,7 @@ import GoogleTagManager from '@/components/analytics/GoogleTagManager';
 import { AnimatePresence, motion  } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { FooterSection } from "@/components/ui/footer-section";
+import { Toaster } from "sonner";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   // We track the current route to create a key for the motion.div
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       >
         <InsightsScript/>
         <GoogleTagManager/>
+        <Toaster richColors closeButton position="top-right"/>
           {children}
         <FooterSection/>
       </motion.div>

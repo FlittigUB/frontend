@@ -16,16 +16,6 @@ import { toast } from "sonner";
 // HELPER COMPONENTS
 // =======================
 
-// Example placeholder logo
-function Logo() {
-  return (
-    <div className="flex items-center justify-center gap-2">
-      <div className="h-8 w-8 rounded bg-orange-500" />
-      <span className="font-bold">MyApp</span>
-    </div>
-  );
-}
-
 // A simple progress bar showing the user’s step
 function ShadcnProgressBar({
   currentStep,
@@ -942,12 +932,7 @@ export default function RegisterPage() {
             {/* LEFT SIDE: STEPS */}
             <div className="flex flex-col">
               {/* Logo + Progress */}
-              <div className="p-4 md:p-6">
-                <div className="mb-2 flex justify-center">
-                  <Logo />
-                </div>
                 <ShadcnProgressBar currentStep={step} totalSteps={totalSteps} />
-              </div>
 
               {/* Step 1 */}
               {step === 1 && (

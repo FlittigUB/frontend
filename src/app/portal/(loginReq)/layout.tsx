@@ -1,9 +1,9 @@
-// app/portal/(loginReq)/layout.tsx
 'use client';
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthProvider, useAuthContext } from '@/context/AuthContext';
+import { usePreviousPath } from "@/context/PreviousPathContext";
 
 interface ProtectedPortalRouteLayoutProps {
   children: React.ReactNode;
@@ -22,13 +22,16 @@ const ProtectedPortalRouteLayout: React.FC<ProtectedPortalRouteLayoutProps> = ({
 const EnsureLoggedIn: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter();
   const { loggedIn, isAuthLoading } = useAuthContext();
+  const { setPreviousPath } = usePreviousPath();
 
   useEffect(() => {
-    // Once we know the user is not loading and not logged in, redirect
+    // Once we know the user is not loading and not logged in, redirect to login
     if (!isAuthLoading && !loggedIn) {
-      router.push('/portal/logg-inn');
+      const currentPath = window.location.pathname;
+      setPreviousPath(currentPath);
+      router.replace(`/portal/logg-inn?redirect=${encodeURIComponent(currentPath)}`);
     }
-  }, [loggedIn, isAuthLoading, router]);
+  }, [loggedIn, isAuthLoading, router, setPreviousPath]);
 
   // Optionally render a loading state while auth is being determined
   if (isAuthLoading) {

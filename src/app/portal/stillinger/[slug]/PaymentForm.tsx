@@ -15,6 +15,7 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js';
 import { toast } from 'sonner';
+import Link from "next/link";
 
 interface PaymentFormProps {
   isOpen: boolean;
@@ -95,6 +96,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Bekreft betaling</DialogTitle>
+          <p>Pengene vil bli reservert, og trekes fra kontoen din når begge parter er enige om utført jobb. <Link href={"#"}>Les mer</Link></p>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>

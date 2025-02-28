@@ -9,8 +9,15 @@ import { PreviousPathProvider } from '@/context/PreviousPathContext';
 import { StripeProvider } from '@/context/StripeContext';
 import { GlobalChatProvider } from '@/context/GlobalChatProvider';
 import { ThemeProvider } from '@/components/theme-provider';
-import { NotificationsProvider } from "@/context/NotificationsContext";
-import { Toaster } from "sonner";
+import { NotificationsProvider } from '@/context/NotificationsContext';
+import useAuth from '@/hooks/useAuth';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Terminal } from 'lucide-react';
+import BennyBever from "@/components/icons/BennyBever";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
 //import NotificationsList from "@/components/portal/ui/NotificationsList"; // Import for typing
 
 interface PortalRouteLayoutProps {
@@ -28,6 +35,7 @@ const DynamicThemeProvider = dynamic<
 );
 
 const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
+  const { loggedIn, userRole, profileCompleted, user } = useAuth();
   return (
     <AuthProvider>
       <StripeProvider>
@@ -39,18 +47,43 @@ const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
         >
           <PreviousPathProvider>
             <NotificationsProvider>
-            <GlobalChatProvider>
-              {
-                // TODO FIX toast
-              }
-              <Toaster richColors closeButton position="top-right"/>
-              <PortalLayout>
-                {children}
-                {
-                  //<NotificationsList/>
-                }
-              </PortalLayout>
-            </GlobalChatProvider>
+              <GlobalChatProvider>
+                <PortalLayout>
+                  {loggedIn &&
+                    user &&
+                    userRole === 'arbeidstaker' &&
+                    !profileCompleted && (
+                      <Alert className="flex gap-2 items-center">
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}722b612f-b083-4a34-bef7-4b884bbeb2dc.png`}
+                          alt={"Benny bever maskott"}
+                          width={75}
+                          height={75}
+                          className="shrink-0"
+                        />
+                        <div>
+                          <AlertTitle>Du er ett steg unna å søke på jobber!</AlertTitle>
+                          <AlertDescription>
+                            Du mangler en konto for utbetaling. Klikk på lenken under for å fullføre din konto.
+                          </AlertDescription>
+                          {
+                            // TODO create account link upon registration of arbeidstaker
+                          }
+                          {user.account_url ? (
+                            <Button asChild variant="link"><Link href={user.account_url}></Link></Button>
+                          ) : (
+                            <p>Det er et problem med din konto. Kontakt kundeservice for å fullføre konto</p>
+                          )}
+
+                        </div>
+                      </Alert>
+                    )}
+                  {children}
+                  {
+                    //<NotificationsList/>
+                  }
+                </PortalLayout>
+              </GlobalChatProvider>
             </NotificationsProvider>
           </PreviousPathProvider>
         </DynamicThemeProvider>

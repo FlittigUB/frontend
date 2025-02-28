@@ -2,6 +2,8 @@
 
 // Interface for User
 export interface User {
+  stripe_account_id: string;
+  stripe_person_id: string;
   mobile: number;
   guardian: any;
   needs_guardian: boolean;
@@ -13,6 +15,7 @@ export interface User {
   role: UserRole;
   image?: string | Image; // ID of the user's profile image
   bio?: string;
+  account_url: string;
   birthdate: Date;
   applications?: Application[];
   jobs?: Job[];

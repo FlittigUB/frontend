@@ -9,12 +9,10 @@ interface AuthLayoutProps {
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
   return (
-    <div className="">
-      <main className="">
+      <main>
         {/* Centered Card */}
         <div className="">{children}</div>
       </main>
-    </div>
   );
 };
 
