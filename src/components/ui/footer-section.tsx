@@ -121,11 +121,11 @@ function FooterSection() {
             © 2025 Flittig Ungdomsbedrift. Alle rettigheter reservert.
           </p>
           <nav className="flex gap-4 text-sm">
-            <Link href="#" className="transition-colors hover:text-primary">
-              Privacy Policy
+            <Link href="/info/flittig-ub-policy" className="transition-colors hover:text-primary">
+              Bedrifts Policy
             </Link>
-            <Link href="#" className="transition-colors hover:text-primary">
-              Terms of Service
+            <Link href="/info/vilkaar-for-bruk" className="transition-colors hover:text-primary">
+              Vilkår for bruk
             </Link>
             <Link href="#" className="transition-colors hover:text-primary">
               Cookie Settings
