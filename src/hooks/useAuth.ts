@@ -62,9 +62,8 @@ const useAuth = () => {
     if (user.role !== 'arbeidstaker') return true;
     console.log(user);
     // For arbeidstaker, check for required Stripe fields
-    return Boolean(user.stripe_account_id && user.stripe_person_id);
+    return Boolean(user.stripe_account_id && user.stripe_person_id && user.stripe_verified);
   }, [user]);
-  console.log("pc",profileCompleted);
 
   return { loggedIn, token, userRole, user, isAuthLoading, profileCompleted };
 };

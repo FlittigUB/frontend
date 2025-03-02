@@ -2,6 +2,7 @@
 
 // Interface for User
 export interface User {
+  stripe_verified: boolean;
   stripe_account_id: string;
   stripe_person_id: string;
   mobile: number;

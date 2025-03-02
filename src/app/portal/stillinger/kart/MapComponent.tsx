@@ -222,9 +222,9 @@ const SearchAndMap: React.FC = () => {
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/job/all`,
         );
-        if (response.data && Array.isArray(response.data)) {
+        if (response.data.data && Array.isArray(response.data.data)) {
           // Apply deterministic offset to each job's coordinates
-          const offsetJobs: Job[] = response.data.map((job: Job) => {
+          const offsetJobs: Job[] = response.data.data.map((job: Job) => {
             const { latOffset, lngOffset } = generateOffset(job.id);
             const originalLat = parseFloat(job.position.latitude);
             const originalLng = parseFloat(job.position.longitude);

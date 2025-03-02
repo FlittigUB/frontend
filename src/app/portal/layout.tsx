@@ -67,12 +67,9 @@ const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
                             Du mangler en konto for utbetaling. Klikk på lenken
                             under for å fullføre din konto.
                           </AlertDescription>
-                          {
-                            // TODO create account link upon registration of arbeidstaker
-                          }
                           {user.account_url ? (
-                            <Button asChild variant="link">
-                              <Link href={user.account_url}></Link>
+                            <Button asChild variant="default" className="mt-4">
+                              <Link href={user.account_url}>Fullfør konto</Link>
                             </Button>
                           ) : (
                             <p>
