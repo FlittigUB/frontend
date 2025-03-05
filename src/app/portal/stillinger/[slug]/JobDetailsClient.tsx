@@ -85,7 +85,7 @@ export default function JobDetailsClient() {
   const [submitting, setSubmitting] = useState<boolean>(false);
 
   // Keep user details & payout modal as is
-  const [userDetails, setUserDetails] = useState<any>(null);
+  const [, setUserDetails] = useState<any>(null);
   const [showPayoutDialog, setShowPayoutDialog] = useState<boolean>(false);
 
   // Determine if the logged-in user is the job owner
@@ -161,13 +161,13 @@ export default function JobDetailsClient() {
   const handleApply = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-
+/*
     // If missing payout info, show modal
     if (!userDetails?.stripe_account_id || !userDetails?.stripe_person_id) {
       setShowPayoutDialog(true);
       setSubmitting(false);
       return;
-    }
+    }*/
 
     try {
       if (!token || !user) throw new Error('Uautorisert.');
