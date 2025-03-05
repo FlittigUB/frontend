@@ -190,7 +190,7 @@ const JobItem: React.FC<JobItemProps> = ({
               href={`/portal/stillinger/${job.slug}`}
               className="hover:bg-primary-dark inline-flex items-center rounded-full bg-primary px-6 py-2 text-sm font-semibold text-white shadow transition-colors focus:outline-none focus:ring-2 focus:ring-primary dark:shadow-button-dark"
             >
-              Søk på denne jobben
+              Se jobben
             </Link>
           </div>
         )
