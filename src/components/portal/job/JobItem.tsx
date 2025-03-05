@@ -103,12 +103,12 @@ const JobItem: React.FC<JobItemProps> = ({
         <FiDollarSign className="h-4 w-4 flex-shrink-0" />
         <span>{displayPayment()}</span>
       </div>
-      {job.hours_estimated && (
+      {job.hours_estimated ? (
         <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <FiClock className="h-4 w-4 flex-shrink-0" />
           <span>{job.hours_estimated} timer</span>
         </div>
-      )}
+      ) : null}
 
       {/* Location & Date */}
       <div className="mt-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
