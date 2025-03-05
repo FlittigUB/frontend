@@ -103,12 +103,12 @@ const JobItem: React.FC<JobItemProps> = ({
         <FiDollarSign className="h-4 w-4 flex-shrink-0" />
         <span>{displayPayment()}</span>
       </div>
-      {job.hours_estimated && (
+      {job.hours_estimated ? (
         <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <FiClock className="h-4 w-4 flex-shrink-0" />
           <span>{job.hours_estimated} timer</span>
         </div>
-      )}
+      ) : null}
 
       {/* Location & Date */}
       <div className="mt-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
@@ -190,7 +190,7 @@ const JobItem: React.FC<JobItemProps> = ({
               href={`/portal/stillinger/${job.slug}`}
               className="hover:bg-primary-dark inline-flex items-center rounded-full bg-primary px-6 py-2 text-sm font-semibold text-white shadow transition-colors focus:outline-none focus:ring-2 focus:ring-primary dark:shadow-button-dark"
             >
-              Søk på denne jobben
+              Se jobben
             </Link>
           </div>
         )
