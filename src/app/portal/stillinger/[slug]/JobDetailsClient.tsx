@@ -201,7 +201,7 @@ export default function JobDetailsClient() {
         return;
       }
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/applications/${applicationId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/applications/${applicationId}/decline`,
         { status: 'declined' },
         { headers: { Authorization: `Bearer ${token}` } },
       );

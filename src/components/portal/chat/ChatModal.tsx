@@ -1,9 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiArrowLeft } from 'react-icons/fi';
 import { Button } from '@/components/ui/button';
-import { DialogChat, DialogPortal, DialogContent } from '@/components/ui/dialogChat';
+import {
+  DialogChat,
+  DialogContent,
+  DialogPortal,
+} from '@/components/ui/dialogChat';
 import ConversationsList, { Conversation } from './ConversationsList';
 import ChatHeader from './ChatHeader';
 import ChatMessages from './ChatMessages';
@@ -17,14 +21,15 @@ interface ChatModalProps {
 }
 
 export default function ChatModal({
-                                    isOpen,
-                                    onCloseAction,
-                                    initialReceiverId = '',
-                                  }: ChatModalProps) {
+  isOpen,
+  onCloseAction,
+  initialReceiverId = '',
+}: ChatModalProps) {
   const [view, setView] = useState<'list' | 'chat'>('list');
   const [selectedReceiverId, setSelectedReceiverId] = useState('');
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loadingConversations, setLoadingConversations] = useState<boolean>(false);
+  const [loadingConversations, setLoadingConversations] =
+    useState<boolean>(false);
 
   // If `initialReceiverId` changes, open directly to the chat view
   useEffect(() => {
@@ -61,7 +66,7 @@ export default function ChatModal({
               headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
               },
-            }
+            },
           );
           if (res.ok) {
             const data = await res.json();
@@ -114,13 +119,8 @@ export default function ChatModal({
           We remove DialogOverlay to avoid a backdrop
           and position the dialog in bottom-right
         */}
-        <div className="fixed bottom-4 right-4 z-50 flex items-end justify-end">
-          <DialogContent
-            className="
-              m-0 p-0
-              h-[600px] w-[400px]
-            "
-          >
+        <div className="fixed bottom-0 right-0 z-50 flex items-end justify-end md:bottom-4 md:right-4">
+          <DialogContent className="m-0 h-[600px] w-[400px] p-0">
             {/* If not logged in, display a fallback */}
             {!loggedIn ? (
               <div className="flex h-full flex-col items-center justify-center p-4">
@@ -157,7 +157,9 @@ export default function ChatModal({
 
                     {!receiver && (
                       <div className="flex flex-1 items-center justify-center">
-                        <p className="text-sm text-muted-foreground">Laster chat...</p>
+                        <p className="text-sm text-muted-foreground">
+                          Laster chat...
+                        </p>
                       </div>
                     )}
 

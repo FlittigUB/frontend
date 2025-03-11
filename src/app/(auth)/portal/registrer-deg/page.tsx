@@ -10,7 +10,59 @@ import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Check, Eye, EyeOff, X } from 'lucide-react';
-import { toast } from "sonner";
+import { toast } from 'sonner';
+
+// =======================
+// HELPER FUNCTIONS
+// =======================
+/**
+ * Extracts a descriptive error message from a given error object.
+ * If the error contains an "errors" array, returns the first error's message.
+ *
+ * @param error - The error object received from the backend.
+ * @returns A string with a descriptive error message.
+ */
+function extractErrorMessage(error: any): string {
+  let extracted = '';
+  if (error) {
+    if (Array.isArray(error.errors) && error.errors.length > 0) {
+      extracted = error.errors[0].message;
+    } else if (error.message && typeof error.message === 'string') {
+      extracted = error.message;
+    } else if (error.message && typeof error.message === 'object') {
+      if (
+        Array.isArray(error.message.errors) &&
+        error.message.errors.length > 0
+      ) {
+        extracted = error.message.errors[0].message;
+      } else {
+        extracted = JSON.stringify(error.message);
+      }
+    } else {
+      extracted = JSON.stringify(error);
+    }
+  } else {
+    extracted = 'En ukjent feil oppstod.';
+  }
+  // Remove redundant backend prefixes to make the message more user-friendly
+  return extracted.replace(/Failed to create item:\s*/g, '').trim();
+}
+
+/**
+ * Calculates the age from a given birthdate string.
+ * @param birthdate - A string representing the birthdate.
+ * @returns The age in years.
+ */
+function calculateAge(birthdate: string): number {
+  const birth = new Date(birthdate);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
 
 // =======================
 // HELPER COMPONENTS
@@ -48,7 +100,7 @@ function RoleSelection({
             style={{ objectFit: 'contain' }}
           />
         </div>
-        <h1 className="mt-4 text-2xl font-bold">Velkommen! 🎉</h1>
+        <h1 className="mt-4 text-2xl font-bold">Velkommen!</h1>
         <p className="text-gray-600">
           La oss starte registreringen ved å velge din rolle.
         </p>
@@ -100,7 +152,7 @@ function PasswordStrengthInput({
 }: {
   password: string;
   setPassword: (val: string) => void;
-  error?: string; // optional field-level error
+  error?: string;
 }) {
   const id = useId();
   const [isVisible, setIsVisible] = useState(false);
@@ -110,10 +162,10 @@ function PasswordStrengthInput({
   // Evaluate password requirements
   const checkStrength = (pass: string) => {
     const requirements = [
-      { regex: /.{8,}/, text: 'At least 8 characters' },
-      { regex: /[0-9]/, text: 'At least 1 number' },
-      { regex: /[a-z]/, text: 'At least 1 lowercase letter' },
-      { regex: /[A-Z]/, text: 'At least 1 uppercase letter' },
+      { regex: /.{8,}/, text: 'Minst 8 tegn' },
+      { regex: /[0-9]/, text: 'Minst 1 nummer' },
+      { regex: /[a-z]/, text: 'Minst 1 liten bokstav' },
+      { regex: /[A-Z]/, text: 'Minst 1 stor bokstav' },
     ];
     return requirements.map((req) => ({
       met: req.regex.test(pass),
@@ -135,13 +187,12 @@ function PasswordStrengthInput({
   };
 
   const getStrengthText = (score: number) => {
-    if (score === 0) return 'Enter a password';
-    if (score <= 2) return 'Weak password';
-    if (score === 3) return 'Medium password';
-    return 'Strong password';
+    if (score === 0) return 'Skriv inn et passord';
+    if (score <= 2) return 'Svakt Passord';
+    if (score === 3) return 'Medium Passord';
+    return 'Sterkt passord';
   };
 
-  // If there's a field-level error, show the border-destructive style
   const passwordClass = error
     ? 'border-destructive/80 text-destructive focus-visible:border-destructive/80 focus-visible:ring-destructive/20'
     : '';
@@ -192,7 +243,6 @@ function PasswordStrengthInput({
         />
       </div>
 
-      {/* Strength text and requirements */}
       <p
         id={`${id}-description`}
         className="mb-2 text-sm font-medium text-foreground"
@@ -218,7 +268,6 @@ function PasswordStrengthInput({
         ))}
       </ul>
 
-      {/* If there's a password error (e.g. mismatch), display it */}
       {error && (
         <p
           className="mt-2 text-xs text-destructive"
@@ -272,7 +321,6 @@ function PersonalInfoForm(props: PersonalInfoFormProps) {
     error,
   } = props;
 
-  // We'll check if the global error references invalid email or password mismatch:
   const isEmailError =
     error.includes('gyldig epost') || error.toLowerCase().includes('email');
   const isConfirmError =
@@ -285,7 +333,6 @@ function PersonalInfoForm(props: PersonalInfoFormProps) {
         Personlig Informasjon 📝
       </h1>
       <div className="grid gap-4">
-        {/* Epost (required) */}
         <EmailInput
           label="Epost"
           value={email}
@@ -293,21 +340,18 @@ function PersonalInfoForm(props: PersonalInfoFormProps) {
           isError={isEmailError}
           errorMsg="Vennligst oppgi en gyldig epostadresse."
         />
-        {/* Navn (required) */}
         <RequiredInput
           label="Navn"
           placeholder="Ola Normann"
           value={name}
           onChange={setName}
         />
-        {/* Fødselsdato (required for individuals) */}
         <RequiredInput
           label="Fødselsdato"
           type="date"
           value={birthdate}
           onChange={setBirthdate}
         />
-        {/* Mobilnummer (required) */}
         <RequiredInput
           label="Mobilnummer"
           placeholder="123 45 678"
@@ -315,15 +359,12 @@ function PersonalInfoForm(props: PersonalInfoFormProps) {
           onChange={setMobile}
         />
 
-        {/* Password with strength indicator */}
         <PasswordStrengthInput
           password={password}
           setPassword={setPassword}
-          // If there's a mismatch or any "Passordene samsvarer ikke!" error, we won't show it here. We'll do it on confirm.
           error={undefined}
         />
 
-        {/* Confirm Password (required). If there's a mismatch error, show it as an error input */}
         <ConfirmPasswordInput
           label="Bekreft Passord"
           value={confirmPassword}
@@ -333,7 +374,6 @@ function PersonalInfoForm(props: PersonalInfoFormProps) {
         />
       </div>
 
-      {/* If there's a "generic" error that doesn't match above, show it here */}
       {error && !isEmailError && !isConfirmError && (
         <p className="text-sm text-destructive" role="alert">
           {error}
@@ -438,7 +478,6 @@ function BusinessInfoForm(props: BusinessInfoFormProps) {
       </h1>
 
       <div className="grid gap-4">
-        {/* Organisasjonsnummer */}
         <div>
           <Label htmlFor="orgNumber">
             Organisasjonsnummer <span className="text-destructive">*</span>
@@ -467,7 +506,6 @@ function BusinessInfoForm(props: BusinessInfoFormProps) {
 
         {orgFetched && (
           <>
-            {/* Epost */}
             <EmailInput
               label="Epost"
               value={email}
@@ -475,26 +513,22 @@ function BusinessInfoForm(props: BusinessInfoFormProps) {
               isError={isEmailError}
               errorMsg="Vennligst oppgi en gyldig epostadresse."
             />
-            {/* Selskapsnavn (required) */}
             <RequiredInput
               label="Selskapsnavn"
               value={name}
               onChange={setName}
             />
-            {/* Mobilnummer (required) */}
             <RequiredInput
               label="Mobilnummer"
               placeholder="123 45 678"
               value={mobile}
               onChange={setMobile}
             />
-            {/* Password with strength */}
             <PasswordStrengthInput
               password={password}
               setPassword={setPassword}
               error={undefined}
             />
-            {/* Confirm Password */}
             <ConfirmPasswordInput
               label="Bekreft Passord"
               value={confirmPassword}
@@ -506,7 +540,6 @@ function BusinessInfoForm(props: BusinessInfoFormProps) {
         )}
       </div>
 
-      {/* If there's a global error we haven't shown, display it */}
       {error && !isEmailError && !isConfirmError && (
         <p className="text-sm text-destructive" role="alert">
           {error}
@@ -518,6 +551,70 @@ function BusinessInfoForm(props: BusinessInfoFormProps) {
           Tilbake
         </Button>
         <Button variant="default" onClick={handleNext} disabled={!orgFetched}>
+          Neste
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ================================
+// NEW STEP: GUARDIAN INFO FORM (for minors)
+// ================================
+interface GuardianInfoFormProps {
+  guardianName: string;
+  setGuardianName: (val: string) => void;
+  guardianEmail: string;
+  setGuardianEmail: (val: string) => void;
+  handleBack: () => void;
+  handleNext: () => void;
+  error: string;
+}
+
+function GuardianInfoForm(props: GuardianInfoFormProps) {
+  const {
+    guardianName,
+    setGuardianName,
+    guardianEmail,
+    setGuardianEmail,
+    handleBack,
+    handleNext,
+    error,
+  } = props;
+
+  // Simple email validation for guardian email
+  const isEmailValid = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  return (
+    <div className="space-y-6 p-6 md:p-8">
+      <h1 className="text-2xl font-bold text-gray-800">
+        Foreldre/Verge Informasjon 📝
+      </h1>
+      <div className="grid gap-4">
+        <RequiredInput
+          label="Foreldre/Verges Navn"
+          value={guardianName}
+          onChange={setGuardianName}
+        />
+        <EmailInput
+          label="Foreldre/Verges Epost"
+          value={guardianEmail}
+          onChange={setGuardianEmail}
+          isError={guardianEmail !== '' && !isEmailValid(guardianEmail)}
+          errorMsg="Vennligst oppgi en gyldig epostadresse."
+        />
+      </div>
+      {error && (
+        <p className="text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="flex justify-between pt-2">
+        <Button variant="outline" onClick={handleBack}>
+          Tilbake
+        </Button>
+        <Button variant="default" onClick={handleNext}>
           Neste
         </Button>
       </div>
@@ -557,7 +654,6 @@ function ProfileDetailsForm(props: ProfileDetailsFormProps) {
     <div className="space-y-6 p-6 md:p-8">
       <h1 className="text-2xl font-bold text-gray-800">Profil Detaljer 🎨</h1>
       <div className="grid gap-4">
-        {/* Bio */}
         <div>
           <Label htmlFor="bio">Bio</Label>
           <textarea
@@ -569,7 +665,6 @@ function ProfileDetailsForm(props: ProfileDetailsFormProps) {
             className="mt-1 w-full rounded-md border border-gray-300 p-2"
           />
         </div>
-        {/* Image Upload */}
         <div>
           <Label htmlFor="profileImage">Profilbilde</Label>
           <Input
@@ -592,11 +687,8 @@ function ProfileDetailsForm(props: ProfileDetailsFormProps) {
           )}
         </div>
       </div>
-
-      {/* Show error or success */}
       {error && <p className="text-sm text-destructive">{error}</p>}
       {success && <p className="text-sm text-green-600">{success}</p>}
-
       <div className="flex justify-between pt-2">
         <Button variant="outline" onClick={handleBack}>
           Tilbake
@@ -649,7 +741,6 @@ function RequiredInput({
 
 // ================================================================
 // Reusable "EmailInput" snippet that can show an error style
-// if isError = true
 // ================================================================
 function EmailInput({
   label,
@@ -699,7 +790,6 @@ function EmailInput({
 
 // =====================================================================
 // Reusable "ConfirmPasswordInput" snippet for confirm password field
-// If isError = true, show destructive styles + error text
 // =====================================================================
 function ConfirmPasswordInput({
   label,
@@ -754,7 +844,6 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const [step, setStep] = useState(1);
-  const totalSteps = 3;
 
   // role + profileType
   const [role, setRole] = useState('');
@@ -775,19 +864,29 @@ export default function RegisterPage() {
   const [bio, setBio] = useState('');
   const [image, setImage] = useState<File | null>(null);
 
+  // New guardian fields (for minors)
+  const [guardianName, setGuardianName] = useState('');
+  const [guardianEmail, setGuardianEmail] = useState('');
+
   // UI
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // If business, skip birthdate
+  // For business profiles, auto-set birthdate
   useEffect(() => {
     if (profileType === 'business' || role === 'bedrift') {
       setBirthdate(new Date(1990, 1, 1).toISOString());
     }
   }, [profileType, role]);
 
-  // Simple email check
+  // Determine if the user is a minor (only applies for individuals)
+  const isMinor =
+    profileType === 'individual' && birthdate && calculateAge(birthdate) < 18;
+
+  // Set total steps dynamically
+  const totalSteps = isMinor ? 4 : 3;
+
   const isValidEmail = (test: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(test);
 
@@ -795,19 +894,17 @@ export default function RegisterPage() {
   const handleNext = () => setStep((prev) => Math.min(prev + 1, totalSteps));
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  // Role selection
   const handleRoleSelection = (selectedRole: string) => {
     if (selectedRole === 'bedrift') {
       setProfileType('business');
       setRole('arbeidsgiver');
     } else {
-      setProfileType("individual");
+      setProfileType('individual');
       setRole(selectedRole);
     }
     handleNext();
   };
 
-  // Image validation
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -827,13 +924,12 @@ export default function RegisterPage() {
     }
   };
 
-  // Final register
+  // Final registration handler
   const handleRegister = async () => {
     setError('');
     setSuccess('');
     setIsSubmitting(true);
 
-    // Basic checks
     if (password !== confirmPassword) {
       setError('Passordene samsvarer ikke!');
       setIsSubmitting(false);
@@ -856,7 +952,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // Decide endpoint
     const endpoint = profileType === 'business' ? '/users/business' : '/users';
 
     try {
@@ -879,6 +974,13 @@ export default function RegisterPage() {
       if (profileType === 'business') {
         formData.append('organization_number', orgNumber);
       }
+
+      // If the user is a minor, include guardian details in the request
+      if (isMinor) {
+        formData.append('guardian_email', guardianEmail);
+        formData.append('guardian_name', guardianName);
+      }
+
       if (image) {
         formData.append('image', image);
       }
@@ -891,7 +993,8 @@ export default function RegisterPage() {
       if (!registerResponse.ok) {
         const registerError = await registerResponse.json();
         throw new Error(
-          registerError.message || 'En feil oppstod under registreringen.',
+          extractErrorMessage(registerError) ||
+            'En feil oppstod under registreringen.',
         );
       }
 
@@ -909,7 +1012,9 @@ export default function RegisterPage() {
 
       if (!loginResponse.ok) {
         const loginError = await loginResponse.json();
-        throw new Error(loginError.message || 'Autentisering mislyktes.');
+        throw new Error(
+          extractErrorMessage(loginError) || 'Autentisering mislyktes.',
+        );
       }
 
       const loginData = await loginResponse.json();
@@ -923,7 +1028,6 @@ export default function RegisterPage() {
     }
   };
 
-  // RENDER
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-muted p-6 md:p-10">
       <div className="w-full max-w-sm md:max-w-3xl">
@@ -931,15 +1035,12 @@ export default function RegisterPage() {
           <CardContent className="grid p-0 md:grid-cols-2">
             {/* LEFT SIDE: STEPS */}
             <div className="flex flex-col">
-              {/* Logo + Progress */}
-                <ShadcnProgressBar currentStep={step} totalSteps={totalSteps} />
+              <ShadcnProgressBar currentStep={step} totalSteps={totalSteps} />
 
-              {/* Step 1 */}
               {step === 1 && (
                 <RoleSelection onSelectRole={handleRoleSelection} />
               )}
 
-              {/* Step 2 */}
               {step === 2 &&
                 (profileType === 'business' ? (
                   <BusinessInfoForm
@@ -979,8 +1080,32 @@ export default function RegisterPage() {
                   />
                 ))}
 
-              {/* Step 3 */}
-              {step === 3 && (
+              {step === 3 &&
+                (isMinor ? (
+                  <GuardianInfoForm
+                    guardianName={guardianName}
+                    setGuardianName={setGuardianName}
+                    guardianEmail={guardianEmail}
+                    setGuardianEmail={setGuardianEmail}
+                    handleBack={handleBack}
+                    handleNext={handleNext}
+                    error={error}
+                  />
+                ) : (
+                  <ProfileDetailsForm
+                    bio={bio}
+                    setBio={setBio}
+                    image={image}
+                    handleImageChange={handleImageChange}
+                    handleBack={handleBack}
+                    handleRegister={handleRegister}
+                    error={error}
+                    success={success}
+                    isSubmitting={isSubmitting}
+                  />
+                ))}
+
+              {step === 4 && isMinor && (
                 <ProfileDetailsForm
                   bio={bio}
                   setBio={setBio}
@@ -1008,7 +1133,6 @@ export default function RegisterPage() {
           </CardContent>
         </Card>
 
-        {/* Global error/success below card (optional) */}
         {error && (
           <div className="mt-4 text-center text-red-600" role="alert">
             {error}
