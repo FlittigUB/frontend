@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import NavbarLayout from '@/components/NavbarLayout';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function Home() {
   return (
@@ -32,27 +33,38 @@ export default function Home() {
               småoppgaver—raskt, trygt og enkelt.
             </p>
             <div className="flex flex-col items-center space-y-3 md:flex-row md:space-x-4 md:space-y-0">
-              <Link
-                href="/portal/registrer-deg"
-                className="inline-block rounded-md bg-yellow-500 px-8 py-3 text-lg font-semibold text-white shadow-md transition-transform duration-300 hover:scale-105 hover:bg-yellow-600"
+              <Button
+                asChild
+                variant="default"
+                size="lg"
+                className="bg-yellow-500 text-white hover:bg-yellow-600"
               >
-                Bli flittig du også
-              </Link>
-              <Link
-                href="/portal/stillinger"
-                className="leading-5 bg-white inline-block rounded-md border border-yellow-500 px-8 py-3 text-lg font-semibold text-yellow-500 shadow-md transition-transform duration-300 hover:scale-105 hover:bg-yellow-50"
+                <Link href="/portal/registrer-deg">Bli flittig du også</Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-yellow-500 text-yellow-500 hover:bg-yellow-100 hover:text-yellow-700"
               >
-                Se ledige oppdrag
-                <p className="text-sm text-gray-400">(Krever ikke innlogging)</p>
-              </Link>
-              {/* CTA 2 */}
-              <Link
-                href="/portal"
-                className="bg-white inline-block rounded-md border border-green-500 px-8 py-3 text-lg font-semibold text-green-500 shadow-md transition-transform duration-300 hover:scale-105 hover:bg-green-50"
+                <Link href="/portal/stillinger">
+                  Se ledige oppdrag
+                  <p className="text-sm text-gray-400">
+                    (Krever ikke innlogging)
+                  </p>
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-green-600 text-green-600 hover:bg-green-100 hover:text-green-700"
               >
-                Publiser oppdrag
-                <p className="text-sm text-gray-400">(Krever innlogging)</p>
-              </Link>
+                <Link href="/portal">
+                  Publiser oppdrag
+                  <p className="text-sm text-gray-400">(Krever innlogging)</p>
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -67,13 +79,13 @@ export default function Home() {
               Flittig er en ungdomsbedrift som forenkler hverdagen for de som
               trenger litt ekstra hjelp. Eldre eller travle familier kan ha
               utfordringer med alt fra husvask og hagearbeid til barnepass.
-              Samtidig finnes det unge som ønsker å tjene litt ekstra ved å bruke
-              sine ferdigheter og sin tilgjengelige tid.
+              Samtidig finnes det unge som ønsker å tjene litt ekstra ved å
+              bruke sine ferdigheter og sin tilgjengelige tid.
             </p>
             <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
-              Gjennom Flittig kan du enten legge ut oppdrag du vil ha utført, eller
-              finne småjobber som passer dine ønsker. Dette gjør det enkelt å koble
-              behov og ressurser i nærmiljøet, til alles fordel.
+              Gjennom Flittig kan du enten legge ut oppdrag du vil ha utført,
+              eller finne småjobber som passer dine ønsker. Dette gjør det
+              enkelt å koble behov og ressurser i nærmiljøet, til alles fordel.
             </p>
           </div>
         </section>
@@ -90,8 +102,8 @@ export default function Home() {
                   For oppdragsgivere
                 </h3>
                 <p className="leading-relaxed text-gray-700">
-                  Opprett en profil og legg ut en kort beskrivelse av oppdraget —
-                  når, hvor og hva som skal gjøres. Du får raskt oversikt over
+                  Opprett en profil og legg ut en kort beskrivelse av oppdraget
+                  — når, hvor og hva som skal gjøres. Du får raskt oversikt over
                   interesserte ungdommer, og dere blir enige om lønn og
                   tidsrammer.
                 </p>
@@ -102,9 +114,9 @@ export default function Home() {
                 </h3>
                 <p className="leading-relaxed text-gray-700">
                   Er du student eller ung voksen? Bla gjennom ledige stillinger
-                  uten å logge inn. Deretter kan du opprette en brukerkonto når du
-                  er klar for å sende en søknad. Slik tjener du litt ekstra og får
-                  verdifull erfaring.
+                  uten å logge inn. Deretter kan du opprette en brukerkonto når
+                  du er klar for å sende en søknad. Slik tjener du litt ekstra
+                  og får verdifull erfaring.
                 </p>
               </div>
             </div>
@@ -118,10 +130,10 @@ export default function Home() {
               Hvorfor velge Flittig?
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
-              Vi vektlegger trygghet, fleksibilitet og enkelhet — alt for å koble
-              behov og ressurser på en smidig måte. Hverken oppdragsgiver eller
-              arbeidstaker trenger å forholde seg til tunge prosesser eller skjulte
-              avgifter.
+              Vi vektlegger trygghet, fleksibilitet og enkelhet — alt for å
+              koble behov og ressurser på en smidig måte. Hverken oppdragsgiver
+              eller arbeidstaker trenger å forholde seg til tunge prosesser
+              eller skjulte avgifter.
             </p>
             <div className="mt-12 grid gap-6 md:grid-cols-3">
               <div className="rounded-lg bg-yellow-50 p-6 shadow-sm">
@@ -129,8 +141,8 @@ export default function Home() {
                   Nærmiljø-fokus
                 </h3>
                 <p className="leading-relaxed text-gray-700">
-                  Finn eller tilby hjelp i ditt eget område og bygg gode relasjoner
-                  på tvers av generasjoner.
+                  Finn eller tilby hjelp i ditt eget område og bygg gode
+                  relasjoner på tvers av generasjoner.
                 </p>
               </div>
               <div className="rounded-lg bg-yellow-50 p-6 shadow-sm">
@@ -162,10 +174,11 @@ export default function Home() {
               Vårt bidrag til lokalsamfunnet
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
-              Småjobber som husvask, flyttehjelp og barnepass knytter folk tettere
-              sammen. Flittig gir unge en trygg arena for å tjene litt ekstra og
-              utvikle seg, samtidig som flere får løst daglige utfordringer.
-              Kort sagt: alle vinner, og lokalsamfunnet blir litt bedre.
+              Småjobber som husvask, flyttehjelp og barnepass knytter folk
+              tettere sammen. Flittig gir unge en trygg arena for å tjene litt
+              ekstra og utvikle seg, samtidig som flere får løst daglige
+              utfordringer. Kort sagt: alle vinner, og lokalsamfunnet blir litt
+              bedre.
             </p>
             <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
               Lurer du på noe mer? Du kan lese mer om oss på
