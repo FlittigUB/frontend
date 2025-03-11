@@ -32,15 +32,7 @@ export default function Home() {
               En plattform som kobler ungdom med mennesker som trenger hjelp til
               småoppgaver—raskt, trygt og enkelt.
             </p>
-            <div className="flex flex-col items-center space-y-3 md:flex-row md:space-x-4 md:space-y-0">
-              <Button
-                asChild
-                variant="default"
-                size="lg"
-                className="bg-yellow-500 text-white hover:bg-yellow-600"
-              >
-                <Link href="/portal/registrer-deg">Bli flittig du også</Link>
-              </Button>
+            <div className="flex flex-col items-center justify-center space-y-3 md:flex-row md:space-x-4 md:space-y-0">
               <Button
                 asChild
                 variant="outline"
@@ -56,14 +48,11 @@ export default function Home() {
               </Button>
               <Button
                 asChild
-                variant="outline"
+                variant="default"
                 size="lg"
-                className="border-green-600 text-green-600 hover:bg-green-100 hover:text-green-700"
+                className="bg-yellow-500 text-white hover:bg-yellow-600"
               >
-                <Link href="/portal">
-                  Publiser oppdrag
-                  <p className="text-sm text-gray-400">(Krever innlogging)</p>
-                </Link>
+                <Link href="/portal/registrer-deg">Bli flittig du også</Link>
               </Button>
             </div>
           </div>
