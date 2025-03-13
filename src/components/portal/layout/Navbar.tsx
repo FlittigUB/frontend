@@ -14,9 +14,8 @@ import {
   HiOutlineX,
 } from 'react-icons/hi';
 import Image from 'next/image';
-import { ModeToggle } from '@/components/portal/theme/ModeToggle';
 import UserDropdown from '@/components/portal/ui/UserDropdown';
-import MobileUserDropdown from "@/components/portal/ui/MobileUserDropdown";
+import MobileUserDropdown from '@/components/portal/ui/MobileUserDropdown';
 
 interface NavbarProps {
   onOpenChat?: () => void;
@@ -107,7 +106,6 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
           </Link>
         </>
       )}
-      <ModeToggle />
     </>
   );
 
@@ -117,7 +115,7 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
         {/* Desktop Logo - hidden on mobile */}
         <Link
           href="/"
-          className="hidden md:flex relative flex-row text-2xl font-bold text-foreground transition-opacity hover:opacity-80"
+          className="relative hidden flex-row text-2xl font-bold text-foreground transition-opacity hover:opacity-80 md:flex"
         >
           <div className="relative aspect-[16/9] w-24">
             <Image
@@ -132,13 +130,15 @@ export default function Navbar({ onOpenChat }: NavbarProps) {
         {/* Desktop Navigation */}
         <nav className="ml-8 hidden w-full items-center md:flex">
           <div className="flex items-center space-x-6">{navLinksLeft}</div>
-          <div className="ml-auto flex items-center space-x-6">{navLinksRight}</div>
+          <div className="ml-auto flex items-center space-x-6">
+            {navLinksRight}
+          </div>
         </nav>
 
         {/* Mobile Burger Icon (only mobile) */}
         <button
           type="button"
-          className="flex md:hidden items-center justify-center rounded-md p-2 text-foreground transition-colors hover:bg-primary hover:text-foregroundDark"
+          className="flex items-center justify-center rounded-md p-2 text-foreground transition-colors hover:bg-primary hover:text-foregroundDark md:hidden"
           onClick={toggleMenu}
         >
           {menuOpen ? (

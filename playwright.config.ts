@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 
-// Load .env.local file
+// Load .env file
 dotenv.config();
 
 export default defineConfig({

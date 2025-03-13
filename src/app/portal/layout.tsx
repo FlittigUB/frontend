@@ -39,7 +39,7 @@ const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
       <StripeProvider>
         <DynamicThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
