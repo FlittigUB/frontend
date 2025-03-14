@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,12 +9,26 @@ import {
 import { Facebook, Instagram } from 'lucide-react';
 import Link from 'next/link';
 import NewsletterDialog from '@/components/portal/ui/NewsletterDialog';
+import axios from 'axios';
 
-function FooterSection() {
+interface Info {
+  id: string;
+  status: 'published' | 'draft' | 'archived';
+  content: string;
+  title: string;
+  description: string;
+}
+
+export const revalidate = 300;
+
+async function FooterSection() {
+  const infoLinks = (
+    await axios.get<Info[]>(`${process.env.NEXT_PUBLIC_API_URL}/info`)
+  ).data;
   return (
     <footer className="relative border-t bg-background text-foreground transition-colors duration-300">
       <div className="container mx-auto px-4 py-12 md:px-6 lg:px-8">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
           <div className="relative">
             <h2 className="mb-4 text-3xl font-bold tracking-tight">
               Hold deg oppdatert
@@ -50,6 +62,22 @@ function FooterSection() {
               >
                 Kontakt
               </Link>
+            </nav>
+          </div>
+          <div>
+            <h3 className="mb-4 text-lg font-semibold">Info</h3>
+            <nav className="space-y-2 text-sm">
+              {infoLinks
+                .filter((link) => link.status === 'published')
+                .map((link) => (
+                  <Link
+                    className="block transition-colors hover:text-primary"
+                    key={link.id}
+                    href={`/info/${link.id}`}
+                  >
+                    {link.title.split('|')[0]}
+                  </Link>
+                ))}
             </nav>
           </div>
           <div>

@@ -5,16 +5,16 @@ import { Info } from '@/common/types';
 import Logo from '@/components/common/Logo';
 import { Metadata } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 import NavbarLayout from '@/components/NavbarLayout';
 
-// Define the revalidation time in seconds (e.g., 60 seconds)
-export const revalidate = 60; // Revalidate every 60 seconds
+export const revalidate = 300; // Revalidate every 5 minutes
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-// Function to fetch the info data
+// Fetch the info data
 async function fetchInfo(slug: string): Promise<Info | null> {
   try {
     const response = await axios.get<Info>(
@@ -23,9 +23,8 @@ async function fetchInfo(slug: string): Promise<Info | null> {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
-
     return response.data;
   } catch (error: any) {
     console.error('Error fetching info:', error);
@@ -39,7 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!info) {
     return {
-      title: 'Informasjon ikke funnet | DittFirma',
+      title: 'Informasjon ikke funnet | Flittig UB',
       description: 'Denne informasjonen ble ikke funnet.',
     };
   }
@@ -59,9 +58,16 @@ const InfoPage = async ({ params }: PageProps) => {
 
   if (!info) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10 bg-gray-100">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6">
         <Logo />
-        <p className="mt-4 text-xl text-red-500">Informasjonen ble ikke funnet.</p>
+        <div className="mt-8 rounded bg-white p-8 text-center shadow-md">
+          <p className="mb-4 text-xl text-red-600">
+            Informasjonen ble ikke funnet.
+          </p>
+          <Link href="/" className="text-blue-600 hover:underline">
+            Gå tilbake til hjem
+          </Link>
+        </div>
       </div>
     );
   }
@@ -69,15 +75,27 @@ const InfoPage = async ({ params }: PageProps) => {
   return (
     <NavbarLayout>
       <Head>
-        <title className="mt-12">{info.title} | Flittig UB</title>
+        <title>{info.title} | Flittig UB</title>
         <meta name="description" content={`Les mer om ${info.title}`} />
       </Head>
-      <section className="container w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-background">
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <h1 className="text-4xl font-bold text-primary font-serif">{info.title}</h1>
-        </div>
-        <div className="prose max-w-3xl mx-auto w-full">
-          <div dangerouslySetInnerHTML={{ __html: info.content }} />
+      <section className="container mx-auto px-4 py-16">
+        <div className="mx-auto max-w-4xl rounded-lg bg-white p-10 shadow-lg">
+          <div className="mb-8 text-center">
+            <h1 className="text-5xl font-extrabold text-gray-800">
+              {info.title}
+            </h1>
+          </div>
+          <article className="prose max-w-none">
+            <div dangerouslySetInnerHTML={{ __html: info.content }} />
+          </article>
+          <div className="mt-12 text-center">
+            <Link
+              href="/"
+              className="inline-block rounded border border-blue-600 px-6 py-3 text-blue-600 transition hover:bg-blue-600 hover:text-white"
+            >
+              Tilbake til hjemmeside
+            </Link>
+          </div>
         </div>
       </section>
     </NavbarLayout>
