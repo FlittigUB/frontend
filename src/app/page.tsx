@@ -186,6 +186,7 @@ export default function Home() {
               </Link>
               .
             </p>
+
             {/* External link section for SEO */}
             <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-700">
               For mer informasjon om hvordan ungdomsbedrifter fungerer i Norge,
