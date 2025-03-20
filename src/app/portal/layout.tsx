@@ -15,8 +15,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-
-//import NotificationsList from "@/components/portal/ui/NotificationsList"; // Import for typing
+import { loadStripe } from '@stripe/stripe-js'; // <-- import Stripe SDK
+import axios from 'axios';
 
 interface PortalRouteLayoutProps {
   children: React.ReactNode;
@@ -33,7 +33,50 @@ const DynamicThemeProvider = dynamic<
 );
 
 const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
-  const { loggedIn, userRole, profileCompleted, user } = useAuth();
+  const { loggedIn, userRole, profileCompleted, user, token } = useAuth();
+
+  // Handler for employer identity verification
+  const handleEmployerVerification = async () => {
+    try {
+      // Create verification session by calling your API endpoint.
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/createVerificationSession?userId=${user?.id}`,
+        undefined,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      console.log(response.data);
+      // Adjust property name if your API returns client_secret or clientSecret.
+      const clientSecret = response.data;
+      console.log(clientSecret);
+      if (!clientSecret) {
+        console.error(
+          'No client secret returned from verification session API.',
+        );
+        return;
+      }
+      // Load Stripe using your publishable key.
+      const stripe = await loadStripe(
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+      );
+      if (!stripe) {
+        console.error('Stripe failed to load.');
+        return;
+      }
+      // Use the client secret to launch the verification flow.
+      // This example uses stripe.verifyIdentity(), which opens a modal.
+      const result = await stripe.verifyIdentity(clientSecret);
+      if (result.error) {
+        console.error(result.error.message);
+        // Optionally display an error alert to the user.
+      } else {
+        // Optionally handle successful verification completion.
+        console.log('Identity verification initiated or completed:', result);
+      }
+    } catch (error) {
+      console.error('Error during verification session creation:', error);
+    }
+  };
+
   return (
     <AuthProvider>
       <StripeProvider>
@@ -47,6 +90,7 @@ const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
             <NotificationsProvider>
               <GlobalChatProvider>
                 <PortalLayout>
+                  {/* Existing alert for arbeidstaker */}
                   {loggedIn &&
                     user &&
                     userRole === 'arbeidstaker' &&
@@ -80,6 +124,40 @@ const PortalRouteLayout: React.FC<PortalRouteLayoutProps> = ({ children }) => {
                         </div>
                       </Alert>
                     )}
+
+                  {/* New alert for arbeidsgiver: Show if user is not verified */}
+                  {loggedIn &&
+                    user &&
+                    userRole === 'arbeidsgiver' &&
+                    !user.verified && (
+                      <Alert className="flex items-center gap-2">
+                        {/* Use a suitable image for identity verification */}
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}722b612f-b083-4a34-bef7-4b884bbeb2dc.png`}
+                          alt={'Verifiser identitet'}
+                          width={75}
+                          height={75}
+                          className="shrink-0"
+                        />
+                        <div>
+                          <AlertTitle>
+                            Fullfør identitetsverifisering!
+                          </AlertTitle>
+                          <AlertDescription>
+                            For å fortsette må du verifisere din identitet.
+                            Klikk på knappen under for å starte prosessen.
+                          </AlertDescription>
+                          <Button
+                            onClick={handleEmployerVerification}
+                            variant="default"
+                            className="mt-4"
+                          >
+                            Verifiser identitet
+                          </Button>
+                        </div>
+                      </Alert>
+                    )}
+
                   {children}
                   {
                     //<NotificationsList/>
