@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import axios from 'axios';
-import { Job, Application } from '@/common/types';
+import { Application, Job } from '@/common/types';
 import { useAuthContext } from '@/context/AuthContext';
-import JobItem from "@/components/portal/job/JobItem";
+import JobItem from '@/components/portal/job/JobItem';
 
 const ArbeidstakerHomePage: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -18,14 +18,14 @@ const ArbeidstakerHomePage: React.FC = () => {
   useEffect(() => {
     const fetchFeaturedJobs = async () => {
       try {
-        const response = await axios.get<{data: Job[]}>(
+        const response = await axios.get<{ data: Job[] }>(
           `${process.env.NEXT_PUBLIC_API_URL}/job/all`,
         );
-        setJobs(response.data.data)
+        setJobs(response.data.data);
       } catch (error) {
         console.error('Error fetching jobs:', error);
       }
-    }
+    };
     fetchFeaturedJobs();
   }, []);
 
@@ -52,7 +52,9 @@ const ArbeidstakerHomePage: React.FC = () => {
   // -------------------------------------------
   // 1) Calculate STATS from "confirmed" apps
   // -------------------------------------------
-  const confirmedApps = applications.filter((app) => app.status === 'confirmed');
+  const confirmedApps = applications.filter(
+    (app) => app.status === 'confirmed',
+  );
 
   // 1a) Total confirmed jobs
   const totalConfirmedJobs = confirmedApps.length;
@@ -98,21 +100,43 @@ const ArbeidstakerHomePage: React.FC = () => {
   const upcomingJobs: Job[] = approvedFutureApps.map((app) => app.job);
 
   // -------------------------------------------
-  // 4) Show Tax Warning if close to 6000kr
+  // 4) Show Tax Warning if earnings from a single employer reach 6000kr+
   // -------------------------------------------
-  const totalEarnings = totalConfirmedPayment + totalPotentialPayment;
-  const showTaxWarning = !dismissedTaxWarning && totalEarnings >= 6000;
-  // Adjust the threshold as you see fit if you want
-  // "close to" 6000 rather than strictly >= 6000.
+  // Assuming each job has an "employerId" field to identify the payer
+  const earningsByEmployer = applications.reduce(
+    (acc, app) => {
+      // Only consider applications with statuses that contribute to earnings
+      if (
+        app.status === 'confirmed' ||
+        app.status === 'approved' ||
+        app.status === 'finished'
+      ) {
+        const employerId = app.job.user.id; // make sure this field exists in your Job type
+        let earning = 0;
+        if (app.job.payment_type === 'hourly') {
+          earning = app.job.rate * (app.job.hours_estimated || 0);
+        } else {
+          earning = app.job.rate;
+        }
+        acc[employerId] = (acc[employerId] || 0) + earning;
+      }
+      return acc;
+    },
+    {} as { [key: string]: number },
+  );
+
+  const showTaxWarning =
+    !dismissedTaxWarning &&
+    Object.values(earningsByEmployer).some((earning) => earning >= 6000);
 
   return (
     <div className="container mx-auto px-4 py-6">
-
       {/* — Tax Warning Banner — */}
       {showTaxWarning && (
         <div className="mb-4 flex items-center justify-between rounded border-2 border-red-500 bg-red-50 p-4 shadow-lg">
           <p className="text-red-700">
-            Du begynner å nærme deg 6000 kr i samlet inntjening. Husk å sjekke
+            Du begynner å nærme deg 6000 kr i samlet inntjening fra en enkelt
+            oppdragsgiver. Husk å sjekke
             <strong> Skatteetaten</strong> for eventuelle skatteplikter.
           </p>
           <button
@@ -139,7 +163,7 @@ const ArbeidstakerHomePage: React.FC = () => {
       <h1 className="mt-4 text-2xl font-bold">Velkommen til Flittig</h1>
       <p className="text-gray-600">Din personlige portal for småjobber</p>
       {/* Links to other pages */}
-      <div className="mt-6 flex flex-col items-start space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+      <div className="mt-6 flex flex-col items-start space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
         <Link
           href="/portal/stillinger"
           className="rounded bg-blue-500 px-4 py-2 text-white shadow hover:opacity-90"
@@ -172,12 +196,14 @@ const ArbeidstakerHomePage: React.FC = () => {
         )}
 
         <div className="mt-4">
-          <Link href="/portal/stillinger" className="text-blue-600 hover:underline">
+          <Link
+            href="/portal/stillinger"
+            className="text-blue-600 hover:underline"
+          >
             Se alle stillinger &rarr;
           </Link>
         </div>
       </div>
-
 
       {/* Explanation: Confirmed vs. Potential */}
       <div className="mt-6 rounded bg-blue-50 p-4 text-sm text-gray-700">
@@ -185,13 +211,13 @@ const ArbeidstakerHomePage: React.FC = () => {
           <strong>Om statistikken:</strong>
         </p>
         <p className="mb-1">
-          <strong>Bekreftet </strong> betyr at du har merket jobben
-          som ferdig, og arbeidsgiveren har godkjent. Betaling er dermed
-          garantert.
+          <strong>Bekreftet </strong> betyr at du har merket jobben som ferdig,
+          og arbeidsgiveren har godkjent. Betaling er dermed garantert.
         </p>
         <p className="mb-1">
-          <strong>Potensiell inntjening</strong> inkluderer jobber du har
-          fått godkjent eller merket som ferdig men som arbeidsgiver ennå ikke har bekreftet.
+          <strong>Potensiell inntjening</strong> inkluderer jobber du har fått
+          godkjent eller merket som ferdig men som arbeidsgiver ennå ikke har
+          bekreftet.
         </p>
       </div>
 
@@ -218,7 +244,9 @@ const ArbeidstakerHomePage: React.FC = () => {
           {/* Card 3: Inntjening bekreftet */}
           <div className="rounded bg-white p-4 shadow hover:shadow-md">
             <p className="text-gray-800">Inntjening bekreftet (kr)</p>
-            <p className="mt-1 text-2xl font-bold">{totalConfirmedPayment} kr</p>
+            <p className="mt-1 text-2xl font-bold">
+              {totalConfirmedPayment} kr
+            </p>
           </div>
 
           {/* Potential Earning Card */}
