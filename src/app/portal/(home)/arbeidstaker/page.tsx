@@ -112,7 +112,7 @@ const ArbeidstakerHomePage: React.FC = () => {
         app.status === 'finished'
       ) {
         const employerId = app.job.user.id; // make sure this field exists in your Job type
-        let earning = 0;
+        let earning;
         if (app.job.payment_type === 'hourly') {
           earning = app.job.rate * (app.job.hours_estimated || 0);
         } else {
