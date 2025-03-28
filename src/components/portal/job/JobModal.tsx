@@ -1,18 +1,18 @@
 // src/components/portal/job/JobModal.tsx
-"use client";
+'use client';
 
-import React, { useCallback, useState, useEffect } from "react";
-import { Category, JobFormData } from "@/common/types";
-import AddressSearch from "./AddressSearch";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Category, JobFormData } from '@/common/types';
+import AddressSearch from './AddressSearch';
 import {
   FaArrowRight,
-  FaMapMarkerAlt,
+  FaDollarSign,
   FaInfoCircle,
   FaList,
-  FaDollarSign,
-} from "react-icons/fa";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+  FaMapMarkerAlt,
+} from 'react-icons/fa';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import {
   Card,
   CardContent,
@@ -20,31 +20,31 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
+} from '@/components/ui/card';
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/popover';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Alert } from "@/components/ui/alert";
-import { Progress } from "@/components/ui/progress";
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Alert } from '@/components/ui/alert';
+import { Progress } from '@/components/ui/progress';
 
 // Import format from date-fns
-import { format } from "date-fns";
+import { format } from 'date-fns';
 // Import Norwegian locale from date-fns
-import { nb } from "date-fns/locale";
+import { nb } from 'date-fns/locale';
 
 interface JobModalProps {
   isOpen: boolean;
@@ -530,7 +530,6 @@ const JobModal: React.FC<JobModalProps> = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="fixed">Fast</SelectItem>
-                      <SelectItem value="hourly">Timebasert</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
