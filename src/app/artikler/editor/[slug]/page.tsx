@@ -7,15 +7,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import NavbarLayout from '@/components/NavbarLayout';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
+import VisualEditorInitializer from '@/components/VisualEditorInitializer';
 
-export const revalidate = 300; // Revalidate every 5 minutes
-
-// Dynamically import our client-side initializer (disabled for SSR)
-const VisualEditorInitializer = dynamic(
-  () => import('@/components/VisualEditorInitializer'),
-  { ssr: false },
-);
 
 interface PageProps {
   params: Promise<{ slug: string }>;
