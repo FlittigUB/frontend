@@ -1,19 +1,24 @@
 'use client';
 
 import { useEffect } from 'react';
+import { apply } from '@directus/visual-editing';
 
 const VisualEditorInitializer = () => {
   useEffect(() => {
-    // Ensure the global object from the Visual Editor library is available
-    if (window && (window as any).DirectusVisualEditor) {
-      (window as any).DirectusVisualEditor.init({
-        // Set your Directus instance URL (make sure NEXT_PUBLIC_DIRECTUS_URL is set in your env)
-        directusUrl: process.env.NEXT_PUBLIC_DIRECTUS_URL,
-        // Selector for editable elements
-        editableSelector: '[data-directus-editable]',
-        // You can add further configuration here per the library docs
+    // Initialize the Directus Visual Editing on the editable elements.
+    // Ensure NEXT_PUBLIC_DIRECTUS_URL is set in your environment variables.
+    apply({
+      directusUrl:
+        process.env.NEXT_PUBLIC_DIRECTUS_URL || 'http://localhost:8000',
+      editableSelector: '[data-directus-editable]',
+      // You can add additional options here (customClass, onSaved, etc.)
+    })
+      .then(() => {
+        console.log('Directus Visual Editing applied.');
+      })
+      .catch((err) => {
+        console.error('Error applying Directus Visual Editing:', err);
       });
-    }
   }, []);
 
   return null;

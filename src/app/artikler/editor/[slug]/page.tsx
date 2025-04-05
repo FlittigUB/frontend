@@ -1,4 +1,3 @@
-// Mark this file as a Server Component (default in Next.js App directory)
 import axios from 'axios';
 import { Article } from '@/common/types';
 import Logo from '@/components/common/Logo';
@@ -8,7 +7,6 @@ import Link from 'next/link';
 import NavbarLayout from '@/components/NavbarLayout';
 import Image from 'next/image';
 import VisualEditorInitializer from '@/components/VisualEditorInitializer';
-
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -100,8 +98,6 @@ const VisualEditorArticlePage = async ({ params }: PageProps) => {
     '@type': 'Article',
     headline: article.title,
     image: article.image ? [article.image] : undefined,
-    datePublished: article.date_created,
-    dateModified: article.date_updated,
     author: {
       '@type': 'Person',
       name: article.author || 'Unknown',
@@ -122,14 +118,9 @@ const VisualEditorArticlePage = async ({ params }: PageProps) => {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        {/* Load the Directus Visual Editor Frontend Library */}
-        <script
-          src="https://panel.flittigub.no/visual-editor.js"
-          async
-        ></script>
       </Head>
 
-      {/* Include our client-side initializer to boot the Visual Editor */}
+      {/* Initialize the Directus Visual Editor */}
       <VisualEditorInitializer />
 
       {/* Main container marked as editable */}
@@ -138,7 +129,6 @@ const VisualEditorArticlePage = async ({ params }: PageProps) => {
         data-directus-editable="true"
         data-directus-slug={slug}
       >
-        {/* Featured image with an editable marker */}
         {article.image && (
           <div
             className="relative h-72 w-full overflow-hidden md:h-96"
@@ -154,9 +144,7 @@ const VisualEditorArticlePage = async ({ params }: PageProps) => {
           </div>
         )}
 
-        {/* Main content container */}
         <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-          {/* Title & meta info with editable marker */}
           <div className="mb-8 text-center" data-directus-field="title">
             <h1 className="mb-2 font-serif text-3xl font-bold text-gray-900 md:text-5xl">
               {article.title}
@@ -171,7 +159,6 @@ const VisualEditorArticlePage = async ({ params }: PageProps) => {
             </p>
           </div>
 
-          {/* Article content marked as editable */}
           <article
             className="prose prose-lg prose-gray mx-auto max-w-none leading-relaxed"
             data-directus-field="content"
@@ -179,7 +166,6 @@ const VisualEditorArticlePage = async ({ params }: PageProps) => {
             <div dangerouslySetInnerHTML={{ __html: article.content }} />
           </article>
 
-          {/* Back link */}
           <div className="mt-12 text-center">
             <Link
               href="/"
