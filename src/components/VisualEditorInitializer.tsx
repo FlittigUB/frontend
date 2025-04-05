@@ -5,13 +5,16 @@ import { apply } from '@directus/visual-editing';
 
 const VisualEditorInitializer = () => {
   useEffect(() => {
-    // Initialize the Directus Visual Editing on the editable elements.
-    // Ensure NEXT_PUBLIC_DIRECTUS_URL is set in your environment variables.
+    // Select all elements with the data-directus-editable attribute
+    const editableElements = Array.from(
+      document.querySelectorAll('[data-directus-editable]'),
+    ) as HTMLElement[];
+
     apply({
       directusUrl:
         process.env.NEXT_PUBLIC_DIRECTUS_URL || 'http://localhost:8000',
-      editableSelector: '[data-directus-editable]',
-      // You can add additional options here (customClass, onSaved, etc.)
+      elements: editableElements,
+      // Additional options (e.g. customClass, onSaved) can be added here
     })
       .then(() => {
         console.log('Directus Visual Editing applied.');
