@@ -84,7 +84,7 @@ async function FooterSection() {
             <h3 className="mb-4 text-lg font-semibold">Kontakt oss</h3>
             <address className="space-y-2 text-sm not-italic">
               <p>Jegersbergveien 1</p>
-              <p>Kristiansand, 4639</p>
+              <p>Kristiansand, 4630</p>
               <Link href={'mailto:kontakt@flittigub.no'}>
                 Email: kontakt@flittigub.no
               </Link>
