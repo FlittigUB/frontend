@@ -105,14 +105,12 @@ export default async function StillingerPage({ searchParams }: StillingerPagePro
     <div className="mx-auto max-w-4xl px-4 py-6">
       <h1 className="my-4 text-3xl font-bold">Tilgjengelige jobber</h1>
       <p className="mb-6">Her kan du se tilgjengelige jobber nær deg.</p>
-      {/* TODO Fix map
       <Link
         className="bg-green-500 hover:bg-green-600 mb-4 inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow transition-colors focus:outline-none focus:ring-2"
         href={'/portal/stillinger/kart'}
       >
         Se på kart
       </Link>
-      */}
 
       {/*
         SearchClient is a small client component that:
